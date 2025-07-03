@@ -23,8 +23,16 @@ FROM registry.access.redhat.com/ubi9/openjdk-17:1.21 AS builder
 
 USER root
 
-# Install Maven
-RUN microdnf install -y maven && microdnf clean all
+# Install Maven manually since it's not available in UBI9 repos
+RUN microdnf install -y tar gzip wget && \
+    wget -O- https://archive.apache.org/dist/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.tar.gz | tar xzf - -C /opt && \
+    ln -s /opt/apache-maven-3.9.6 /opt/maven && \
+    rm -f /usr/bin/mvn && \
+    ln -s /opt/maven/bin/mvn /usr/bin/mvn && \
+    microdnf clean all
+
+ENV MAVEN_HOME=/opt/maven
+ENV PATH="${MAVEN_HOME}/bin:${PATH}"
 
 # Set working directory
 WORKDIR /workspace
@@ -32,12 +40,14 @@ WORKDIR /workspace
 # Copy Maven configuration and source code
 COPY pom.xml .
 COPY src ./src
+COPY checkstyle.xml .
+COPY checkstyle-suppressions.xml .
 
 # Download dependencies (separate layer for caching)
 RUN mvn dependency:go-offline -B
 
-# Build the application
-RUN mvn clean package -DskipTests
+# Build the application without container image build
+RUN mvn clean package -DskipTests -Dquarkus.container-image.build=false
 
 # Runtime stage
 FROM registry.access.redhat.com/ubi9/openjdk-17:1.21
