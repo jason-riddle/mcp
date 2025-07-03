@@ -36,5 +36,6 @@ pyproject.toml
 release.properties
 settings.json
 settings.local.json
+staging
 target
 test-memory.jsonl
