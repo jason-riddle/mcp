@@ -36,3 +36,4 @@ release.properties
 settings.json
 settings.local.json
 target
+test-memory.jsonl
