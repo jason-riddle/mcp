@@ -26,7 +26,7 @@ This project follows **Palantir Java Format** with enhanced Checkstyle rules bas
 - **Interface types:** Must use `List`, `Set`, `Map` instead of concrete implementations in APIs
 - **No System.out/err:** Must use proper logging instead of console output
 - **No object instantiation in method calls:** Extract object creation to separate variables for debugging
-- **Forbidden imports:** Bans dangerous packages (sun.*, junit.framework.*, etc.)
+- **Forbidden imports:** Bans dangerous packages (sun.*, junit.framework.*, etc. )
 
 ### Javadoc Standards
 

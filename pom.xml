@@ -4,9 +4,9 @@
 
     <!-- Project Information -->
     <groupId>com.jasonriddle.api</groupId>
-    <artifactId>api-bridge-server</artifactId>
+    <artifactId>jasons-mcp-server</artifactId>
     <version>0.0.6-SNAPSHOT</version>
-    <name>API Bridge Server</name>
+    <name>Jasons MCP Server</name>
     <description>A Model Context Protocol (MCP) server with memory graph capabilities</description>
 
     <!-- SCM Information -->
@@ -48,7 +48,7 @@
 
         <!-- Container & Test Configuration -->
         <quarkus.container-image.group>com.jasonriddle.api</quarkus.container-image.group>
-        <quarkus.container-image.name>api-bridge-server</quarkus.container-image.name>
+        <quarkus.container-image.name>jasons-mcp-server</quarkus.container-image.name>
         <skipITs>true</skipITs>
     </properties>
 
