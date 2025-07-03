@@ -45,16 +45,26 @@ public final class UpdateReadme {
     /**
      * Main entry point for the documentation generator.
      *
-     * @param args command line arguments (unused).
+     * @param args command line arguments. Use --json for JSON output.
      */
     public static void main(final String[] args) {
         try {
-            System.out.println("Parsing MCP tools and resources from compiled classes...");
+            final boolean jsonOutput = args.length > 0 && "--json".equals(args[0]);
+
+            if (jsonOutput) {
+                System.err.println("Parsing MCP tools and resources from compiled classes...");
+            } else {
+                System.out.println("Parsing MCP tools and resources from compiled classes...");
+            }
 
             final UpdateReadme generator = new UpdateReadme();
-            final boolean success = generator.updateReadme();
 
-            System.exit(success ? 0 : 1);
+            if (jsonOutput) {
+                generator.outputJson();
+            } else {
+                final boolean success = generator.updateReadme();
+                System.exit(success ? 0 : 1);
+            }
         } catch (final Exception e) {
             System.err.println("ERROR: " + e.getMessage());
             e.printStackTrace();
@@ -93,6 +103,53 @@ public final class UpdateReadme {
         Files.writeString(README_PATH, content);
         System.out.println("README.md updated successfully");
         return true;
+    }
+
+    /**
+     * Outputs tools and resources as JSON to stdout.
+     *
+     * @throws Exception if an error occurs during processing.
+     */
+    public void outputJson() throws Exception {
+        if (!Files.exists(TARGET_CLASSES)) {
+            System.err.println("ERROR: Compiled classes not found. Run 'make build' first.");
+            System.exit(1);
+        }
+
+        // Load classes and extract tools/resources
+        final List<ToolInfo> tools = extractTools();
+        final List<ResourceInfo> resources = extractResources();
+
+        System.err.println("Found " + tools.size() + " tools and " + resources.size() + " resources");
+
+        // Output JSON
+        final StringBuilder json = new StringBuilder();
+        json.append("{\n");
+        json.append("  \"tools\": [\n");
+
+        for (int i = 0; i < tools.size(); i++) {
+            json.append(toJson(tools.get(i), "    "));
+            if (i < tools.size() - 1) {
+                json.append(",");
+            }
+            json.append("\n");
+        }
+
+        json.append("  ],\n");
+        json.append("  \"resources\": [\n");
+
+        for (int i = 0; i < resources.size(); i++) {
+            json.append(toJson(resources.get(i), "    "));
+            if (i < resources.size() - 1) {
+                json.append(",");
+            }
+            json.append("\n");
+        }
+
+        json.append("  ]\n");
+        json.append("}");
+
+        System.out.println(json.toString());
     }
 
     /**
@@ -468,6 +525,78 @@ public final class UpdateReadme {
         content.append("  - Title: ").append(resource.title).append("\n");
         content.append("  - Description: ").append(resource.description).append("\n\n");
         return content.toString();
+    }
+
+    /**
+     * Converts a ToolInfo object to JSON string.
+     *
+     * @param tool the tool to convert.
+     * @param indent the indentation to use.
+     * @return JSON string representation.
+     */
+    private String toJson(final ToolInfo tool, final String indent) {
+        final StringBuilder json = new StringBuilder();
+        json.append(indent).append("{\n");
+        json.append(indent).append("  \"name\": \"").append(escapeJson(tool.name)).append("\",\n");
+        json.append(indent).append("  \"title\": \"").append(escapeJson(tool.title)).append("\",\n");
+        json.append(indent).append("  \"description\": \"").append(escapeJson(tool.description)).append("\",\n");
+        json.append(indent).append("  \"method_name\": \"").append(escapeJson(tool.methodName)).append("\",\n");
+        json.append(indent).append("  \"return_type\": \"").append(escapeJson(tool.returnType)).append("\",\n");
+        json.append(indent).append("  \"parameters\": [\n");
+
+        for (int i = 0; i < tool.parameters.size(); i++) {
+            final ParameterInfo param = tool.parameters.get(i);
+            json.append(indent).append("    {\n");
+            json.append(indent).append("      \"name\": \"").append(escapeJson(param.name)).append("\",\n");
+            json.append(indent).append("      \"type\": \"").append(escapeJson(param.type)).append("\",\n");
+            json.append(indent).append("      \"description\": \"").append(escapeJson(param.description)).append("\",\n");
+            json.append(indent).append("      \"required\": ").append(param.required).append("\n");
+            json.append(indent).append("    }");
+            if (i < tool.parameters.size() - 1) {
+                json.append(",");
+            }
+            json.append("\n");
+        }
+
+        json.append(indent).append("  ],\n");
+        json.append(indent).append("  \"read_only\": ").append(tool.readOnly).append("\n");
+        json.append(indent).append("}");
+        return json.toString();
+    }
+
+    /**
+     * Converts a ResourceInfo object to JSON string.
+     *
+     * @param resource the resource to convert.
+     * @param indent the indentation to use.
+     * @return JSON string representation.
+     */
+    private String toJson(final ResourceInfo resource, final String indent) {
+        final StringBuilder json = new StringBuilder();
+        json.append(indent).append("{\n");
+        json.append(indent).append("  \"uri\": \"").append(escapeJson(resource.uri)).append("\",\n");
+        json.append(indent).append("  \"method_name\": \"").append(escapeJson(resource.methodName)).append("\",\n");
+        json.append(indent).append("  \"title\": \"").append(escapeJson(resource.title)).append("\",\n");
+        json.append(indent).append("  \"description\": \"").append(escapeJson(resource.description)).append("\"\n");
+        json.append(indent).append("}");
+        return json.toString();
+    }
+
+    /**
+     * Escapes JSON special characters.
+     *
+     * @param text the text to escape.
+     * @return escaped text.
+     */
+    private String escapeJson(final String text) {
+        if (text == null) {
+            return "";
+        }
+        return text.replace("\\", "\\\\")
+                   .replace("\"", "\\\"")
+                   .replace("\n", "\\n")
+                   .replace("\r", "\\r")
+                   .replace("\t", "\\t");
     }
 
     /**
