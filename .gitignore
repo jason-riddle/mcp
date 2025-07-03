@@ -41,3 +41,9 @@ settings.local.json
 staging
 target
 test-memory.jsonl
+
+
+*.txt
+*.after*
+*.before*
+*.comp*
