@@ -28,30 +28,6 @@ This project follows **Palantir Java Format** with enhanced Checkstyle rules bas
 - **No object instantiation in method calls:** Extract object creation to separate variables for debugging
 - **Forbidden imports:** Bans dangerous packages (sun.*, junit.framework.*, etc.)
 
-#### Style Suppressions
-Test files have relaxed rules for:
-- Magic numbers and string literals (following Palantir test patterns)
-- Visibility modifiers (public fields allowed in tests)
-- Static imports (Mockito, AssertJ imports allowed)
-- System.out/err usage (debugging in tests)
-- Line length for Application files
-- Visibility modifiers for DTO/Request/Response classes
-- Empty record braces formatting (Spotless vs Checkstyle conflict)
-
-**Palantir Java Format vs Checkstyle Conflicts:**
-- Method chaining patterns created by Palantir Java Format may exceed 120-character line limits
-- `checkstyle-suppressions.xml` includes LineLength suppressions for affected files:
-  - `McpMemoryResources.java` - Method chaining in string building operations
-  - `McpMemoryPrompts.java` - Long text content and method concatenation
-- These suppressions maintain strict line length rules elsewhere while allowing Palantir's formatting preferences
-
-### Package Structure
-- `com.jasonriddle.api` - Main API package containing API endpoints and resources (ApiEndpoints, ApiMemoryEndpoints, McpMemoryTools, McpMemoryResources, McpMemoryPrompts)
-  - `memory/` - Memory graph data models and services (Entity, Relation, MemoryGraph, MemoryService)
-  - `response/` - JSON response models (records for type-safe serialization)
-- All response classes use Java records for immutable, type-safe data transfer
-- Jackson automatically handles JSON serialization without manual string building
-
 ### Javadoc Standards
 
 This project follows strict javadoc standards for all Java files:

@@ -1,6 +1,5 @@
 { pkgs, ... }:
 {
-  # Environment configuration for Java 17 Quarkus API development
   # https://devenv.sh/integrations/dotenv/
   dotenv.enable = true;
   dotenv.filename = [
@@ -8,7 +7,6 @@
     ".env.local"
   ];
 
-  # Java 17 development environment
   # https://devenv.sh/languages/
   languages.java = {
     enable = true;
@@ -19,13 +17,11 @@
     };
   };
 
-  # Development packages for Java API development
   # https://devenv.sh/packages/
   packages = with pkgs; [
     flyctl
   ];
 
-  # Comprehensive git hooks for Java development
   # https://devenv.sh/git-hooks/
   # Organized by speed: fast checks first, slower ones last
   git-hooks.hooks = {
@@ -138,7 +134,7 @@
 
   # Development shell setup
   enterShell = ''
-    echo "🚀 Java Quarkus Development Environment"
+    echo "🚀 Java Development Environment"
     echo "📦 Java: $(java -version 2>&1 | tail -n1)"
     echo "📦 Maven: $(mvn -version | head -n1)"
     echo ""

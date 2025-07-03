@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE suppressions PUBLIC
+        "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+        "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+
+<suppressions>
+    <!-- Suppress certain checks for test files (Palantir pattern) -->
+    <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="MagicNumber"/>
+    <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="MultipleStringLiterals"/>
+    <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="VisibilityModifier"/>
+    <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="AvoidStaticImport"/>
+    <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="RegexpSinglelineJava"/>
+
+    <!-- Suppress AbbreviationAsWordInName for integration tests (IT suffix is standard) -->
+    <suppress files=".*IT\.java" checks="AbbreviationAsWordInName"/>
+
+    <!-- Suppress line length for generated files -->
+    <suppress checks="LineLength" files=".*Application\.java"/>
+
+    <!-- Allow public fields in DTOs/data classes -->
+    <suppress checks="VisibilityModifier" files=".*DTO\.java"/>
+    <suppress checks="VisibilityModifier" files=".*Request\.java"/>
+    <suppress checks="VisibilityModifier" files=".*/response/.*\.java|.*Response\.java"/>
+
+    <!-- Allow empty record bodies (conflict with Spotless formatting) -->
+    <suppress checks="WhitespaceAround" files=".*/response/.*\.java|.*Response\.java"/>
+
+    <!-- Allow longer lines for method chaining patterns (conflict with Palantir Java Format) -->
+    <suppress checks="LineLength" files=".*McpMemoryResources\.java"/>
+    <suppress checks="LineLength" files=".*McpMemoryPrompts\.java"/>
+</suppressions>
