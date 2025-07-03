@@ -4,6 +4,10 @@
  * Licensed under the MIT License.
  */
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import io.quarkiverse.mcp.server.Resource;
 import io.quarkiverse.mcp.server.Tool;
 import io.quarkiverse.mcp.server.ToolArg;
@@ -37,6 +41,10 @@ public final class UpdateReadme {
     private static final Path PROJECT_ROOT = Paths.get(System.getProperty("user.dir"));
     private static final Path TARGET_CLASSES = PROJECT_ROOT.resolve("target").resolve("classes");
     private static final Path README_PATH = PROJECT_ROOT.resolve("README.md");
+
+    // Jackson ObjectMapper instance for JSON processing (thread-safe and reusable)
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
+        .enable(SerializationFeature.INDENT_OUTPUT);
 
     private UpdateReadme() {
         // Utility class
@@ -122,34 +130,20 @@ public final class UpdateReadme {
 
         System.err.println("Found " + tools.size() + " tools and " + resources.size() + " resources");
 
-        // Output JSON
-        final StringBuilder json = new StringBuilder();
-        json.append("{\n");
-        json.append("  \"tools\": [\n");
+        // Create output object using Jackson
+        final var output = Map.of(
+            "tools", tools,
+            "resources", resources
+        );
 
-        for (int i = 0; i < tools.size(); i++) {
-            json.append(toJson(tools.get(i), "    "));
-            if (i < tools.size() - 1) {
-                json.append(",");
-            }
-            json.append("\n");
+        // Convert to JSON and output
+        try {
+            final String json = OBJECT_MAPPER.writeValueAsString(output);
+            System.out.println(json);
+        } catch (final JsonProcessingException e) {
+            System.err.println("ERROR: Failed to generate JSON output: " + e.getMessage());
+            throw e;
         }
-
-        json.append("  ],\n");
-        json.append("  \"resources\": [\n");
-
-        for (int i = 0; i < resources.size(); i++) {
-            json.append(toJson(resources.get(i), "    "));
-            if (i < resources.size() - 1) {
-                json.append(",");
-            }
-            json.append("\n");
-        }
-
-        json.append("  ]\n");
-        json.append("}");
-
-        System.out.println(json.toString());
     }
 
     /**
@@ -555,108 +549,64 @@ public final class UpdateReadme {
         return content.toString();
     }
 
-    /**
-     * Converts a ToolInfo object to JSON string.
-     *
-     * @param tool the tool to convert.
-     * @param indent the indentation to use.
-     * @return JSON string representation.
-     */
-    private String toJson(final ToolInfo tool, final String indent) {
-        final StringBuilder json = new StringBuilder();
-        json.append(indent).append("{\n");
-        json.append(indent).append("  \"name\": \"").append(escapeJson(tool.name)).append("\",\n");
-        json.append(indent).append("  \"title\": \"").append(escapeJson(tool.title)).append("\",\n");
-        json.append(indent).append("  \"description\": \"").append(escapeJson(tool.description)).append("\",\n");
-        json.append(indent).append("  \"method_name\": \"").append(escapeJson(tool.methodName)).append("\",\n");
-        json.append(indent).append("  \"return_type\": \"").append(escapeJson(tool.returnType)).append("\",\n");
-        json.append(indent).append("  \"parameters\": [\n");
-
-        for (int i = 0; i < tool.parameters.size(); i++) {
-            final ParameterInfo param = tool.parameters.get(i);
-            json.append(indent).append("    {\n");
-            json.append(indent).append("      \"name\": \"").append(escapeJson(param.name)).append("\",\n");
-            json.append(indent).append("      \"type\": \"").append(escapeJson(param.type)).append("\",\n");
-            json.append(indent).append("      \"description\": \"").append(escapeJson(param.description)).append("\",\n");
-            json.append(indent).append("      \"required\": ").append(param.required).append("\n");
-            json.append(indent).append("    }");
-            if (i < tool.parameters.size() - 1) {
-                json.append(",");
-            }
-            json.append("\n");
-        }
-
-        json.append(indent).append("  ],\n");
-        json.append(indent).append("  \"read_only\": ").append(tool.readOnly).append("\n");
-        json.append(indent).append("}");
-        return json.toString();
-    }
-
-    /**
-     * Converts a ResourceInfo object to JSON string.
-     *
-     * @param resource the resource to convert.
-     * @param indent the indentation to use.
-     * @return JSON string representation.
-     */
-    private String toJson(final ResourceInfo resource, final String indent) {
-        final StringBuilder json = new StringBuilder();
-        json.append(indent).append("{\n");
-        json.append(indent).append("  \"uri\": \"").append(escapeJson(resource.uri)).append("\",\n");
-        json.append(indent).append("  \"method_name\": \"").append(escapeJson(resource.methodName)).append("\",\n");
-        json.append(indent).append("  \"title\": \"").append(escapeJson(resource.title)).append("\",\n");
-        json.append(indent).append("  \"description\": \"").append(escapeJson(resource.description)).append("\"\n");
-        json.append(indent).append("}");
-        return json.toString();
-    }
-
-    /**
-     * Escapes JSON special characters.
-     *
-     * @param text the text to escape.
-     * @return escaped text.
-     */
-    private String escapeJson(final String text) {
-        if (text == null) {
-            return "";
-        }
-        return text.replace("\\", "\\\\")
-                   .replace("\"", "\\\"")
-                   .replace("\n", "\\n")
-                   .replace("\r", "\\r")
-                   .replace("\t", "\\t");
-    }
 
     /**
      * Data class for tool information.
      */
     private static final class ToolInfo {
-        String name;
-        String title;
-        String description;
-        String methodName;
-        String returnType;
-        List<ParameterInfo> parameters = new ArrayList<>();
-        boolean readOnly;
+        @JsonProperty("name")
+        public String name;
+
+        @JsonProperty("title")
+        public String title;
+
+        @JsonProperty("description")
+        public String description;
+
+        @JsonProperty("method_name")
+        public String methodName;
+
+        @JsonProperty("return_type")
+        public String returnType;
+
+        @JsonProperty("parameters")
+        public List<ParameterInfo> parameters = new ArrayList<>();
+
+        @JsonProperty("read_only")
+        public boolean readOnly;
     }
 
     /**
      * Data class for parameter information.
      */
     private static final class ParameterInfo {
-        String name;
-        String type;
-        String description;
-        boolean required;
+        @JsonProperty("name")
+        public String name;
+
+        @JsonProperty("type")
+        public String type;
+
+        @JsonProperty("description")
+        public String description;
+
+        @JsonProperty("required")
+        public boolean required;
     }
 
     /**
      * Data class for resource information.
      */
     private static final class ResourceInfo {
-        String uri;
-        String methodName;
-        String title;
-        String description;
+        @JsonProperty("uri")
+        public String uri;
+
+        @JsonProperty("method_name")
+        public String methodName;
+
+        @JsonProperty("title")
+        public String title;
+
+        @JsonProperty("description")
+        public String description;
     }
 }
