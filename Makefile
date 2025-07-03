@@ -59,6 +59,8 @@ help:
 clean:
 	@echo "Cleaning build artifacts..."
 	@$(MVN) clean -q
+	@echo "Cleaning compiled class files..."
+	@find . -name "*.class" -type f -delete
 	@echo "✓ Clean complete"
 
 ## Build the project
