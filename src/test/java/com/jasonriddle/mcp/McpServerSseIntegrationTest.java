@@ -205,7 +205,8 @@ final class McpServerSseIntegrationTest {
         }
     }
 
-    // TODO: Future tool testing when tools are implemented
+    // Future tool testing will be implemented when MCP tools are added to the server.
+    // These tests will verify tools/list and tools/call operations for memory management.
     /*
     @Test
     @Order(6)
@@ -234,7 +235,8 @@ final class McpServerSseIntegrationTest {
     }
     */
 
-    // TODO: Future resource testing when resources are implemented
+    // Future resource testing will be implemented when MCP resources are added to the server.
+    // These tests will verify resources/list and resources/read operations for memory graph data.
     /*
     @Test
     @Order(9)
