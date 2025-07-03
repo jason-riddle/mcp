@@ -213,8 +213,8 @@ class StagedDocumentationGenerator:
         import re
 
         # Find @ToolArg annotations followed by parameter declarations
-        # This pattern handles multi-line parameter declarations
-        toolarg_pattern = r'@ToolArg\(description\s*=\s*"([^"]+)"\)\s*final\s+([^@]+?)(\w+)(?=\s*[,)])'
+        # This pattern handles multi-line parameter declarations and whitespace
+        toolarg_pattern = r'@ToolArg\(description\s*=\s*"([^"]+)"\)\s+final\s+([^)]+?)\s+(\w+)\s*(?=[,)])'
 
         for match in re.finditer(toolarg_pattern, method_section, re.MULTILINE | re.DOTALL):
             description = match.group(1)
