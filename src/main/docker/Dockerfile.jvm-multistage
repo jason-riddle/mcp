@@ -1,0 +1,58 @@
+####
+# Multi-stage Dockerfile that builds the Quarkus application in JVM mode
+#
+# This Dockerfile performs the full build process inside the container:
+# 1. Build stage: Compiles and packages the application using Maven
+# 2. Runtime stage: Runs the application using the optimized JVM runtime
+#
+# Build the image with:
+#
+# docker build -f src/main/docker/Dockerfile.jvm-multistage -t quarkus/jasons-mcp-server-jvm-multistage .
+#
+# Run the container using:
+#
+# docker run -i --rm -p 8080:8080 quarkus/jasons-mcp-server-jvm-multistage
+#
+# For debug mode, expose port 5005 and set environment variables:
+# docker run -i --rm -p 8080:8080 -p 5005:5005 -e JAVA_DEBUG=true -e JAVA_DEBUG_PORT=*:5005 quarkus/jasons-mcp-server-jvm-multistage
+#
+###
+
+# Build stage
+FROM registry.access.redhat.com/ubi9/openjdk-17:1.21 AS builder
+
+USER root
+
+# Install Maven
+RUN microdnf install -y maven && microdnf clean all
+
+# Set working directory
+WORKDIR /workspace
+
+# Copy Maven configuration and source code
+COPY pom.xml .
+COPY src ./src
+
+# Download dependencies (separate layer for caching)
+RUN mvn dependency:go-offline -B
+
+# Build the application
+RUN mvn clean package -DskipTests
+
+# Runtime stage
+FROM registry.access.redhat.com/ubi9/openjdk-17:1.21
+
+ENV LANGUAGE='en_US:en'
+
+# We make four distinct layers so if there are application changes the library layers can be re-used
+COPY --from=builder --chown=185 /workspace/target/quarkus-app/lib/ /deployments/lib/
+COPY --from=builder --chown=185 /workspace/target/quarkus-app/*.jar /deployments/
+COPY --from=builder --chown=185 /workspace/target/quarkus-app/app/ /deployments/app/
+COPY --from=builder --chown=185 /workspace/target/quarkus-app/quarkus/ /deployments/quarkus/
+
+EXPOSE 8080
+USER 185
+ENV JAVA_OPTS_APPEND="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
+ENV JAVA_APP_JAR="/deployments/quarkus-run.jar"
+
+ENTRYPOINT [ "/opt/jboss/container/java/run/run-java.sh" ]
