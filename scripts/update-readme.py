@@ -357,14 +357,35 @@ class ReadmeUpdater:
 
 def main():
     """Main entry point"""
+    import argparse
+    import json
+
+    parser = argparse.ArgumentParser(description='Update README with MCP tools and resources documentation')
+    parser.add_argument('--json', action='store_true', help='Output JSON instead of updating README')
+    args = parser.parse_args()
+
     script_dir = Path(__file__).parent
     project_root = script_dir.parent
 
     updater = ReadmeUpdater(project_root)
 
     try:
-        success = updater.update_readme()
-        sys.exit(0 if success else 1)
+        if args.json:
+            # Output JSON data
+            tools = updater.parser.parse_tools()
+            resources = updater.parser.parse_resources()
+
+            output = {
+                'tools': tools,
+                'resources': resources
+            }
+
+            print(json.dumps(output, indent=2))
+            sys.exit(0)
+        else:
+            # Update README
+            success = updater.update_readme()
+            sys.exit(0 if success else 1)
     except Exception as e:
         print(f"ERROR: {e}")
         sys.exit(1)
