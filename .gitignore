@@ -2,6 +2,7 @@
 *.db
 *.jar
 *.log*
+*.pyc
 *.sqlite
 *.tmp
 .DS_Store
@@ -22,6 +23,7 @@ AIDER.md
 CLAUDE.local.md
 CONVENTIONS.md
 GEMINI.md
+__pycache__
 go.mod
 instructions.md
 mcp.json
