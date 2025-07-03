@@ -1,4 +1,4 @@
 /**
- * TODO: CLAUDE PLEASE FILL
+ * Memory graph implementation for the MCP server.
  */
 package com.jasonriddle.mcp.memory;
