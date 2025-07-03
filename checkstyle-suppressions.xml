@@ -11,8 +11,9 @@
     <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="AvoidStaticImport"/>
     <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="RegexpSinglelineJava"/>
 
-    <!-- Suppress AbbreviationAsWordInName for integration tests (IT suffix is standard) -->
+    <!-- Suppress AbbreviationAsWordInName for integration tests (IT suffix and IntegrationTest suffix are standard) -->
     <suppress files=".*IT\.java" checks="AbbreviationAsWordInName"/>
+    <suppress files=".*IntegrationTest\.java" checks="AbbreviationAsWordInName"/>
 
     <!-- Suppress line length for generated files -->
     <suppress checks="LineLength" files=".*Application\.java"/>
