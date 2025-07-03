@@ -100,7 +100,7 @@ The server provides MCP tools for memory graph operations:
   - Title: Create Entities
   - Description: Create multiple new entities in the knowledge graph
   - Parameters:
-    - `String` (list<map<): Array of entities with name, entityType, and observations
+    - `entities` (array): Array of entities with name, entityType, and observations
   - Read-only: **false**
 
 <!-- NOTE: This has been generated via update-docs.py --->
@@ -123,7 +123,7 @@ The server provides MCP tools for memory graph operations:
   - Title: Create Relations
   - Description: Create multiple new relations between entities
   - Parameters:
-    - `String` (list<map<): Array of relations with from, to, and relationType
+    - `relations` (array): Array of relations with from, to, and relationType
   - Read-only: **false**
 
 <!-- NOTE: This has been generated via update-docs.py --->
@@ -132,7 +132,7 @@ The server provides MCP tools for memory graph operations:
   - Title: Delete Relations
   - Description: Remove specific relations from the knowledge graph
   - Parameters:
-    - `String` (list<map<): Array of relations with from, to, and relationType
+    - `relations` (array): Array of relations with from, to, and relationType
   - Read-only: **false**
 
 </details>
@@ -146,7 +146,7 @@ The server provides MCP tools for memory graph operations:
   - Title: Add Observations
   - Description: Add new observations to existing entities
   - Parameters:
-    - `String` (list<map<): Array of objects with entityName and contents
+    - `observations` (array): Array of objects with entityName and contents
   - Read-only: **false**
 
 <!-- NOTE: This has been generated via update-docs.py --->
@@ -155,7 +155,7 @@ The server provides MCP tools for memory graph operations:
   - Title: Delete Observations
   - Description: Remove specific observations from entities
   - Parameters:
-    - `String` (list<map<): Array of objects with entityName and observations to delete
+    - `deletions` (array): Array of objects with entityName and observations to delete
   - Read-only: **false**
 
 </details>
