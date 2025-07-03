@@ -1,5 +1,5 @@
 # Modern Makefile best practices
-.PHONY: help clean build dev run format checkstyle test test-watch test-integration docker-build docker-run docker-clean update-readme update-readme-java
+.PHONY: help clean build dev run format checkstyle test test-watch test-integration docker-build docker-run docker-clean update-readme update-readme-java update-readme-combined
 .DELETE_ON_ERROR:
 .ONESHELL:
 
@@ -51,8 +51,9 @@ help:
 	@echo "  docker-clean - Remove Docker images"
 	@echo ""
 	@echo "Documentation:"
-	@echo "  update-readme      - Update README.md with generated tool documentation (Python)"
-	@echo "  update-readme-java - Update README.md with generated tool documentation (Java)"
+	@echo "  update-readme          - Update README.md with generated tool documentation (Python)"
+	@echo "  update-readme-java     - Update README.md with generated tool documentation (Java)"
+	@echo "  update-readme-combined - Update README.md combining strengths of both approaches"
 
 ## Clean build artifacts
 clean:
@@ -167,6 +168,12 @@ update-readme-java: $(JAR_FILE)
 	@echo "Running UpdateReadme..."
 	@java -cp "scripts:target/classes:target/quarkus-app/lib/main/*" UpdateReadme
 	@echo "✓ README.md updated with latest tool and resource documentation"
+
+## Update README.md combining strengths of both Python and Java approaches
+update-readme-combined:
+	@echo "Updating README.md with combined approach (Python + Java)..."
+	@./scripts/update-readme-combined.sh
+	@echo "✓ README.md updated using combined approach leveraging both scripts"
 
 # ============================================================================
 # UTILITY RULES
