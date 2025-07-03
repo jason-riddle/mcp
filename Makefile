@@ -1,5 +1,5 @@
 # Modern Makefile best practices
-.PHONY: help clean build dev run format checkstyle test test-watch test-integration docker-build docker-run docker-clean update-readme update-readme-java update-readme-combined
+.PHONY: help clean build dev run format checkstyle test test-watch test-integration docker-build docker-run docker-clean update-readme-py update-readme-java update-readme-combined
 .DELETE_ON_ERROR:
 .ONESHELL:
 
@@ -51,7 +51,7 @@ help:
 	@echo "  docker-clean - Remove Docker images"
 	@echo ""
 	@echo "Documentation:"
-	@echo "  update-readme          - Update README.md with generated tool documentation (Python)"
+	@echo "  update-readme-py       - Update README.md with generated tool documentation (Python)"
 	@echo "  update-readme-java     - Update README.md with generated tool documentation (Java)"
 	@echo "  update-readme-combined - Update README.md combining strengths of both approaches"
 
@@ -155,7 +155,7 @@ docker-clean:
 # ============================================================================
 
 ## Update README.md with generated tool documentation (Python)
-update-readme:
+update-readme-py:
 	@echo "Updating README.md with generated documentation (Python)..."
 	@python scripts/update-readme.py
 	@echo "✓ README.md updated with latest tool and resource documentation"
