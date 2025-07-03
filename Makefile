@@ -1,5 +1,5 @@
 # Modern Makefile best practices
-.PHONY: help clean build dev run format checkstyle test test-watch test-integration docker-build docker-run docker-clean update-readme-py update-readme-java update-readme-combined
+.PHONY: help clean build dev run format checkstyle test test-watch test-integration docker-build docker-run docker-clean update-readme
 .DELETE_ON_ERROR:
 .ONESHELL:
 
@@ -51,9 +51,7 @@ help:
 	@echo "  docker-clean - Remove Docker images"
 	@echo ""
 	@echo "Documentation:"
-	@echo "  update-readme-py       - Update README.md with generated tool documentation (Python)"
-	@echo "  update-readme-java     - Update README.md with generated tool documentation (Java)"
-	@echo "  update-readme-combined - Update README.md combining strengths of both approaches"
+	@echo "  update-readme - Update README.md with generated tool documentation"
 
 ## Clean build artifacts
 clean:
@@ -61,6 +59,13 @@ clean:
 	@$(MVN) clean -q
 	@echo "Cleaning compiled class files..."
 	@find . -name "*.class" -type f -delete
+	@echo "Cleaning staging directory..."
+	@if [ -d "staging" ]; then \
+		find staging -type f ! -name ".gitignore" -delete; \
+		echo "✓ Staging directory cleaned (preserved .gitignore)"; \
+	else \
+		echo "✓ No staging directory to clean"; \
+	fi
 	@echo "✓ Clean complete"
 
 ## Build the project
@@ -156,26 +161,11 @@ docker-clean:
 # DOCUMENTATION TARGETS
 # ============================================================================
 
-## Update README.md with generated tool documentation (Python)
-update-readme-py:
-	@echo "Updating README.md with generated documentation (Python)..."
-	@python scripts/update-readme.py
+## Update README.md with generated tool documentation
+update-readme: $(JAR_FILE)
+	@echo "Updating README.md with generated documentation..."
+	@python scripts/update-docs.py
 	@echo "✓ README.md updated with latest tool and resource documentation"
-
-## Update README.md with generated tool documentation (Java)
-update-readme-java: $(JAR_FILE)
-	@echo "Updating README.md with generated documentation (Java)..."
-	@echo "Compiling UpdateReadme.java..."
-	@javac -cp "target/classes:target/quarkus-app/lib/main/*" scripts/UpdateReadme.java -d scripts/
-	@echo "Running UpdateReadme..."
-	@java -cp "scripts:target/classes:target/quarkus-app/lib/main/*" UpdateReadme
-	@echo "✓ README.md updated with latest tool and resource documentation"
-
-## Update README.md combining strengths of both Python and Java approaches
-update-readme-combined:
-	@echo "Updating README.md with combined approach (Python + Java)..."
-	@python scripts/update-combined-simple.py
-	@echo "✓ README.md updated using combined approach leveraging both scripts"
 
 # ============================================================================
 # UTILITY RULES
