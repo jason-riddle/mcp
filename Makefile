@@ -10,7 +10,7 @@ SHELL := /bin/bash
 # ============================================================================
 # PROJECT CONFIGURATION
 # ============================================================================
-PROJECT_NAME := api-bridge-server
+PROJECT_NAME := jasons-mcp-server
 JAR_FILE := target/quarkus-app/quarkus-run.jar
 MVN := ./mvnw
 

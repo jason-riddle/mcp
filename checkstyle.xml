@@ -4,7 +4,7 @@
         "https://checkstyle.org/dtds/configuration_1_3.dtd">
 
 <!--
-    Palantir-inspired Checkstyle configuration for api-bridge-server
+    Palantir-inspired Checkstyle configuration for jasons-mcp-server
     Based on Palantir Baseline Checkstyle configuration
     Authors: Based on work by Robert Fink, Brian Worth, Merrick Zoubeiri, and contributors
     Reference: https://github.com/palantir/gradle-baseline
