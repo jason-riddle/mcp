@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <!-- Project Information -->
-    <groupId>com.jasonriddle.api</groupId>
+    <groupId>com.jasonriddle.mcp</groupId>
     <artifactId>jasons-mcp-server</artifactId>
     <version>0.0.6-SNAPSHOT</version>
     <name>Jasons MCP Server</name>
@@ -11,10 +11,10 @@
 
     <!-- SCM Information -->
     <scm>
-        <connection>scm:git:git://github.com/jason-riddle/apijasonriddlecom.git</connection>
-        <developerConnection>scm:git:git@github.com:jason-riddle/apijasonriddlecom.git</developerConnection>
+        <connection>scm:git:git://github.com/jason-riddle/mcp.git</connection>
+        <developerConnection>scm:git:git@github.com:jason-riddle/mcp.git</developerConnection>
         <tag>HEAD</tag>
-        <url>https://github.com/jason-riddle/apijasonriddlecom</url>
+        <url>https://github.com/jason-riddle/mcp</url>
     </scm>
 
     <!-- Distribution Management -->
@@ -22,7 +22,7 @@
         <repository>
             <id>github</id>
             <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/jason-riddle/apijasonriddlecom</url>
+            <url>https://maven.pkg.github.com/jason-riddle/mcp</url>
         </repository>
     </distributionManagement>
 
