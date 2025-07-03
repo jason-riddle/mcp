@@ -1,5 +1,5 @@
 # Modern Makefile best practices
-.PHONY: help clean build dev run format checkstyle test test-watch test-integration docker-build docker-run docker-clean
+.PHONY: help clean build dev run format checkstyle test test-watch test-integration docker-build docker-run docker-clean update-readme
 .DELETE_ON_ERROR:
 .ONESHELL:
 
@@ -49,6 +49,9 @@ help:
 	@echo "  docker-build - Build Docker image"
 	@echo "  docker-run   - Run in Docker"
 	@echo "  docker-clean - Remove Docker images"
+	@echo ""
+	@echo "Documentation:"
+	@echo "  update-readme - Update README.md with generated tool documentation"
 
 ## Clean build artifacts
 clean:
@@ -144,6 +147,16 @@ docker-clean:
 	@echo "Removing Docker images for $(PROJECT_NAME)..."
 	@docker images -q $(PROJECT_NAME) | xargs -r docker rmi -f
 	@echo "✓ Docker images removed"
+
+# ============================================================================
+# DOCUMENTATION TARGETS
+# ============================================================================
+
+## Update README.md with generated tool documentation
+update-readme:
+	@echo "Updating README.md with generated documentation..."
+	@python scripts/update-readme.py
+	@echo "✓ README.md updated with latest tool and resource documentation"
 
 # ============================================================================
 # UTILITY RULES
