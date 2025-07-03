@@ -1,0 +1,19 @@
+---
+extends: default
+
+rules:
+  comments:
+    min-spaces-from-content: 2
+  # comments-indentation: disable
+  line-length:
+    max: 145
+    level: warning
+  truthy:
+    ignore: |
+      .github
+
+ignore: |
+  .github/stale.yml
+  .github/workflows/release.yml
+  .travis.yml
+  .venv
