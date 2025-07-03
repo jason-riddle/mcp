@@ -1,5 +1,5 @@
 # Modern Makefile best practices
-.PHONY: help clean build dev run format checkstyle test test-watch test-integration docker-build docker-run docker-clean update-readme
+.PHONY: help clean build dev run format checkstyle test test-watch test-integration docker-build docker-run docker-clean update-readme update-readme-java
 .DELETE_ON_ERROR:
 .ONESHELL:
 
@@ -51,7 +51,8 @@ help:
 	@echo "  docker-clean - Remove Docker images"
 	@echo ""
 	@echo "Documentation:"
-	@echo "  update-readme - Update README.md with generated tool documentation"
+	@echo "  update-readme      - Update README.md with generated tool documentation (Python)"
+	@echo "  update-readme-java - Update README.md with generated tool documentation (Java)"
 
 ## Clean build artifacts
 clean:
@@ -152,10 +153,19 @@ docker-clean:
 # DOCUMENTATION TARGETS
 # ============================================================================
 
-## Update README.md with generated tool documentation
+## Update README.md with generated tool documentation (Python)
 update-readme:
-	@echo "Updating README.md with generated documentation..."
+	@echo "Updating README.md with generated documentation (Python)..."
 	@python scripts/update-readme.py
+	@echo "✓ README.md updated with latest tool and resource documentation"
+
+## Update README.md with generated tool documentation (Java)
+update-readme-java: $(JAR_FILE)
+	@echo "Updating README.md with generated documentation (Java)..."
+	@echo "Compiling UpdateReadme.java..."
+	@javac -cp "target/classes:target/quarkus-app/lib/main/*" scripts/UpdateReadme.java -d scripts/
+	@echo "Running UpdateReadme..."
+	@java -cp "scripts:target/classes:target/quarkus-app/lib/main/*" UpdateReadme
 	@echo "✓ README.md updated with latest tool and resource documentation"
 
 # ============================================================================
