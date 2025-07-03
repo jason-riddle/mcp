@@ -283,7 +283,8 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(description="Generate MCP documentation")
-    parser.add_argument("--project-root", type=Path, default=Path.cwd().parent,
+    parser.add_argument("--project-root", type=Path,
+                       default=Path(__file__).parent.parent.parent,
                        help="Path to project root directory")
     parser.add_argument("--dry-run", action="store_true",
                        help="Preview changes without applying them")

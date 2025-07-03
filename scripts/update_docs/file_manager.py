@@ -2,6 +2,7 @@
 File operations manager for safe README updates with backup and rollback.
 """
 
+import re
 import shutil
 import tempfile
 from pathlib import Path
@@ -67,8 +68,9 @@ class FileManager:
             raise FileManagerError(f"Unknown section: {section_name}")
 
         markers = self.config.section_markers[section_name]
-        start_marker = markers.get('start', markers.get('new_start_marker', ''))
-        end_marker = markers.get('end', markers.get('end_marker', ''))
+        start_pattern = markers.get('start_pattern', '')
+        end_marker = markers.get('end_marker', '')
+        new_start_marker = markers.get('new_start_marker', '')
 
         # Read current README content
         try:
@@ -81,7 +83,7 @@ class FileManager:
 
         # Update the section
         updated_content = self._replace_section_content(
-            current_content, start_marker, end_marker, new_content
+            current_content, start_pattern, end_marker, new_content, new_start_marker
         )
 
         # Create staging file with updated content
@@ -90,38 +92,52 @@ class FileManager:
         self.operations_log.append(f"Updated {section_name} section in staging file")
         return True
 
-    def _replace_section_content(self, content: str, start_marker: str, end_marker: str, new_content: str) -> str:
-        """Replace content between section markers."""
-        start_pos = content.find(start_marker)
-        end_pos = content.find(end_marker)
+    def _find_start_marker(self, content: str, start_pattern: str) -> Tuple[int, int, str]:
+        """Find start marker using regex pattern and return position info."""
+        match = re.search(start_pattern, content)
+        if not match:
+            raise FileManagerError(f"Start marker not found: {start_pattern}")
 
-        if start_pos == -1:
-            raise FileManagerError(f"Start marker not found: {start_marker}")
+        start_pos = match.start()
+        end_pos = match.end()
+        actual_marker = match.group(0)
+        return start_pos, end_pos, actual_marker
+
+    def _replace_section_content(self, content: str, start_pattern: str, end_marker: str, new_content: str, new_start_marker: str) -> str:
+        """Replace content between section markers using regex for start marker."""
+        # Find start marker using regex
+        start_pos, start_end_pos, actual_start_marker = self._find_start_marker(content, start_pattern)
+
+        # Find end marker using exact string
+        end_pos = content.find(end_marker)
 
         if end_pos == -1:
             raise FileManagerError(f"End marker not found: {end_marker}")
 
-        if start_pos >= end_pos:
+        if start_end_pos >= end_pos:
             raise FileManagerError("End marker appears before start marker")
 
-        # Calculate positions
-        section_start = start_pos + len(start_marker)
+        # Calculate positions - use the end of the matched start marker
+        section_start = start_end_pos
 
-        # Replace section content
-        before_section = content[:section_start]
+        # Replace section content, including the new start marker
+        before_section = content[:start_pos]
         after_section = content[end_pos:]
+
+        # Build the new section with proper markers
+        section_content = new_start_marker + '\n\n' + new_content
 
         # Ensure proper spacing
         if not before_section.endswith('\n'):
             before_section += '\n'
 
-        if not new_content.endswith('\n'):
-            new_content += '\n'
+        if not section_content.endswith('\n'):
+            section_content += '\n'
 
         if not after_section.startswith('\n'):
-            new_content += '\n'
+            section_content += '\n'
 
-        return before_section + new_content + after_section
+        return before_section + section_content + after_section
 
     def validate_staging_files(self) -> List[str]:
         """Validate all staging files before applying changes."""
@@ -166,9 +182,9 @@ class FileManager:
 
         # Check all configured section markers exist
         for section_name, markers in self.config.section_markers.items():
-            start_marker = markers.get('start', markers.get('new_start_marker', ''))
-            end_marker = markers.get('end', markers.get('end_marker', ''))
-            if start_marker not in content or end_marker not in content:
+            start_pattern = markers.get('start_pattern', '')
+            end_marker = markers.get('end_marker', '')
+            if not re.search(start_pattern, content) or end_marker not in content:
                 return False
 
         return True
@@ -278,16 +294,19 @@ class SectionManager:
             return None
 
         markers = self.config.section_markers[section_name]
-        start_marker = markers.get('start', markers.get('new_start_marker', ''))
-        end_marker = markers.get('end', markers.get('end_marker', ''))
+        start_pattern = markers.get('start_pattern', '')
+        end_marker = markers.get('end_marker', '')
 
-        start_pos = content.find(start_marker)
-        end_pos = content.find(end_marker)
-
-        if start_pos == -1 or end_pos == -1:
+        try:
+            start_pos, start_end_pos, actual_marker = self._find_start_marker(content, start_pattern)
+        except FileManagerError:
             return None
 
-        section_start = start_pos + len(start_marker)
+        end_pos = content.find(end_marker)
+        if end_pos == -1:
+            return None
+
+        section_start = start_end_pos
         return content[section_start:end_pos].strip()
 
     def validate_section_markers(self, content: str) -> Dict[str, List[str]]:
@@ -296,14 +315,16 @@ class SectionManager:
 
         for section_name, markers in self.config.section_markers.items():
             errors = []
-            start_marker = markers.get('start', markers.get('new_start_marker', ''))
-            end_marker = markers.get('end', markers.get('end_marker', ''))
+            start_pattern = markers.get('start_pattern', '')
+            end_marker = markers.get('end_marker', '')
 
-            start_count = content.count(start_marker)
+            # Count matches using regex for start pattern
+            start_matches = re.findall(start_pattern, content)
+            start_count = len(start_matches)
             end_count = content.count(end_marker)
 
             if start_count == 0:
-                errors.append(f"Start marker not found: {start_marker}")
+                errors.append(f"Start marker not found: {start_pattern}")
             elif start_count > 1:
                 errors.append(f"Multiple start markers found: {start_count}")
 
@@ -313,10 +334,13 @@ class SectionManager:
                 errors.append(f"Multiple end markers found: {end_count}")
 
             if start_count == 1 and end_count == 1:
-                start_pos = content.find(start_marker)
-                end_pos = content.find(end_marker)
-                if start_pos >= end_pos:
-                    errors.append("End marker appears before start marker")
+                try:
+                    start_pos, start_end_pos, actual_marker = self._find_start_marker(content, start_pattern)
+                    end_pos = content.find(end_marker)
+                    if start_end_pos >= end_pos:
+                        errors.append("End marker appears before start marker")
+                except FileManagerError:
+                    errors.append("Error validating marker positions")
 
             results[section_name] = errors
 
