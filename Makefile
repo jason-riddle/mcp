@@ -172,7 +172,7 @@ update-readme-java: $(JAR_FILE)
 ## Update README.md combining strengths of both Python and Java approaches
 update-readme-combined:
 	@echo "Updating README.md with combined approach (Python + Java)..."
-	@./scripts/update-readme-combined.sh
+	@python scripts/update-combined-simple.py
 	@echo "✓ README.md updated using combined approach leveraging both scripts"
 
 # ============================================================================
