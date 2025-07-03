@@ -1,0 +1,25 @@
+Starting staged documentation generation...
+
+=== Stage 1: Data Extraction ===
+Attempting Java reflection extraction...
+Java reflection failed (exit code 1): Error: Could not find or load main class UpdateReadme
+Caused by: java.lang.ClassNotFoundException: UpdateReadme
+
+Falling back to regex parsing...
+✓ Wrote /home/jason/code/src/github.com/jason-riddle/mcp/staging/extracted-data.json
+✓ Stage 1 complete: 9 tools, 3 resources
+
+=== Stage 2: Content Generation ===
+✓ Wrote /home/jason/code/src/github.com/jason-riddle/mcp/staging/generated-content.json
+✓ Stage 2 complete: Generated tools and resources sections
+
+=== Stage 3: Staging File Creation ===
+✓ Stage 3 complete: Created /home/jason/code/src/github.com/jason-riddle/mcp/staging/README-staging.md
+
+=== Stage 4: Validation ===
+✓ Validation report written to /home/jason/code/src/github.com/jason-riddle/mcp/staging/validation-report.txt
+✓ Stage 4 complete: Validation passed
+
+=== Stage 5: Apply Changes ===
+✓ Stage 5 complete: Changes applied successfully
+✓ Backup created at: /home/jason/code/src/github.com/jason-riddle/mcp/staging/README-backup-20250703_173244.md
