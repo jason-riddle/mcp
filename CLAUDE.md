@@ -114,3 +114,46 @@ This project follows strict javadoc standards for all Java files:
 - Methods that modify global state unexpectedly
 - Duplicate code across multiple classes
 - Classes that change frequently for different reasons
+
+## Package Structure
+
+This project follows a feature-based package organization:
+
+### Main Package Structure
+```
+com.jasonriddle.mcp/
+├── McpMemoryPrompts.java      # MCP prompts providing memory guidance
+├── McpMemoryResources.java    # MCP resources (memory://) for graph access
+├── McpMemoryTools.java        # MCP tools for graph operations
+└── memory/                    # Memory graph implementation
+    ├── Entity.java            # Entity record representing graph nodes
+    ├── MemoryGraph.java       # Complete graph structure record
+    ├── MemoryRecord.java      # Base interface for JSONL records
+    ├── MemoryService.java     # Core service for graph persistence and operations
+    └── Relation.java          # Relation record representing graph edges
+```
+
+### Test Package Structure
+```
+com.jasonriddle.mcp/
+├── McpMemoryPromptsTest.java         # Tests for memory prompts
+├── McpMemoryResourcesTest.java       # Tests for memory resources
+├── McpMemoryToolsTest.java           # Tests for memory tools
+├── McpServerSseIntegrationTest.java  # Integration tests for SSE server
+└── memory/                           # Memory implementation tests
+    └── MemoryServiceTest.java        # Tests for memory service
+```
+
+### Package Documentation
+Each package contains a `package-info.java` file with purpose and responsibilities:
+
+- **Root package** (`com.jasonriddle.mcp`): Model Context Protocol server implementation with memory graph capabilities
+- **Memory package** (`com.jasonriddle.mcp.memory`): Memory graph implementation for the MCP server
+- **Test packages**: Corresponding test suites for implementation verification
+
+### Design Principles
+- **Feature-based organization**: Packages organized around functional areas rather than technical layers
+- **Minimal dependencies**: Each package has clear, minimal dependencies on other packages
+- **Clear separation**: MCP-specific classes in root, domain logic in memory package
+- **Consistent naming**: Package names reflect their primary responsibility
+- **Single responsibility**: Each package has one clear purpose and set of related classes
