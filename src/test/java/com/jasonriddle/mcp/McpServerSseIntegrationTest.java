@@ -1,15 +1,19 @@
 package com.jasonriddle.mcp;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jasonriddle.mcp.memory.Entity;
+import com.jasonriddle.mcp.memory.MemoryService;
 import io.quarkus.test.common.http.TestHTTPResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.QuarkusTestProfile;
 import io.quarkus.test.junit.TestProfile;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.WebTarget;
@@ -38,6 +42,15 @@ final class McpServerSseIntegrationTest {
     @TestHTTPResource("/v1/mcp/sse")
     URI sseEndpoint;
 
+    @Inject
+    MemoryService memoryService;
+
+    @Inject
+    McpMemoryResources mcpMemoryResources;
+
+    @Inject
+    McpMemoryTools mcpMemoryTools;
+
     private Client client;
     private ObjectMapper objectMapper;
 
@@ -57,6 +70,14 @@ final class McpServerSseIntegrationTest {
     void setUp() {
         client = ClientBuilder.newClient();
         objectMapper = new ObjectMapper();
+
+        // Clear memory before each test to ensure clean state
+        final var graph = memoryService.readGraph();
+        if (!graph.entities().isEmpty()) {
+            final List<String> entityNames =
+                    graph.entities().stream().map(Entity::name).toList();
+            memoryService.deleteEntities(entityNames);
+        }
     }
 
     @AfterEach
@@ -205,71 +226,281 @@ final class McpServerSseIntegrationTest {
         }
     }
 
-    // Future tool testing will be implemented when MCP tools are added to the server.
-    // These tests will verify tools/list and tools/call operations for memory management.
-    /*
-    @Test
-    @Order(6)
-    void shouldListAvailableTools() throws InterruptedException {
-        // Test tools/list MCP request
-        // Verify memory tools are listed (create_entities, create_relations, etc.)
-        // Check tool schemas and descriptions
-    }
-
-    @Test
-    @Order(7)
-    void shouldExecuteMemoryTools() throws InterruptedException {
-        // Test tools/call for memory operations
-        // Test create_entities tool
-        // Test create_relations tool
-        // Test search_nodes tool
-        // Verify responses and data persistence
-    }
-
-    @Test
-    @Order(8)
-    void shouldHandleToolErrors() throws InterruptedException {
-        // Test invalid tool calls
-        // Test malformed parameters
-        // Verify proper error responses
-    }
-    */
-
-    // Future resource testing will be implemented when MCP resources are added to the server.
-    // These tests will verify resources/list and resources/read operations for memory graph data.
-    /*
     @Test
     @Order(9)
-    void shouldListAvailableResources() throws InterruptedException {
-        // Test resources/list MCP request
-        // Verify memory graph resources are listed
-        // Check resource URIs and descriptions
+    void shouldExecuteMemoryCreateEntitiesToolIntegration() {
+        // Test memory.create_entities tool integration
+        final List<Map<String, Object>> entityData = List.of(
+                Map.of(
+                        "name",
+                        "ToolTestUser",
+                        "entityType",
+                        "person",
+                        "observations",
+                        List.of("Created via tool testing")),
+                Map.of(
+                        "name",
+                        "ToolTestPrefs",
+                        "entityType",
+                        "preferences",
+                        "observations",
+                        List.of("Tool test preferences")));
+
+        final String result = mcpMemoryTools.createEntities(entityData);
+        assertTrue(result.contains("Created 2 entities"));
+
+        // Verify entities exist in memory service
+        final var graph = memoryService.readGraph();
+        assertEquals(2, graph.entities().size());
+        assertTrue(graph.entities().stream().anyMatch(e -> "ToolTestUser".equals(e.name())));
+        assertTrue(graph.entities().stream().anyMatch(e -> "ToolTestPrefs".equals(e.name())));
     }
 
     @Test
     @Order(10)
-    void shouldReadMemoryResources() throws InterruptedException {
-        // Test resources/read for memory graph data
-        // Test different resource URIs (memory://entities, memory://relations)
-        // Verify resource content format
+    void shouldExecuteMemoryCreateRelationsToolIntegration() {
+        // Setup entities first
+        final List<Map<String, Object>> entityData = List.of(
+                Map.of(
+                        "name",
+                        "RelationTestUser",
+                        "entityType",
+                        "person",
+                        "observations",
+                        List.of("User for relation testing")),
+                Map.of(
+                        "name",
+                        "RelationTestPrefs",
+                        "entityType",
+                        "preferences",
+                        "observations",
+                        List.of("Preferences for relation testing")));
+        mcpMemoryTools.createEntities(entityData);
+
+        // Test memory.create_relations tool integration
+        final List<Map<String, String>> relationData = List.of(
+                Map.of("from", "RelationTestUser", "to", "RelationTestPrefs", "relationType", "has_preferences"),
+                Map.of("from", "RelationTestUser", "to", "RelationTestPrefs", "relationType", "configured"));
+
+        final String result = mcpMemoryTools.createRelations(relationData);
+        assertTrue(result.contains("Created 2 relations"));
+
+        // Verify relations exist in memory service
+        final var graph = memoryService.readGraph();
+        assertEquals(2, graph.relations().size());
+        assertTrue(graph.relations().stream().anyMatch(r -> "has_preferences".equals(r.relationType())));
+        assertTrue(graph.relations().stream().anyMatch(r -> "configured".equals(r.relationType())));
     }
 
     @Test
     @Order(11)
-    void shouldHandleResourceErrors() throws InterruptedException {
-        // Test invalid resource URIs
-        // Test non-existent resources
-        // Verify proper error responses
+    void shouldExecuteMemorySearchNodesToolIntegration() {
+        // Setup test data for searching
+        final List<Map<String, Object>> entityData = List.of(
+                Map.of(
+                        "name",
+                        "SearchTestDeveloper",
+                        "entityType",
+                        "person",
+                        "observations",
+                        List.of("Loves Java programming", "Uses IntelliJ IDE")),
+                Map.of(
+                        "name",
+                        "SearchTestManager",
+                        "entityType",
+                        "person",
+                        "observations",
+                        List.of("Manages development team", "Prefers Python")));
+        mcpMemoryTools.createEntities(entityData);
+
+        // Test memory.search_nodes tool integration
+        final var javaResults = mcpMemoryTools.searchNodes("Java");
+        assertNotNull(javaResults);
+        assertEquals(1, javaResults.entities().size());
+        assertEquals("SearchTestDeveloper", javaResults.entities().get(0).name());
+
+        final var pythonResults = mcpMemoryTools.searchNodes("Python");
+        assertNotNull(pythonResults);
+        assertEquals(1, pythonResults.entities().size());
+        assertEquals("SearchTestManager", pythonResults.entities().get(0).name());
+
+        final var teamResults = mcpMemoryTools.searchNodes("team");
+        assertNotNull(teamResults);
+        assertEquals(1, teamResults.entities().size());
+        assertEquals("SearchTestManager", teamResults.entities().get(0).name());
     }
-    */
 
     @Test
     @Order(12)
+    void shouldExecuteMemoryToolsEndToEndWorkflow() {
+        // Test complete end-to-end workflow using memory tools
+
+        // 1. Create entities
+        final List<Map<String, Object>> entityData = List.of(
+                Map.of(
+                        "name",
+                        "WorkflowUser",
+                        "entityType",
+                        "person",
+                        "observations",
+                        List.of("Integration test user")),
+                Map.of(
+                        "name",
+                        "WorkflowProject",
+                        "entityType",
+                        "project",
+                        "observations",
+                        List.of("Test project for workflow")));
+        final String createResult = mcpMemoryTools.createEntities(entityData);
+        assertTrue(createResult.contains("Created 2 entities"));
+
+        // 2. Create relations
+        final List<Map<String, String>> relationData =
+                List.of(Map.of("from", "WorkflowUser", "to", "WorkflowProject", "relationType", "works_on"));
+        final String relationResult = mcpMemoryTools.createRelations(relationData);
+        assertTrue(relationResult.contains("Created 1 relations"));
+
+        // 3. Add observations
+        final List<Map<String, Object>> observationData = List.of(Map.of(
+                "entityName",
+                "WorkflowUser",
+                "contents",
+                List.of("Added via workflow test", "Integration testing expert")));
+        final String observationResult = mcpMemoryTools.addObservations(observationData);
+        assertTrue(observationResult.contains("Added 2 observations to 1 entities"));
+
+        // 4. Read complete graph
+        final var fullGraph = mcpMemoryTools.readGraph();
+        assertEquals(2, fullGraph.entities().size());
+        assertEquals(1, fullGraph.relations().size());
+
+        // 5. Search and verify
+        final var searchResults = mcpMemoryTools.searchNodes("workflow");
+        assertEquals(2, searchResults.entities().size()); // Both entities mention workflow
+
+        // 6. Open specific nodes
+        final var userNode = mcpMemoryTools.openNodes(List.of("WorkflowUser"));
+        assertEquals(1, userNode.entities().size());
+        assertEquals(3, userNode.entities().get(0).observations().size()); // Original + 2 added
+
+        // 7. Clean up specific observations
+        final List<Map<String, Object>> deletionData =
+                List.of(Map.of("entityName", "WorkflowUser", "observations", List.of("Added via workflow test")));
+        final String deleteObsResult = mcpMemoryTools.deleteObservations(deletionData);
+        assertTrue(deleteObsResult.contains("Deleted 1 observations"));
+
+        // 8. Verify final state
+        final var finalGraph = mcpMemoryTools.readGraph();
+        final var finalUser = finalGraph.entities().stream()
+                .filter(e -> "WorkflowUser".equals(e.name()))
+                .findFirst()
+                .orElseThrow();
+        assertEquals(2, finalUser.observations().size()); // One deleted, two remaining
+    }
+
+    @Test
+    @Order(6)
+    void shouldReadMemoryGraphResource() {
+        // Create test data for resource testing
+        final List<Map<String, Object>> entityData = List.of(
+                Map.of(
+                        "name",
+                        "ResourceTestUser",
+                        "entityType",
+                        "person",
+                        "observations",
+                        List.of("Test user for resource testing")),
+                Map.of(
+                        "name",
+                        "ResourceTestPrefs",
+                        "entityType",
+                        "preferences",
+                        "observations",
+                        List.of("Test preferences")));
+        mcpMemoryTools.createEntities(entityData);
+
+        final List<Map<String, String>> relationData = List.of(
+                Map.of("from", "ResourceTestUser", "to", "ResourceTestPrefs", "relationType", "has_preferences"));
+        mcpMemoryTools.createRelations(relationData);
+
+        // Test memory://graph resource
+        final var graphResource = mcpMemoryResources.memoryGraphResource();
+        assertNotNull(graphResource);
+        assertEquals("memory://graph", graphResource.uri());
+        assertTrue(graphResource.text().contains("Complete Memory Graph"));
+        assertTrue(graphResource.text().contains("ResourceTestUser"));
+        assertTrue(graphResource.text().contains("ResourceTestPrefs"));
+        assertTrue(graphResource.text().contains("has_preferences"));
+    }
+
+    @Test
+    @Order(7)
+    void shouldReadMemoryTypesResource() {
+        // Create diverse test data for types testing
+        final List<Map<String, Object>> entityData = List.of(
+                Map.of("name", "TypeTestPerson", "entityType", "person", "observations", List.of("Person entity")),
+                Map.of("name", "TypeTestProject", "entityType", "project", "observations", List.of("Project entity")),
+                Map.of("name", "TypeTestSystem", "entityType", "system", "observations", List.of("System entity")));
+        mcpMemoryTools.createEntities(entityData);
+
+        final List<Map<String, String>> relationData = List.of(
+                Map.of("from", "TypeTestPerson", "to", "TypeTestProject", "relationType", "works_on"),
+                Map.of("from", "TypeTestProject", "to", "TypeTestSystem", "relationType", "runs_on"));
+        mcpMemoryTools.createRelations(relationData);
+
+        // Test memory://types resource
+        final var typesResource = mcpMemoryResources.typesResource();
+        assertNotNull(typesResource);
+        assertEquals("memory://types", typesResource.uri());
+        assertTrue(typesResource.text().contains("Memory Graph Types and Patterns"));
+        assertTrue(typesResource.text().contains("**person:** 1 entities"));
+        assertTrue(typesResource.text().contains("**project:** 1 entities"));
+        assertTrue(typesResource.text().contains("**system:** 1 entities"));
+        assertTrue(typesResource.text().contains("**works_on:** 1 connections"));
+        assertTrue(typesResource.text().contains("**runs_on:** 1 connections"));
+    }
+
+    @Test
+    @Order(8)
+    void shouldReadMemoryStatusResource() {
+        // Create test data with potential integrity issues
+        final List<Map<String, Object>> entityData = List.of(
+                Map.of(
+                        "name",
+                        "StatusTestUser",
+                        "entityType",
+                        "person",
+                        "observations",
+                        List.of("User for status testing")),
+                Map.of(
+                        "name",
+                        "EmptyEntity",
+                        "entityType",
+                        "preferences",
+                        "observations",
+                        List.of()) // Empty observations
+                );
+        mcpMemoryTools.createEntities(entityData);
+
+        // Test memory://status resource
+        final var statusResource = mcpMemoryResources.memoryStatusResource();
+        assertNotNull(statusResource);
+        assertEquals("memory://status", statusResource.uri());
+        assertTrue(statusResource.text().contains("Memory Graph Status"));
+        assertTrue(statusResource.text().contains("**Total Entities:** 2"));
+        assertTrue(statusResource.text().contains("**Total Relations:** 0"));
+        assertTrue(statusResource.text().contains("**Entities with No Observations:** 1"));
+        assertTrue(statusResource.text().contains("**Isolated Entities:** 2"));
+        assertTrue(statusResource.text().contains("**Status:** Issues detected"));
+    }
+
+    @Test
+    @Order(13)
     void shouldHandleConnectionErrors() throws InterruptedException {
         // Test connection drops and reconnection
-        WebTarget target = client.target(sseEndpoint);
-        CountDownLatch errorLatch = new CountDownLatch(1);
-        List<Throwable> errors = new ArrayList<>();
+        final WebTarget target = client.target(sseEndpoint);
+        final CountDownLatch errorLatch = new CountDownLatch(1);
+        final List<Throwable> errors = new ArrayList<>();
 
         try (SseEventSource eventSource = SseEventSource.target(target)
                 .reconnectingEvery(1, TimeUnit.SECONDS)
@@ -292,18 +523,18 @@ final class McpServerSseIntegrationTest {
     }
 
     @Test
-    @Order(13)
+    @Order(14)
     void shouldRespectConnectionTimeout() throws InterruptedException {
-        WebTarget target = client.target(sseEndpoint);
+        final WebTarget target = client.target(sseEndpoint);
 
         // Configure client with short timeout for testing
-        Client timeoutClient = ClientBuilder.newBuilder()
+        final Client timeoutClient = ClientBuilder.newBuilder()
                 .connectTimeout(5, TimeUnit.SECONDS)
                 .readTimeout(5, TimeUnit.SECONDS)
                 .build();
 
         try {
-            WebTarget timeoutTarget = timeoutClient.target(sseEndpoint);
+            final WebTarget timeoutTarget = timeoutClient.target(sseEndpoint);
 
             try (SseEventSource eventSource =
                     SseEventSource.target(timeoutTarget).build()) {
