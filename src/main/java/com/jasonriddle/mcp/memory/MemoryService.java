@@ -34,8 +34,8 @@ public class MemoryService {
     /**
      * Creates a new MemoryService.
      *
-     * @param objectMapper json object mapper
-     * @param memoryFilePath path to memory file from config
+     * @param objectMapper json object mapper.
+     * @param memoryFilePath path to memory file from config.
      */
     @Inject
     public MemoryService(
@@ -63,7 +63,7 @@ public class MemoryService {
     /**
      * Reads the entire memory graph from the JSONL file.
      *
-     * @return the complete memory graph
+     * @return the complete memory graph.
      */
     public MemoryGraph readGraph() {
         lock.readLock().lock();
@@ -107,7 +107,7 @@ public class MemoryService {
     /**
      * Writes the entire memory graph to the JSONL file.
      *
-     * @param graph the memory graph to write
+     * @param graph the memory graph to write.
      */
     private void writeGraph(final MemoryGraph graph) {
         lock.writeLock().lock();
@@ -137,8 +137,8 @@ public class MemoryService {
     /**
      * Creates multiple new entities in the graph.
      *
-     * @param entities entities to create
-     * @return created entities
+     * @param entities entities to create.
+     * @return created entities.
      */
     public List<Entity> createEntities(final List<Entity> entities) {
         lock.writeLock().lock();
@@ -173,8 +173,8 @@ public class MemoryService {
     /**
      * Creates multiple new relations in the graph.
      *
-     * @param relations relations to create
-     * @return created relations
+     * @param relations relations to create.
+     * @return created relations.
      */
     public List<Relation> createRelations(final List<Relation> relations) {
         lock.writeLock().lock();
@@ -207,8 +207,8 @@ public class MemoryService {
     /**
      * Adds observations to existing entities.
      *
-     * @param observationMap map of entity names to new observations
-     * @return map of entity names to added observations
+     * @param observationMap map of entity names to new observations.
+     * @return map of entity names to added observations.
      */
     public Map<String, List<String>> addObservations(final Map<String, List<String>> observationMap) {
         lock.writeLock().lock();
@@ -251,8 +251,8 @@ public class MemoryService {
     /**
      * Deletes entities and their relations.
      *
-     * @param entityNames names of entities to delete
-     * @return deleted entity names
+     * @param entityNames names of entities to delete.
+     * @return deleted entity names.
      */
     public List<String> deleteEntities(final List<String> entityNames) {
         lock.writeLock().lock();
@@ -281,8 +281,8 @@ public class MemoryService {
     /**
      * Deletes specific observations from entities.
      *
-     * @param deletionMap map of entity names to observations to delete
-     * @return map of entity names to deleted observations
+     * @param deletionMap map of entity names to observations to delete.
+     * @return map of entity names to deleted observations.
      */
     public Map<String, List<String>> deleteObservations(final Map<String, List<String>> deletionMap) {
         lock.writeLock().lock();
@@ -333,8 +333,8 @@ public class MemoryService {
     /**
      * Deletes specific relations.
      *
-     * @param relations relations to delete
-     * @return deleted relations
+     * @param relations relations to delete.
+     * @return deleted relations.
      */
     public List<Relation> deleteRelations(final List<Relation> relations) {
         lock.writeLock().lock();
@@ -362,8 +362,8 @@ public class MemoryService {
     /**
      * Searches for nodes based on query.
      *
-     * @param query search query
-     * @return matching entities and their relations
+     * @param query search query.
+     * @return matching entities and their relations.
      */
     public MemoryGraph searchNodes(final String query) {
         lock.readLock().lock();
@@ -397,8 +397,8 @@ public class MemoryService {
     /**
      * Opens specific nodes by name.
      *
-     * @param names entity names to retrieve
-     * @return entities and their relations
+     * @param names entity names to retrieve.
+     * @return entities and their relations.
      */
     public MemoryGraph openNodes(final List<String> names) {
         lock.readLock().lock();

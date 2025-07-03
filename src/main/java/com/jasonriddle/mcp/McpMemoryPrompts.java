@@ -6,7 +6,7 @@ import io.quarkiverse.mcp.server.TextContent;
 import jakarta.enterprise.context.ApplicationScoped;
 
 /**
- * MCP Memory Prompts providing guidance on memory management best practices.
+ * MCP memory prompts providing guidance on memory management best practices.
  */
 @ApplicationScoped
 public final class McpMemoryPrompts {
@@ -14,7 +14,7 @@ public final class McpMemoryPrompts {
     /**
      * Provides comprehensive guidance on memory management patterns and best practices.
      *
-     * @return memory best practices prompt message
+     * @return memory best practices prompt message.
      */
     @Prompt(name = "memory_best_practices", description = "Guide Claude on effective memory management patterns")
     PromptMessage memoryBestPracticesPrompt() {

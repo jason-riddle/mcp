@@ -75,34 +75,34 @@
     # ========== SLOWER CHECKS (5-30s) ==========
 
     # Java code quality - CHECK ONLY (don't modify files during commit)
-    # spotless-check = {
-    #   enable = true;
-    #   name = "spotless-check";
-    #   entry = "./mvnw spotless:check";
-    #   language = "system";
-    #   files = "\\.(java|xml|json|yaml|yml|properties)$";
-    #   pass_filenames = false;
-    # };
+    spotless-check = {
+      enable = true;
+      name = "spotless-check";
+      entry = "./mvnw spotless:check";
+      language = "system";
+      files = "\\.(java|xml|json|yaml|yml|properties)$";
+      pass_filenames = false;
+    };
 
     # Maven checkstyle validation
-    # maven-checkstyle = {
-    #   enable = true;
-    #   name = "maven-checkstyle";
-    #   entry = "./mvnw checkstyle:check";
-    #   language = "system";
-    #   files = "\\.java$";
-    #   pass_filenames = false;
-    # };
+    maven-checkstyle = {
+      enable = true;
+      name = "maven-checkstyle";
+      entry = "./mvnw checkstyle:check";
+      language = "system";
+      files = "\\.java$";
+      pass_filenames = false;
+    };
 
     # Javadoc validation
-    # javadoc-check = {
-    #   enable = true;
-    #   name = "javadoc-check";
-    #   entry = "./mvnw javadoc:javadoc -Dadditionalparam=-Xdoclint:all -Ddoclint=all,-missing";
-    #   language = "system";
-    #   files = "\\.java$";
-    #   pass_filenames = false;
-    # };
+    javadoc-check = {
+      enable = true;
+      name = "javadoc-check";
+      entry = "./mvnw javadoc:javadoc -Dadditionalparam=-Xdoclint:all -Ddoclint=all,-missing";
+      language = "system";
+      files = "\\.java$";
+      pass_filenames = false;
+    };
 
     # Dependency security check (only on pom.xml changes)
     # dependency-check = {

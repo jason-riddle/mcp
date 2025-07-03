@@ -25,8 +25,8 @@ public final class McpMemoryTools {
     /**
      * Creates multiple new entities in the knowledge graph.
      *
-     * @param entities entities to create
-     * @return created entities as JSON string
+     * @param entities entities to create.
+     * @return created entities as JSON string.
      */
     @Tool(name = "memory.create_entities", description = "Create multiple new entities in the knowledge graph")
     public String createEntities(
@@ -53,8 +53,8 @@ public final class McpMemoryTools {
     /**
      * Creates multiple new relations between entities.
      *
-     * @param relations relations to create
-     * @return created relations as JSON string
+     * @param relations relations to create.
+     * @return created relations as JSON string.
      */
     @Tool(name = "memory.create_relations", description = "Create multiple new relations between entities")
     public String createRelations(
@@ -80,8 +80,8 @@ public final class McpMemoryTools {
     /**
      * Adds observations to existing entities.
      *
-     * @param observations observations to add
-     * @return added observations as JSON string
+     * @param observations observations to add.
+     * @return added observations as JSON string.
      */
     @Tool(name = "memory.add_observations", description = "Add new observations to existing entities")
     public String addObservations(
@@ -107,8 +107,8 @@ public final class McpMemoryTools {
     /**
      * Deletes entities and their relations.
      *
-     * @param entityNames names of entities to delete
-     * @return deleted entity names as JSON string
+     * @param entityNames names of entities to delete.
+     * @return deleted entity names as JSON string.
      */
     @Tool(name = "memory.delete_entities", description = "Remove entities and their relations from the knowledge graph")
     public String deleteEntities(
@@ -120,8 +120,8 @@ public final class McpMemoryTools {
     /**
      * Deletes specific observations from entities.
      *
-     * @param deletions deletions to perform
-     * @return deleted observations as JSON string
+     * @param deletions deletions to perform.
+     * @return deleted observations as JSON string.
      */
     @Tool(name = "memory.delete_observations", description = "Remove specific observations from entities")
     public String deleteObservations(
@@ -147,8 +147,8 @@ public final class McpMemoryTools {
     /**
      * Deletes specific relations.
      *
-     * @param relations relations to delete
-     * @return deleted relations as JSON string
+     * @param relations relations to delete.
+     * @return deleted relations as JSON string.
      */
     @Tool(name = "memory.delete_relations", description = "Remove specific relations from the knowledge graph")
     public String deleteRelations(
@@ -174,7 +174,7 @@ public final class McpMemoryTools {
     /**
      * Reads the entire knowledge graph.
      *
-     * @return complete graph structure as JSON string
+     * @return complete graph structure as JSON string.
      */
     @Tool(name = "memory.read_graph", description = "Read the entire knowledge graph")
     public MemoryGraph readGraph() {
@@ -184,8 +184,8 @@ public final class McpMemoryTools {
     /**
      * Searches for nodes based on query.
      *
-     * @param query search query
-     * @return matching entities and relations as JSON string
+     * @param query search query.
+     * @return matching entities and relations as JSON string.
      */
     @Tool(name = "memory.search_nodes", description = "Search for nodes in the knowledge graph based on a query")
     public MemoryGraph searchNodes(
@@ -197,8 +197,8 @@ public final class McpMemoryTools {
     /**
      * Opens specific nodes by name.
      *
-     * @param names entity names to retrieve
-     * @return requested entities and relations as JSON string
+     * @param names entity names to retrieve.
+     * @return requested entities and relations as JSON string.
      */
     @Tool(name = "memory.open_nodes", description = "Retrieve specific nodes by name")
     public MemoryGraph openNodes(@ToolArg(description = "Array of entity names to retrieve") final List<String> names) {

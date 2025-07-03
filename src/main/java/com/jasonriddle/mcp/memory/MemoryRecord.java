@@ -20,7 +20,7 @@ public interface MemoryRecord {
     /**
      * Gets the type of this record.
      *
-     * @return the record type
+     * @return the record type.
      */
     @JsonProperty("type")
     String type();

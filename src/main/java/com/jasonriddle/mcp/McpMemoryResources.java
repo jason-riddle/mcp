@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 /**
- * MCP Memory Resources providing memory graph access via memory:// URI scheme.
+ * MCP memory resources providing memory graph access via memory:// URI scheme.
  */
 @ApplicationScoped
 public final class McpMemoryResources {
@@ -35,7 +35,7 @@ public final class McpMemoryResources {
     /**
      * Returns the complete knowledge graph in formatted, human-readable way.
      *
-     * @return formatted memory graph resource
+     * @return formatted memory graph resource.
      */
     @Resource(uri = "memory://graph")
     TextResourceContents memoryGraphResource() {
@@ -95,7 +95,7 @@ public final class McpMemoryResources {
     /**
      * Returns types and patterns available in the memory graph.
      *
-     * @return types and patterns resource
+     * @return types and patterns resource.
      */
     @Resource(uri = "memory://types")
     TextResourceContents typesResource() {
@@ -176,7 +176,7 @@ public final class McpMemoryResources {
     /**
      * Returns memory graph status and health information.
      *
-     * @return memory status resource
+     * @return memory status resource.
      */
     @Resource(uri = "memory://status")
     TextResourceContents memoryStatusResource() {
