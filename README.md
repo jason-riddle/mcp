@@ -142,7 +142,7 @@ The server provides MCP tools for memory graph operations:
 
 <!-- NOTE: This has been generated via update-docs.py --->
 
-- **memory.add_observations**
+- **memory_add_observations**
   - Title: Add Observations
   - Description: Add new observations to existing entities
   - Parameters:

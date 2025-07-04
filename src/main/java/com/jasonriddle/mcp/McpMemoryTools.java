@@ -83,7 +83,7 @@ public final class McpMemoryTools {
      * @param observations observations to add.
      * @return added observations as JSON string.
      */
-    @Tool(name = "memory.add_observations", description = "Add new observations to existing entities")
+    @Tool(name = "memory_add_observations", description = "Add new observations to existing entities")
     public String addObservations(
             @ToolArg(description = "Array of objects with entityName and contents")
                     final List<Map<String, Object>> observations) {

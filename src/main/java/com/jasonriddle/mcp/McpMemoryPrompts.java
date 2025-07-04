@@ -97,7 +97,7 @@ public final class McpMemoryPrompts {
             - Use relationship traversal to explore connected concepts
 
             ### Entity Modification
-            - **Add observations**: Use `memory.add_observations`
+            - **Add observations**: Use `memory_add_observations`
             - **Create relationships**: Use `memory.create_relations`
             - **Update information**: Add new observations, archive old ones
 
