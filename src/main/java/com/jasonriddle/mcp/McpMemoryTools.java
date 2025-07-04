@@ -123,7 +123,7 @@ public final class McpMemoryTools {
      * @param deletions deletions to perform.
      * @return deleted observations as JSON string.
      */
-    @Tool(name = "memory.delete_observations", description = "Remove specific observations from entities")
+    @Tool(name = "memory_delete_observations", description = "Remove specific observations from entities")
     public String deleteObservations(
             @ToolArg(description = "Array of objects with entityName and observations to delete")
                     final List<Map<String, Object>> deletions) {

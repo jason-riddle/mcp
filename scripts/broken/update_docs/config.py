@@ -122,7 +122,7 @@ class DocumentationConfig:
 
     def categorize_tool(self, tool_name: str) -> str:
         """Determine category for a tool based on its name."""
-        tool_name = tool_name.replace('memory.', '')
+        tool_name = tool_name.replace('memory.', '').replace('memory_', '')
 
         for category, keywords in self.tool_categories.items():
             if any(keyword in tool_name for keyword in keywords):

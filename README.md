@@ -96,7 +96,7 @@ The server provides MCP tools for memory graph operations:
 
 <!-- NOTE: This has been generated via update-docs.py --->
 
-- **memory.create_entities**
+- **memory_create_entities**
   - Title: Create Entities
   - Description: Create multiple new entities in the knowledge graph
   - Parameters:
@@ -105,7 +105,7 @@ The server provides MCP tools for memory graph operations:
 
 <!-- NOTE: This has been generated via update-docs.py --->
 
-- **memory.delete_entities**
+- **memory_delete_entities**
   - Title: Delete Entities
   - Description: Remove entities and their relations from the knowledge graph
   - Parameters:
@@ -119,7 +119,7 @@ The server provides MCP tools for memory graph operations:
 
 <!-- NOTE: This has been generated via update-docs.py --->
 
-- **memory.create_relations**
+- **memory_create_relations**
   - Title: Create Relations
   - Description: Create multiple new relations between entities
   - Parameters:
@@ -128,7 +128,7 @@ The server provides MCP tools for memory graph operations:
 
 <!-- NOTE: This has been generated via update-docs.py --->
 
-- **memory.delete_relations**
+- **memory_delete_relations**
   - Title: Delete Relations
   - Description: Remove specific relations from the knowledge graph
   - Parameters:
@@ -151,7 +151,7 @@ The server provides MCP tools for memory graph operations:
 
 <!-- NOTE: This has been generated via update-docs.py --->
 
-- **memory.delete_observations**
+- **memory_delete_observations**
   - Title: Delete Observations
   - Description: Remove specific observations from entities
   - Parameters:
@@ -165,7 +165,7 @@ The server provides MCP tools for memory graph operations:
 
 <!-- NOTE: This has been generated via update-docs.py --->
 
-- **memory.read_graph**
+- **memory_read_graph**
   - Title: Read Graph
   - Description: Read the entire knowledge graph
   - Parameters: None
@@ -173,7 +173,7 @@ The server provides MCP tools for memory graph operations:
 
 <!-- NOTE: This has been generated via update-docs.py --->
 
-- **memory.search_nodes**
+- **memory_search_nodes**
   - Title: Search Nodes
   - Description: Search for nodes in the knowledge graph based on a query
   - Parameters:
@@ -182,7 +182,7 @@ The server provides MCP tools for memory graph operations:
 
 <!-- NOTE: This has been generated via update-docs.py --->
 
-- **memory.open_nodes**
+- **memory_open_nodes**
   - Title: Open Nodes
   - Description: Retrieve specific nodes by name
   - Parameters:

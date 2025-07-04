@@ -173,7 +173,7 @@ class TestDocumentationConfig:
         config = DocumentationConfig.from_project_root(Path.cwd())
 
         assert config.categorize_tool("memory_add_observations") == "Observation Management"
-        assert config.categorize_tool("memory.delete_observations") == "Observation Management"
+        assert config.categorize_tool("memory_delete_observations") == "Observation Management"
 
     def test_categorize_tool_graph_operations(self):
         """Test categorizing graph operation tools."""
