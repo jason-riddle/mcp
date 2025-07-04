@@ -295,12 +295,6 @@ make update-readme
 
 # Or run directly with the new modular system
 python scripts/update-docs.py
-
-# Available options
-python scripts/update-docs.py --help              # Show all options
-python scripts/update-docs.py --dry-run           # Preview changes safely
-python scripts/update-docs.py --section tools     # Update only tools section
-python scripts/update-docs.py --section resources # Update only resources section
 ```
 
 #### New Modular Architecture
