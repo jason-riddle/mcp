@@ -74,14 +74,14 @@ updates:
       prefix: "deps"
       include: "scope"
 
-# Git submodules support (commented out - enable when needed)
-# - package-ecosystem: "gitsubmodule"
-#   directory: "/"
-#   schedule:
-#     interval: "daily"
-#   labels:
-#     - "dependencies"
-#     - "submodules"
-#   commit-message:
-#     prefix: "deps"
-#     include: "scope"
+  # Git submodules support (commented out - enable when needed)
+  # - package-ecosystem: "gitsubmodule"
+  #   directory: "/"
+  #   schedule:
+  #     interval: "daily"
+  #   labels:
+  #     - "dependencies"
+  #     - "submodules"
+  #   commit-message:
+  #     prefix: "deps"
+  #     include: "scope"
