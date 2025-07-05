@@ -167,6 +167,8 @@
     echo "🚀 Java Development Environment"
     echo "📦 Java: $(java -version 2>&1 | tail -n1)"
     echo "📦 Maven: $(mvn -version | head -n1)"
+    echo "📍 Java path: $(which java)"
+    echo "📍 Maven path: $(which mvn)"
     echo ""
     echo "💡 Tips:"
     echo "    - Use 'git commit --no-verify' to skip git hooks in emergencies"
