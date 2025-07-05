@@ -1,6 +1,6 @@
 # AGENTS.md
 
-This guide provides instructions for automated agents or developers contributing to this repository.
+This guide provides instructions for automated agents contributing to this repository.
 
 ## Table of Contents
 - [Quick Start](#quick-start)
@@ -12,9 +12,9 @@ This guide provides instructions for automated agents or developers contributing
 
 ### Building and Running
 ```bash
-make build       # Build the project
-make dev         # Start in development mode with live reload
-make run         # Run the server in production mode
+make build  # Build the project
+make dev    # Start in development mode with live reload
+make run    # Run the server in production mode
 ```
 
 ### Makefile Commands
@@ -24,21 +24,20 @@ Run `make help` to see all available tasks. Common ones include:
 
 ### Formatting and Style Checks
 ```bash
-make format     # Apply formatting
-make checkstyle # Run style checks
+make format      # Apply formatting
+make checkstyle  # Run style checks
 ```
 
 ### Testing
 ```bash
-make test             # Run unit tests
-make test-watch       # Continuous testing mode
-make test-integration # Run integration tests
+make test                             # Run unit tests
+make test-integration                 # Run integration tests
 ./mvnw test -Dtest=MemoryServiceTest  # Run specific test class
 ```
 
 ### Documentation Generation
 ```bash
-make update-readme      # Update README with generated tool docs
+make update-readme             # Update README with generated tool docs
 python scripts/update-docs.py  # Run the script directly
 ```
 
