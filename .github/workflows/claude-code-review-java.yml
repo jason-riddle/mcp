@@ -1,17 +1,18 @@
 ---
 name: Claude Code Review - Java
 
-on:
-  pull_request:
-    types: [opened, synchronize]
-    paths:
-      # Only run when specific Java paths are modified
-      - "src/**/*.java"
-      - "src/**/package-info.java"
-      - "pom.xml"
-      - "checkstyle.xml"
-      - "src/test/**/*.java"
-      # You can add more specific patterns as needed
+# Temporarily disabled - uncomment to re-enable
+# on:
+#   pull_request:
+#     types: [opened, synchronize]
+#     paths:
+#       # Only run when specific Java paths are modified
+#       - "src/**/*.java"
+#       - "src/**/package-info.java"
+#       - "pom.xml"
+#       - "checkstyle.xml"
+#       - "src/test/**/*.java"
+#       # You can add more specific patterns as needed
 
 jobs:
   claude-code-review-java:
