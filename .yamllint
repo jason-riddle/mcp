@@ -14,7 +14,5 @@ rules:
 
 ignore: |
   .github/stale.yml
-  .github/workflows/release.yml
-  .github/workflows/claude.yml
   .travis.yml
   .venv
