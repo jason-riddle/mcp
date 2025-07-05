@@ -47,8 +47,8 @@
         <mcp.version>1.3.1</mcp.version>
 
         <!-- Container & Test Configuration -->
-        <quarkus.container-image.group>com.jasonriddle.api</quarkus.container-image.group>
-        <quarkus.container-image.name>jasons-mcp-server</quarkus.container-image.name>
+        <!-- <quarkus.container-image.group>com.jasonriddle.mcp</quarkus.container-image.group>
+        <quarkus.container-image.name>jasons-mcp-server</quarkus.container-image.name> -->
         <skipITs>true</skipITs>
     </properties>
 
