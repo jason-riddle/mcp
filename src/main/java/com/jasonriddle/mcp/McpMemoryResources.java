@@ -6,6 +6,7 @@ import com.jasonriddle.mcp.memory.MemoryService;
 import com.jasonriddle.mcp.memory.Relation;
 import io.quarkiverse.mcp.server.Resource;
 import io.quarkiverse.mcp.server.TextResourceContents;
+import io.quarkiverse.mcp.server.McpServer;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.io.IOException;
@@ -21,6 +22,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
  * MCP memory resources providing memory graph access via memory:// URI scheme.
  */
 @ApplicationScoped
+@McpServer("memory")
 public final class McpMemoryResources {
 
     @Inject
