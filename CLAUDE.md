@@ -157,3 +157,34 @@ Each package contains a `package-info.java` file with purpose and responsibiliti
 - **Clear separation**: MCP-specific classes in root, domain logic in memory package
 - **Consistent naming**: Package names reflect their primary responsibility
 - **Single responsibility**: Each package has one clear purpose and set of related classes
+
+## Development Workflow
+
+### Building and Running
+```bash
+make build       # Build the project
+make dev         # Start in development mode with live reload
+make run         # Run the server in production mode
+```
+
+### Formatting and Style Checks
+```bash
+make format     # Apply formatting
+make checkstyle # Run style checks
+```
+
+### Testing
+```bash
+make test             # Run unit tests
+make test-watch       # Continuous testing mode
+make test-integration # Run integration tests
+./mvnw test -Dtest=MemoryServiceTest  # Run specific test class
+```
+
+### Documentation Generation
+```bash
+make update-readme
+python scripts/update-docs.py
+```
+
+See [AGENTS.md](AGENTS.md) for a general overview applicable to all agents.
