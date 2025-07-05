@@ -59,6 +59,8 @@ jobs:
 
           # Optional: Allow Claude to run specific commands
           # allowed_tools: "Bash(npm install),Bash(npm run build),Bash(npm run test:*),Bash(npm run lint:*)"
+          # Maven/Java project allowed_tools configuration:
+          # allowed_tools: "Bash(./mvnw clean),Bash(./mvnw compile),Bash(./mvnw test),Bash(./mvnw verify),Bash(./mvnw checkstyle:check),Bash(./mvnw spotless:check),Bash(./mvnw spotless:apply),Bash(make test),Bash(make build),Bash(make format),Bash(make checkstyle),Bash(make clean),Bash(git status),Bash(git add *),Bash(git commit *),Bash(ls *),Bash(cat *),Bash(find *)"
 
           # Optional: Add custom instructions for Claude to customize its behavior for your project
           # custom_instructions: |
