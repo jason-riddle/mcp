@@ -65,10 +65,6 @@ make clean
 # Build and run with Make
 make docker-build
 make docker-run
-
-# Or use Docker directly
-docker build -f src/main/docker/Dockerfile.jvm -t mcp-memory-server .
-docker run -p 8080:8080 -v $(pwd)/memory.jsonl:/deployments/memory.jsonl mcp-memory-server
 ```
 
 ## Usage
