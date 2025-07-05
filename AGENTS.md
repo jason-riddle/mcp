@@ -343,6 +343,82 @@ memory.file.path=memory.jsonl
 quarkus.http.port=8080
 ```
 
+### Container Image Tagging Strategy
+
+The project implements a comprehensive Docker image tagging strategy for both local development and CI/CD deployment:
+
+#### Local Development Tags
+
+Local builds use Quarkus container image configuration in `application.properties`:
+
+```properties
+# Container Image Configuration
+quarkus.container-image.build=true
+quarkus.container-image.registry=us-central1-docker.pkg.dev
+quarkus.container-image.group=jasons-mcp-server-20250705/mcp-servers
+quarkus.container-image.name=jasons-mcp-server
+quarkus.container-image.tag=latest
+quarkus.container-image.additional-tags=${quarkus.application.version}
+```
+
+**Generated Tags:**
+- `latest` - Always points to most recent local build
+- `{version}` - Maven project version (e.g., `0.0.1-SNAPSHOT`)
+- Custom additional tags as specified
+
+#### Cloud Build Tags
+
+Cloud Build generates unique, traceable tags combining multiple identifiers:
+
+**Tag Format:** `build-{BUILD_ID}-{MAVEN_VERSION}-{TIMESTAMP}`
+
+**Example:** `build-ffa31445-4f67-41aa-97cf-cd66e1279eba-0.0.1-SNAPSHOT-20250705-163119`
+
+**Components:**
+- `BUILD_ID` - Google Cloud Build unique identifier
+- `MAVEN_VERSION` - Extracted from `pom.xml` using `mvn help:evaluate`
+- `TIMESTAMP` - ISO format: `YYYYMMDD-HHMMSS` (UTC)
+
+#### Tag Generation Process
+
+Cloud Build uses a two-step process in `cloudbuild.yaml`:
+
+1. **Generate Tag:** Extract Maven version and create timestamp
+2. **Build & Push:** Use unique tag for container image and deployment
+
+```bash
+# Extract version and create unique tag
+MAVEN_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+TIMESTAMP=$(date -u +%Y%m%d-%H%M%S)
+UNIQUE_TAG="build-${BUILD_ID}-${MAVEN_VERSION}-${TIMESTAMP}"
+
+# Build with unique tag
+mvn clean package -DskipTests=true \
+  -Dquarkus.container-image.tag="${UNIQUE_TAG}"
+```
+
+#### Best Practices Implemented
+
+- ✅ **Unique identification** - Every Cloud Build has a unique, non-colliding tag
+- ✅ **Traceability** - Can trace image back to specific build, version, and time
+- ✅ **Reproducibility** - Timestamp ensures consistent identification across environments
+- ✅ **Version control** - Maven version included for release tracking
+- ✅ **Build correlation** - Cloud Build ID links image to CI/CD logs and artifacts
+
+#### Rollback Strategy
+
+To rollback to a previous deployment:
+
+```bash
+# Find desired build tag
+make cloud-build-status
+
+# Deploy specific tag
+gcloud run deploy jasons-mcp-server \
+  --image=us-central1-docker.pkg.dev/PROJECT_ID/mcp-servers/jasons-mcp-server:build-ABC123-0.0.1-SNAPSHOT-20250705-120000 \
+  --region=us-central1
+```
+
 ### Documentation Generation
 
 ```bash
