@@ -37,40 +37,9 @@ GCLOUD_IMAGE := $(GCLOUD_REGISTRY)/$(PROJECT_NAME):latest
 
 ## Show available targets
 help:
-	@echo "Available targets:"
-	@echo ""
-	@echo "Core:"
-	@echo "  build     - Build the project"
-	@echo "  clean     - Clean build artifacts"
-	@echo "  dev       - Run in development mode with hot reload"
-	@echo "  run       - Run the MCP server"
-	@echo ""
-	@echo "Quality:"
-	@echo "  format      - Format code using Spotless"
-	@echo "  checkstyle  - Run checkstyle verification"
-	@echo ""
-	@echo "Testing:"
-	@echo "  test             - Run unit tests"
-	@echo "  test-watch       - Run tests in watch mode"
-	@echo "  test-integration - Run integration tests"
-	@echo ""
-	@echo "Docker:"
-	@echo "  docker-build - Build Docker image"
-	@echo "  docker-run   - Run in Docker"
-	@echo "  docker-clean - Remove Docker images"
-	@echo ""
-	@echo "Google Cloud:"
-	@echo "  gcloud-push   - Build and push image to Artifact Registry"
-	@echo "  gcloud-deploy - Deploy to Cloud Run"
-	@echo "  gcloud-proxy  - Start Cloud Run proxy for local access"
-	@echo "  gcloud-logs   - View Cloud Run logs"
-	@echo "  gcloud-status - Check Cloud Run service status"
-	@echo ""
-	@echo "Documentation:"
-	@echo "  update-readme - Update README.md with generated tool documentation"
+	@awk 'BEGIN {FS = ":.*##"; printf "Available targets:\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  %-20s %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 
-## Clean build artifacts
-clean:
+clean: ## Clean build artifacts
 	@echo "Cleaning build artifacts..."
 	@$(MVN) clean -q
 	@echo "Cleaning compiled class files..."
@@ -84,8 +53,7 @@ clean:
 	fi
 	@echo "✓ Clean complete"
 
-## Build the project
-build:
+build: ## Build the project
 	@echo "Building project..."
 	@$(MVN) clean package -q
 	@if [ -f "$(JAR_FILE)" ]; then \
@@ -95,14 +63,12 @@ build:
 		exit 1; \
 	fi
 
-## Run in development mode with hot reload
-dev:
+dev: ## Run in development mode with hot reload
 	@echo "Starting development mode..."
 	@echo "Press Ctrl+C to stop"
 	@$(MVN) quarkus:dev -q
 
-## Run the MCP server
-run: $(JAR_FILE)
+run: $(JAR_FILE) ## Run the MCP server
 	@echo "Starting MCP Server..."
 	@echo "Server will communicate via STDIO"
 	@echo "Press Ctrl+C to stop"
@@ -112,14 +78,12 @@ run: $(JAR_FILE)
 # QUALITY TARGETS
 # ============================================================================
 
-## Format code using Spotless
-format:
+format: ## Format code using Spotless
 	@echo "Code formatting..."
 	$(MVN) spotless:apply
 	@echo "✓ Formatted files"
 
-## Run checkstyle verification
-checkstyle:
+checkstyle: ## Run checkstyle verification
 	@echo "Running checkstyle verification..."
 	@if $(MVN) checkstyle:check -q; then \
 		echo "✓ Checkstyle passed"; \
@@ -133,20 +97,17 @@ checkstyle:
 # TESTING TARGETS
 # ============================================================================
 
-## Run unit tests
-test:
+test: ## Run unit tests
 	@echo "Running unit tests..."
 	@$(MVN) test -q
 	@echo "✓ Unit tests completed"
 
-## Run tests in watch mode
-test-watch:
+test-watch: ## Run tests in watch mode
 	@echo "Running tests in watch mode..."
 	@echo "Press Ctrl+C to stop"
 	@$(MVN) quarkus:test -q
 
-## Run integration tests
-test-integration:
+test-integration: ## Run integration tests
 	@echo "Running integration tests..."
 	@$(MVN) verify -DskipITs=false -q
 	@echo "✓ Integration tests completed"
@@ -155,20 +116,17 @@ test-integration:
 # DOCKER TARGETS
 # ============================================================================
 
-## Build Docker image
-docker-build:
+docker-build: ## Build Docker image
 	@echo "Building Docker image..."
 	@$(MVN) package -Dquarkus.container-image.build=true -q
 	@echo "✓ Docker image built: $(DOCKER_IMAGE)"
 
-## Run the application in Docker
-docker-run: $(JAR_FILE)
+docker-run: $(JAR_FILE) ## Run the application in Docker
 	@echo "Running $(PROJECT_NAME) in Docker..."
 	@echo "Press Ctrl+C to stop"
 	docker run -i --rm $(DOCKER_IMAGE)
 
-## Remove Docker images for this project
-docker-clean:
+docker-clean: ## Remove Docker images for this project
 	@echo "Removing Docker images for $(PROJECT_NAME)..."
 	@docker images -q $(PROJECT_NAME) | xargs -r docker rmi -f
 	@echo "✓ Docker images removed"
@@ -177,8 +135,7 @@ docker-clean:
 # DOCUMENTATION TARGETS
 # ============================================================================
 
-## Update README.md with generated tool documentation
-update-readme: $(JAR_FILE)
+update-readme: $(JAR_FILE) ## Update README.md with generated tool documentation
 	@echo "Updating README.md with generated documentation..."
 	@python scripts/update-docs.py
 	@echo "✓ README.md updated with latest tool and resource documentation"
@@ -187,16 +144,14 @@ update-readme: $(JAR_FILE)
 # GOOGLE CLOUD TARGETS
 # ============================================================================
 
-## Build and push Docker image to Artifact Registry
-gcloud-push: docker-build
+gcloud-push: docker-build ## Build and push Docker image to Artifact Registry
 	@echo "Tagging image for Artifact Registry..."
 	@docker tag registry.fly.io/$(PROJECT_NAME)/$(PROJECT_NAME):latest $(GCLOUD_IMAGE)
 	@echo "Pushing to Artifact Registry..."
 	@docker push $(GCLOUD_IMAGE)
 	@echo "✓ Image pushed to $(GCLOUD_IMAGE)"
 
-## Deploy to Google Cloud Run
-gcloud-deploy:
+gcloud-deploy: ## Deploy to Google Cloud Run
 	@echo "Deploying to Cloud Run..."
 	@gcloud run deploy $(GCLOUD_SERVICE) \
 		--image $(GCLOUD_IMAGE) \
@@ -211,20 +166,17 @@ gcloud-deploy:
 	@echo "✓ Deployed to Cloud Run"
 	@echo "Service URL: $$(gcloud run services describe $(GCLOUD_SERVICE) --region $(GCLOUD_REGION) --format='value(status.url)')"
 
-## Start Cloud Run proxy for local access
-gcloud-proxy:
+gcloud-proxy: ## Start Cloud Run proxy for local access
 	@echo "Starting Cloud Run proxy..."
 	@echo "MCP endpoint will be available at: http://localhost:3000/v1/mcp/sse"
 	@echo "Press Ctrl+C to stop"
 	@gcloud run services proxy $(GCLOUD_SERVICE) --region $(GCLOUD_REGION) --port 3000
 
-## View Cloud Run service logs
-gcloud-logs:
+gcloud-logs: ## View Cloud Run service logs
 	@echo "Viewing Cloud Run logs..."
 	@gcloud run services logs read $(GCLOUD_SERVICE) --region $(GCLOUD_REGION) --limit 50
 
-## Check Cloud Run service status
-gcloud-status:
+gcloud-status: ## Check Cloud Run service status
 	@echo "Cloud Run service status:"
 	@gcloud run services describe $(GCLOUD_SERVICE) --region $(GCLOUD_REGION) --format="table(metadata.name,status.url,status.conditions[0].status,spec.template.spec.containers[0].image)"
 
