@@ -399,41 +399,6 @@ final class McpServerSseIntegrationTest {
     }
 
     @Test
-    @Order(6)
-    void shouldReadMemoryGraphResource() {
-        // Create test data for resource testing
-        final List<Map<String, Object>> entityData = List.of(
-                Map.of(
-                        "name",
-                        "ResourceTestUser",
-                        "entityType",
-                        "person",
-                        "observations",
-                        List.of("Test user for resource testing")),
-                Map.of(
-                        "name",
-                        "ResourceTestPrefs",
-                        "entityType",
-                        "preferences",
-                        "observations",
-                        List.of("Test preferences")));
-        mcpMemoryTools.createEntities(entityData);
-
-        final List<Map<String, String>> relationData = List.of(
-                Map.of("from", "ResourceTestUser", "to", "ResourceTestPrefs", "relationType", "has_preferences"));
-        mcpMemoryTools.createRelations(relationData);
-
-        // Test memory://graph resource
-        final var graphResource = mcpMemoryResources.memoryGraphResource();
-        assertNotNull(graphResource);
-        assertEquals("memory://graph", graphResource.uri());
-        assertTrue(graphResource.text().contains("Complete Memory Graph"));
-        assertTrue(graphResource.text().contains("ResourceTestUser"));
-        assertTrue(graphResource.text().contains("ResourceTestPrefs"));
-        assertTrue(graphResource.text().contains("has_preferences"));
-    }
-
-    @Test
     @Order(7)
     void shouldReadMemoryTypesResource() {
         // Create diverse test data for types testing

@@ -57,37 +57,6 @@ final class McpMemoryResourcesTest {
     }
 
     @Test
-    void memoryGraphResourceShouldReturnFormattedGraph() {
-        final TextResourceContents result = mcpMemoryResources.memoryGraphResource();
-
-        assertNotNull(result);
-        assertEquals("memory://graph", result.uri());
-        assertTrue(result.text().contains("Complete Memory Graph"));
-        assertTrue(result.text().contains("**Entities:** 2"));
-        assertTrue(result.text().contains("**Relations:** 1"));
-        assertTrue(result.text().contains("person (1)"));
-        assertTrue(result.text().contains("preferences (1)"));
-        assertTrue(result.text().contains("**Jason** has_preferences **Technical_Preferences**"));
-    }
-
-    @Test
-    void memoryGraphResourceShouldHandleEmptyGraph() throws IOException {
-        // Create empty memory service
-        final Path emptyFile = Files.createTempFile("empty-memory", ".jsonl");
-        final MemoryService emptyMemoryService = new MemoryService(new ObjectMapper(), emptyFile.toString());
-        mcpMemoryResources.memoryService = emptyMemoryService;
-
-        final TextResourceContents result = mcpMemoryResources.memoryGraphResource();
-
-        assertNotNull(result);
-        assertTrue(result.text().contains("**Entities:** 0"));
-        assertTrue(result.text().contains("**Relations:** 0"));
-        assertTrue(result.text().contains("*No entities found in memory graph.*"));
-
-        Files.deleteIfExists(emptyFile);
-    }
-
-    @Test
     void typesResourceShouldListAvailableTypesAndPatterns() {
         final TextResourceContents result = mcpMemoryResources.typesResource();
 

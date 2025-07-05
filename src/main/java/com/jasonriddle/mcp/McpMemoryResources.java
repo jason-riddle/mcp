@@ -12,8 +12,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -31,66 +29,6 @@ public final class McpMemoryResources {
     @Inject
     @ConfigProperty(name = "memory.file.path", defaultValue = "memory.jsonl")
     String memoryFilePath;
-
-    /**
-     * Returns the complete knowledge graph in formatted, human-readable way.
-     *
-     * @return formatted memory graph resource.
-     */
-    @Resource(uri = "memory://graph")
-    TextResourceContents memoryGraphResource() {
-        final MemoryGraph graph = memoryService.readGraph();
-        final StringBuilder content = new StringBuilder();
-
-        content.append("# Complete Memory Graph\n\n");
-        content.append("## Summary\n");
-        content.append("- **Entities:** ").append(graph.entities().size()).append("\n");
-        content.append("- **Relations:** ").append(graph.relations().size()).append("\n");
-        content.append("- **Last Updated:** ")
-                .append(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
-                .append("\n\n");
-
-        if (graph.entities().isEmpty()) {
-            content.append("*No entities found in memory graph.*\n");
-            return TextResourceContents.create("memory://graph", content.toString());
-        }
-
-        // Group entities by type
-        final Map<String, List<Entity>> entitiesByType =
-                graph.entities().stream().collect(Collectors.groupingBy(Entity::entityType));
-
-        content.append("## Entities by Type\n\n");
-        for (final Map.Entry<String, List<Entity>> entry : entitiesByType.entrySet()) {
-            content.append("### ")
-                    .append(entry.getKey())
-                    .append(" (")
-                    .append(entry.getValue().size())
-                    .append(")\n");
-            for (final Entity entity : entry.getValue()) {
-                content.append("- **").append(entity.name()).append("**");
-                if (!entity.observations().isEmpty()) {
-                    content.append(" (").append(entity.observations().size()).append(" observations)");
-                }
-                content.append("\n");
-            }
-            content.append("\n");
-        }
-
-        if (!graph.relations().isEmpty()) {
-            content.append("## Relationships\n\n");
-            for (final Relation relation : graph.relations()) {
-                content.append("- **")
-                        .append(relation.from())
-                        .append("** ")
-                        .append(relation.relationType())
-                        .append(" **")
-                        .append(relation.to())
-                        .append("**\n");
-            }
-        }
-
-        return TextResourceContents.create("memory://graph", content.toString());
-    }
 
     /**
      * Returns types and patterns available in the memory graph.
