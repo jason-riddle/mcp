@@ -63,7 +63,6 @@ updates:
       prefix: "deps"
       include: "scope"
 
-
   # Git submodules support (commented out - enable when needed)
   # - package-ecosystem: "gitsubmodule"
   #   directory: "/"
