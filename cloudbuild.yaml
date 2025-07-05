@@ -173,11 +173,11 @@ options:
 timeout: '1200s'
 
 # Artifacts to store (optional - for debugging)
-artifacts:
-  objects:
-    location: 'gs://${PROJECT_ID}_cloudbuild/artifacts'
-    paths:
-      - 'target/quarkus-app/quarkus-run.jar'
+# artifacts:
+#   objects:
+#     location: 'gs://${PROJECT_ID}_cloudbuild/artifacts'
+#     paths:
+#       - 'target/quarkus-app/quarkus-run.jar'
 
 # Build logs location
 logsBucket: 'gs://${PROJECT_ID}_cloudbuild/logs'
