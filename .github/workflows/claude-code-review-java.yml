@@ -62,16 +62,20 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Claude Code Review
-        uses: grll/claude-code-action@beta
-        with:
-          # OAuth authentication for Claude Max subscribers
-          use_oauth: true
-          claude_access_token: ${{ secrets.CLAUDE_ACCESS_TOKEN }}
-          claude_refresh_token: ${{ secrets.CLAUDE_REFRESH_TOKEN }}
-          claude_expires_at: ${{ secrets.CLAUDE_EXPIRES_AT }}
-          secrets_admin_pat: ${{ secrets.SECRETS_ADMIN_PAT }}
+      # - name: Claude Code Review
+      #   uses: grll/claude-code-action@beta
+      #   with:
+      #     # OAuth authentication for Claude Max subscribers
+      #     use_oauth: true
+      #     claude_access_token: ${{ secrets.CLAUDE_ACCESS_TOKEN }}
+      #     claude_refresh_token: ${{ secrets.CLAUDE_REFRESH_TOKEN }}
+      #     claude_expires_at: ${{ secrets.CLAUDE_EXPIRES_AT }}
+      #     secrets_admin_pat: ${{ secrets.SECRETS_ADMIN_PAT }}
 
+      - name: Claude Code Review
+        uses: anthropics/claude-code-action@beta
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           timeout_minutes: "60"
           direct_prompt: |
             Please review this code change focusing on the modified Java files, build configuration, and resources.
