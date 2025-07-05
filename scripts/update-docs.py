@@ -38,7 +38,7 @@ class StagedDocumentationGenerator:
                 print("✗ Stage 1 failed: No data extracted")
                 return False
             self.write_json("extracted-data.json", data)
-            print(f"✓ Stage 1 complete: {len(data.get('tools', []))} tools, {len(data.get('resources', []))} resources")
+            print(f"✓ Stage 1 complete: {len(data.get('tools', []))} tools, {len(data.get('resources', []))} resources, {len(data.get('prompts', []))} prompts")
 
             # Stage 2: Content Generation
             print("\n=== Stage 2: Content Generation ===")
@@ -47,7 +47,7 @@ class StagedDocumentationGenerator:
                 print("✗ Stage 2 failed: No content generated")
                 return False
             self.write_json("generated-content.json", content)
-            print("✓ Stage 2 complete: Generated tools and resources sections")
+            print("✓ Stage 2 complete: Generated tools, resources, and prompts sections")
 
             # Stage 3: Staging File Creation
             print("\n=== Stage 3: Staging File Creation ===")
@@ -119,10 +119,12 @@ class StagedDocumentationGenerator:
         """Fallback data extraction using regex parsing."""
         tools = self.parse_tools_with_regex()
         resources = self.parse_resources_with_regex()
+        prompts = self.parse_prompts_with_regex()
 
         return {
             "tools": tools,
-            "resources": resources
+            "resources": resources,
+            "prompts": prompts
         }
 
     def parse_tools_with_regex(self) -> List[Dict]:
@@ -167,7 +169,6 @@ class StagedDocumentationGenerator:
 
             tools.append({
                 'name': tool_name,
-                'title': self.format_title(tool_name),
                 'description': description,
                 'method_name': method_name,
                 'return_type': return_type,
@@ -198,11 +199,37 @@ class StagedDocumentationGenerator:
             resources.append({
                 'uri': uri,
                 'method_name': method_name,
-                'title': self.format_resource_title(uri),
                 'description': self.extract_javadoc_description(content, match.start())
             })
 
         return resources
+
+    def parse_prompts_with_regex(self) -> List[Dict]:
+        """Parse prompts from McpMemoryPrompts.java using regex."""
+        prompts_file = self.src_dir / "McpMemoryPrompts.java"
+        if not prompts_file.exists():
+            print(f"Warning: {prompts_file} not found")
+            return []
+
+        content = prompts_file.read_text()
+        prompts = []
+
+        # Find all @Prompt annotations and their methods
+        import re
+        prompt_pattern = r'@Prompt\(name\s*=\s*"([^"]+)",\s*description\s*=\s*"([^"]+)"\)\s*PromptMessage\s+(\w+)\s*\(\)'
+
+        for match in re.finditer(prompt_pattern, content):
+            name = match.group(1)
+            description = match.group(2)
+            method_name = match.group(3)
+
+            prompts.append({
+                'name': name,
+                'description': description,
+                'method_name': method_name
+            })
+
+        return prompts
 
     def parse_method_parameters(self, method_section: str) -> List[Dict]:
         """Parse parameters from a method section (includes annotations and method body)."""
@@ -274,15 +301,6 @@ class StagedDocumentationGenerator:
 
         return ' '.join(description_lines)
 
-    def format_title(self, tool_name: str) -> str:
-        """Format tool name into a readable title."""
-        parts = tool_name.replace('memory.', '').split('_')
-        return ' '.join(word.capitalize() for word in parts)
-
-    def format_resource_title(self, uri: str) -> str:
-        """Format resource URI into a readable title."""
-        resource_name = uri.replace('memory://', '')
-        return f"Memory {resource_name.capitalize()}"
 
     def simplify_type(self, java_type: str) -> str:
         """Simplify Java type to more readable format."""
@@ -324,9 +342,10 @@ class StagedDocumentationGenerator:
         print(f"✓ Wrote {filepath}")
 
     def generate_all_content(self, data: Dict) -> Dict:
-        """Stage 2: Generate formatted content for tools and resources."""
+        """Stage 2: Generate formatted content for tools, resources, and prompts."""
         tools = data.get('tools', [])
         resources = data.get('resources', [])
+        prompts = data.get('prompts', [])
 
         # Clean up resource descriptions (remove verbose Java source code)
         cleaned_resources = []
@@ -347,22 +366,25 @@ class StagedDocumentationGenerator:
                     if len(first_sentence) < 200:  # Only use if reasonably short
                         cleaned_resource['description'] = first_sentence
                     else:
-                        cleaned_resource['description'] = f"Resource for {resource['title'].lower()}"
+                        cleaned_resource['description'] = f"Resource for {resource['uri']}"
                 else:
-                    cleaned_resource['description'] = f"Resource for {resource['title'].lower()}"
+                    cleaned_resource['description'] = f"Resource for {resource['uri']}"
             cleaned_resources.append(cleaned_resource)
 
         # Generate content sections
         tools_content = self.generate_tools_section(tools)
         resources_content = self.generate_resources_section(cleaned_resources)
+        prompts_content = self.generate_prompts_section(prompts)
 
         return {
             'tools_section': tools_content,
             'resources_section': resources_content,
+            'prompts_section': prompts_content,
             'metadata': {
                 'generated_at': datetime.now().isoformat(),
                 'tools_count': len(tools),
-                'resources_count': len(cleaned_resources)
+                'resources_count': len(cleaned_resources),
+                'prompts_count': len(prompts)
             }
         }
 
@@ -417,13 +439,27 @@ class StagedDocumentationGenerator:
 
         return '\n'.join(lines)
 
+    def generate_prompts_section(self, prompts: List[Dict]) -> str:
+        """Generate formatted content for the prompts section."""
+        if not prompts:
+            return "No prompts found."
+
+        lines = []
+
+        for i, prompt in enumerate(prompts):
+            lines.extend(self.format_prompt(prompt))
+            # Add spacing between prompts, but not after the last prompt
+            if i < len(prompts) - 1:
+                lines.append("")
+
+        return '\n'.join(lines)
+
     def format_tool(self, tool: Dict) -> List[str]:
         """Format a single tool for documentation."""
         lines = [
             "<!-- NOTE: This has been generated via update-docs.py --->",
             "",
             f"- **{tool['name']}**",
-            f"  - Title: {tool['title']}",
             f"  - Description: {tool['description']}"
         ]
 
@@ -445,8 +481,16 @@ class StagedDocumentationGenerator:
             "<!-- NOTE: This has been generated via update-docs.py --->",
             "",
             f"- **{resource['uri']}**",
-            f"  - Title: {resource['title']}",
             f"  - Description: {resource['description']}"
+        ]
+
+    def format_prompt(self, prompt: Dict) -> List[str]:
+        """Format a single prompt for documentation."""
+        return [
+            "<!-- NOTE: This has been generated via update-docs.py --->",
+            "",
+            f"- **{prompt['name']}**",
+            f"  - Description: {prompt['description']}"
         ]
 
     def create_staging_readme(self, content: Dict) -> str:
@@ -470,6 +514,13 @@ class StagedDocumentationGenerator:
             updated_content,
             "resources",
             content['resources_section']
+        )
+
+        # Update prompts section
+        updated_content = self.update_section_in_content(
+            updated_content,
+            "prompts",
+            content['prompts_section']
         )
 
         return updated_content
@@ -571,7 +622,8 @@ class StagedDocumentationGenerator:
             '## Installation',
             '## Usage',
             '### Memory Tools',
-            '### Memory Resources'
+            '### Memory Resources',
+            '### Memory Prompts'
         ]
 
         for section in required_sections:
@@ -623,6 +675,19 @@ class StagedDocumentationGenerator:
             result['valid'] = False
         else:
             result['info'].append("Resources section markers validated")
+
+        # Check for prompts markers
+        prompts_start = 'Prompts generated by' in content
+        prompts_end = '<!--- End of prompts generated section -->' in content
+
+        if not prompts_start:
+            result['errors'].append("Missing prompts section start marker")
+            result['valid'] = False
+        elif not prompts_end:
+            result['errors'].append("Missing prompts section end marker")
+            result['valid'] = False
+        else:
+            result['info'].append("Prompts section markers validated")
 
     def validate_file_size(self, content: str, result: Dict) -> None:
         """Validate file size is reasonable."""
