@@ -1,5 +1,6 @@
 ---
 # REF: https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+# REF: https://docs.github.com/en/code-security/dependabot/ecosystems-supported-by-dependabot/supported-ecosystems-and-repositories
 version: 2
 updates:
   - package-ecosystem: "maven"
@@ -17,3 +18,70 @@ updates:
     commit-message:
       prefix: "deps"
       include: "scope"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    labels:
+      - "dependencies"
+      - "docker"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    labels:
+      - "dependencies"
+      - "npm"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    labels:
+      - "dependencies"
+      - "python"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+
+  - package-ecosystem: "yarn"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    labels:
+      - "dependencies"
+      - "yarn"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+
+# Git submodules support (commented out - enable when needed)
+# - package-ecosystem: "gitsubmodule"
+#   directory: "/"
+#   schedule:
+#     interval: "daily"
+#   labels:
+#     - "dependencies"
+#     - "submodules"
+#   commit-message:
+#     prefix: "deps"
+#     include: "scope"
