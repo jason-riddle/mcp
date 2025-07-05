@@ -1,0 +1,13 @@
+*.bak
+*.lock
+*.new
+*.old
+*.swp
+*.tar.gz
+.aider.conf.yml
+.devenv
+.dockerignore
+.env
+.envrc
+.github
+.mvn
