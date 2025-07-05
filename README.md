@@ -217,25 +217,8 @@ quarkus.http.port=8080
 
 ## Development
 
-### Project Structure
-
-```
-src/main/java/com/jasonriddle/mcp/
-├── McpMemoryPrompts.java      # MCP prompts providing memory guidance
-├── McpMemoryResources.java    # MCP resources (memory://) for graph access
-├── McpMemoryTools.java        # MCP tools for graph operations
-└── memory/                    # Memory graph implementation
-    ├── Entity.java            # Entity record representing graph nodes
-    ├── MemoryGraph.java       # Complete graph structure record
-    ├── MemoryRecord.java      # Base interface for JSONL records
-    ├── MemoryService.java     # Core service for graph persistence and operations
-    └── Relation.java          # Relation record representing graph edges
-```
-
 ### Code Quality
 
-For detailed style guidelines and contributor workflows see
-[AGENTS.md](AGENTS.md).
 The project uses Palantir Java Format via Spotless and enhanced Checkstyle rules.
 Run `make format` and `make checkstyle` before committing.
 
@@ -276,18 +259,6 @@ make test-integration
 
 # Run specific test class (using Maven directly)
 ./mvnw test -Dtest=MemoryServiceTest
-```
-
-### Test Structure
-
-```
-src/test/java/com/jasonriddle/mcp/
-├── McpMemoryPromptsTest.java         # Tests for memory prompts
-├── McpMemoryResourcesTest.java       # Tests for memory resources
-├── McpMemoryToolsTest.java           # Tests for memory tools
-├── McpServerSseIntegrationTest.java  # Integration tests for SSE server
-└── memory/                           # Memory implementation tests
-    └── MemoryServiceTest.java        # Tests for memory service
 ```
 
 ### Integration Testing
