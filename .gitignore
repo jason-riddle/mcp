@@ -1,10 +1,16 @@
+
+
+*.after*
+*.before*
 *.class
+*.comp*
 *.db
 *.jar
 *.log*
 *.pyc
 *.sqlite
 *.tmp
+*.txt
 .DS_Store
 .aider.chat.*
 .aider.input.*
@@ -41,9 +47,4 @@ settings.local.json
 staging
 target
 test-memory.jsonl
-
-
-*.txt
-*.after*
-*.before*
-*.comp*
+tmp
