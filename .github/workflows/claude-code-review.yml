@@ -6,10 +6,10 @@ on:
     types: [opened, synchronize]
     # Optional: Only run on specific file changes
     # paths:
-    #   - "src/**/*.ts"
-    #   - "src/**/*.tsx"
-    #   - "src/**/*.js"
-    #   - "src/**/*.jsx"
+    #   - "src/**/*.java"
+    #   - "pom.xml"
+    #   - "checkstyle.xml"
+    #   - "src/**/package-info.java"
 
 jobs:
   claude-review:
@@ -67,9 +67,9 @@ jobs:
           # Optional: Customize review based on file types
           # direct_prompt: |
           #   Review this PR focusing on:
-          #   - For TypeScript files: Type safety and proper interface usage
+          #   - For Java files: Code quality, proper OOP practices, and adherence to style guidelines
           #   - For API endpoints: Security, input validation, and error handling
-          #   - For React components: Performance, accessibility, and best practices
+          #   - For configuration files: Proper settings and potential security risks
           #   - For tests: Coverage, edge cases, and test quality
 
           # Optional: Different prompts for different authors
@@ -79,7 +79,7 @@ jobs:
           #   'Please provide a thorough code review focusing on our coding standards.' }}
 
           # Optional: Add specific tools for running tests or linting
-          # allowed_tools: "Bash(npm run test),Bash(npm run lint),Bash(npm run typecheck)"
+          # allowed_tools: "Bash(mvn test),Bash(mvn checkstyle:check),Bash(mvn compile)"
 
           # Optional: Skip review for certain conditions
           # if: |
