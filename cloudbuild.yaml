@@ -67,6 +67,101 @@ steps:
           --quiet
     id: 'deploy-to-cloud-run'
 
+  # Step 4: GitHub Status Integration Options (COMMENTED OUT)
+  # The recommended approach is to use the official Google Cloud Build GitHub App
+  # Install it at: https://github.com/apps/google-cloud-build
+  # Docs: https://cloud.google.com/build/docs/automating-builds/github/build-repos-from-github
+  # Alternative options are provided below but commented out
+
+  # Option 1: Cloud Build Notifiers (More Control)
+  # Source: https://github.com/GoogleCloudPlatform/cloud-build-notifiers
+  # Docs: https://cloud.google.com/build/docs/configuring-notifications/configure-github
+  # Reference: https://medium.com/google-cloud/sending-build-status-notification-from-google-container-builder-to-github-8adb33abba80
+  # Uncomment and configure the following to use official Cloud Build Notifiers
+  # Prerequisites:
+  #   1. Create GitHub Personal Access Token with repo:status scope
+  #   2. Store token in Secret Manager: gcloud secrets create github-token --data-file=-
+  #   3. Grant Cloud Build service account access to the secret
+  # - name: 'gcr.io/cloud-build-notifiers/github'
+  #   args:
+  #     - '--github-token-secret-id=github-token'
+  #     - '--repo-owner=jason-riddle'
+  #     - '--repo-name=mcp'
+  #     - '--commit-sha=$COMMIT_SHA'
+  #     - '--build-status=success'
+  #     - '--build-id=$BUILD_ID'
+  #     - '--build-url=https://console.cloud.google.com/cloud-build/builds/$BUILD_ID?project=$PROJECT_ID'
+  #   id: 'notify-github-success'
+  #   waitFor: ['deploy-to-cloud-run']
+
+  # Option 2: Direct GitHub API Integration
+  # Docs: https://docs.github.com/en/rest/commits/statuses
+  # Reference: https://stackoverflow.com/questions/52636635/further-integrating-google-cloud-build-with-github-checks-api
+  # Community example: https://github.com/pokutuna/cloudbuild-github-commit-status
+  # Uncomment and configure the following to directly call GitHub's Status API
+  # Prerequisites:
+  #   1. Create GitHub Personal Access Token with repo:status scope
+  #   2. Store as secret environment variable in Cloud Build
+  # - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  #   entrypoint: 'bash'
+  #   args:
+  #     - '-c'
+  #     - |
+  #       # Update GitHub commit status via API
+  #       curl -X POST \
+  #         -H "Authorization: token $$GITHUB_TOKEN" \
+  #         -H "Accept: application/vnd.github.v3+json" \
+  #         -H "Content-Type: application/json" \
+  #         https://api.github.com/repos/jason-riddle/mcp/statuses/$COMMIT_SHA \
+  #         -d '{
+  #           "state": "success",
+  #           "target_url": "https://console.cloud.google.com/cloud-build/builds/$BUILD_ID?project=$PROJECT_ID",
+  #           "description": "Cloud Build completed successfully",
+  #           "context": "google-cloud-build"
+  #         }'
+  #
+  #       echo "GitHub commit status updated for SHA: $COMMIT_SHA"
+  #   secretEnv: ['GITHUB_TOKEN']
+  #   id: 'update-github-status'
+  #   waitFor: ['deploy-to-cloud-run']
+
+  # Option 3: Enhanced GitHub Status with Build Details
+  # Docs: https://docs.github.com/en/rest/commits/statuses
+  # Reference: https://cloud.google.com/build/docs/configuring-notifications/configure-github
+  # Uncomment for more detailed status reporting including deployment information
+  # - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  #   entrypoint: 'bash'
+  #   args:
+  #     - '-c'
+  #     - |
+  #       # Get unique tag and deployment details
+  #       UNIQUE_TAG=$$(cat /workspace/unique_tag.txt)
+  #       DEPLOYMENT_URL="https://jasons-mcp-server-711952654932.us-central1.run.app"
+  #
+  #       # Update GitHub commit status with deployment information
+  #       curl -X POST \
+  #         -H "Authorization: token $$GITHUB_TOKEN" \
+  #         -H "Accept: application/vnd.github.v3+json" \
+  #         -H "Content-Type: application/json" \
+  #         https://api.github.com/repos/jason-riddle/mcp/statuses/$COMMIT_SHA \
+  #         -d '{
+  #           "state": "success",
+  #           "target_url": "'$DEPLOYMENT_URL'",
+  #           "description": "Deployed to Cloud Run: '$UNIQUE_TAG'",
+  #           "context": "google-cloud-build/deploy"
+  #         }'
+  #
+  #       echo "GitHub status updated with deployment info for tag: $UNIQUE_TAG"
+  #   secretEnv: ['GITHUB_TOKEN']
+  #   id: 'update-deployment-status'
+  #   waitFor: ['deploy-to-cloud-run']
+
+# Secret environment variables (uncomment if using direct API integration)
+# availableSecrets:
+#   secretManager:
+#     - versionName: projects/$PROJECT_ID/secrets/github-token/versions/latest
+#       env: 'GITHUB_TOKEN'
+
 # Build options for optimization
 options:
   # Use higher performance machine for faster builds
