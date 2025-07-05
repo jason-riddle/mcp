@@ -1,0 +1,65 @@
+---
+name: Claude Review - Path Specific
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    paths:
+      # Only run when specific Java paths are modified
+      - "src/**/*.java"
+      - "src/**/package-info.java"
+      - "pom.xml"
+      - "checkstyle.xml"
+      - "src/test/**/*.java"
+      # You can add more specific patterns as needed
+
+jobs:
+  claude-review-paths:
+    if: |
+      github.actor == 'jason-riddle' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      (github.event.pull_request.base.ref == 'main' || github.event.pull_request.base.ref == 'develop')
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+      issues: read
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Claude Code Review
+        uses: grll/claude-code-action@beta
+        with:
+          # OAuth authentication for Claude Max subscribers
+          use_oauth: true
+          claude_access_token: ${{ secrets.CLAUDE_ACCESS_TOKEN }}
+          claude_refresh_token: ${{ secrets.CLAUDE_REFRESH_TOKEN }}
+          claude_expires_at: ${{ secrets.CLAUDE_EXPIRES_AT }}
+          secrets_admin_pat: ${{ secrets.SECRETS_ADMIN_PAT }}
+
+          timeout_minutes: "60"
+          direct_prompt: |
+            Please review this pull request focusing on the changed Java files.
+            Provide feedback on:
+            - Code quality and adherence to Palantir Java Format standards
+            - Proper javadoc documentation following project standards
+            - Potential bugs or edge cases
+            - Performance considerations
+            - Security implications
+            - Single Responsibility Principle and method design
+            - Proper use of final parameters and interface types
+            - Checkstyle compliance and code organization
+            - Suggestions for improvement
+
+            Since this PR touches critical Java source code paths, please be thorough
+            in your review and provide inline comments where appropriate.
+            Pay special attention to package organization and naming conventions.
+
+          # Optional: Add Java-specific tools for validation
+          # allowed_tools: "Bash(./mvnw checkstyle:check),Bash(./mvnw spotless:check),Bash(./mvnw test),Bash(./mvnw compile)"
