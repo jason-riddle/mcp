@@ -1,0 +1,80 @@
+# .gcloudignore file for Google Cloud Build
+# This file specifies which files to exclude from Cloud Build uploads
+
+# Git files
+.git/
+.gitignore
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# Maven build files (keep pom.xml and src/)
+target/
+
+# Gradle build files (if switching to Gradle)
+.gradle/
+build/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+jasons-mcp-server.log
+
+# Temporary files
+*.tmp
+*.temp
+*~
+
+# Documentation (unless needed for build)
+*.md
+docs/
+
+# Local development files
+.env
+.env.local
+*.local
+
+# Memory files (runtime generated)
+memory.jsonl
+
+# Cache directories
+.cache/
+node_modules/
+.npm/
+
+# Test reports and coverage
+test-results/
+coverage/
+surefire-reports/
+
+# Backup files
+*.bak
+*.backup
+
+# Archive files
+*.zip
+*.tar.gz
+*.rar
+
+# Docker files (not needed if using Quarkus container build)
+Dockerfile*
+.dockerignore
+
+# Python cache (if any Python scripts)
+__pycache__/
+*.pyc
+*.pyo
+
+# Scripts directory (if contains development scripts only)
+scripts/
+
+# Staging directory
+staging/

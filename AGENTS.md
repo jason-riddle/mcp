@@ -52,6 +52,13 @@ make gcloud-proxy   # Start local proxy for MCP clients
 make gcloud-logs    # View service logs
 make gcloud-status  # Check deployment status
 
+# Google Cloud Build (CI/CD)
+make cloud-build                  # Submit manual build to Cloud Build
+make cloud-build-status          # Check recent build status
+make cloud-build-logs            # View latest build logs
+make cloud-build-trigger-create  # Create GitHub trigger
+make cloud-build-trigger-list    # List build triggers
+
 # Cleanup
 make clean
 ```
@@ -280,7 +287,7 @@ make gcloud-logs                        # View service logs
 - **Service URL**: https://jasons-mcp-server-711952654932.us-central1.run.app
 - **MCP Endpoint**: `/v1/mcp/sse` (Server-Sent Events transport)
 - **Authentication**: Google Cloud IAM required (no unauthenticated access)
-- **Scaling**: Auto-scaling from 0 to 10 instances
+- **Scaling**: Auto-scaling from 0 to 1 instances
 - **Resources**: 512Mi memory, 1 CPU, 300s timeout
 
 ### Local Access
@@ -344,6 +351,156 @@ make update-readme
 
 # Or run directly
 python scripts/update-docs.py
+```
+
+## Google Cloud Build
+
+### Overview
+
+Google Cloud Build provides automated CI/CD for the MCP server with container building and deployment to Cloud Run.
+
+**Key Features:**
+- Automated build on GitHub commits
+- Parallel build and deployment steps
+- Artifact Registry integration
+- Build caching for performance
+- Comprehensive logging and monitoring
+
+### Cloud Build Configuration
+
+The project uses `cloudbuild.yaml` for build configuration:
+
+```yaml
+# Two-step pipeline:
+# 1. Maven build with Quarkus container image
+# 2. Deploy to Cloud Run
+steps:
+  - name: 'maven:3.9.9-eclipse-temurin-17'
+    entrypoint: 'mvn'
+    args: ['clean', 'package', '-DskipTests=true', ...]
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args: ['run', 'deploy', ...]
+```
+
+### Build Management Commands
+
+#### Manual Builds
+
+```bash
+# Submit manual build
+make cloud-build
+
+# Check build status
+make cloud-build-status
+
+# View build logs
+make cloud-build-logs
+```
+
+#### Automated Triggers
+
+```bash
+# Create GitHub trigger for automatic builds
+make cloud-build-trigger-create
+
+# List existing triggers
+make cloud-build-trigger-list
+
+# Direct gcloud commands
+gcloud builds triggers create github \
+  --repo-name=mcp \
+  --repo-owner=USERNAME \
+  --branch-pattern="^main$" \
+  --build-config=cloudbuild.yaml
+```
+
+### Build Process Flow
+
+1. **Source Upload**: Code archived and uploaded to Cloud Storage
+2. **Maven Build**: Dependencies downloaded, code compiled, tests skipped
+3. **Container Build**: Quarkus container image built using JIB
+4. **Image Push**: Container pushed to Artifact Registry
+5. **Cloud Run Deploy**: New revision deployed with zero-downtime
+6. **Health Check**: Service verified and traffic routed
+
+### Build Optimization
+
+#### Performance Settings
+
+```yaml
+# High-performance machine for faster builds
+options:
+  machineType: 'E2_HIGHCPU_8'
+  diskSizeGb: 100
+
+# Extended timeout for complex builds
+timeout: '1200s'
+```
+
+#### Caching Strategy
+
+- **Maven Dependencies**: Cached in container layers
+- **Docker Layers**: Reused across builds
+- **Quarkus Build Cache**: Optimizes compilation
+
+#### .gcloudignore Configuration
+
+```bash
+# Excludes unnecessary files from upload
+.git/
+target/
+*.log
+docs/
+staging/
+```
+
+### Build URLs and Resources
+
+- **Cloud Build Console**: https://console.cloud.google.com/cloud-build/builds
+- **Artifact Registry**: https://console.cloud.google.com/artifacts
+- **Build History**: `gcloud builds list --format="table(id,status,createTime,duration)"`
+- **Build Logs**: `gcloud builds log BUILD_ID`
+
+### Trigger Configuration
+
+#### GitHub Integration
+
+```bash
+# Connect GitHub repository
+gcloud builds triggers create github \
+  --repo-name=mcp \
+  --repo-owner=jason-riddle \
+  --branch-pattern="^main$" \
+  --build-config=cloudbuild.yaml \
+  --description="Automatic build and deploy on main branch push"
+```
+
+#### Trigger Filters
+
+- **Branch**: `^main$` (main branch only)
+- **Included Files**: All files (no filter)
+- **Build Config**: `cloudbuild.yaml`
+- **Substitutions**: `PROJECT_ID`, `BUILD_ID` variables
+
+### Service Accounts and Permissions
+
+Cloud Build service account requires:
+
+```bash
+# Grant necessary permissions
+gcloud projects add-iam-policy-binding PROJECT_ID \
+  --member="serviceAccount:PROJECT_NUMBER@cloudbuild.gserviceaccount.com" \
+  --role="roles/run.admin"
+
+gcloud projects add-iam-policy-binding PROJECT_ID \
+  --member="serviceAccount:PROJECT_NUMBER@cloudbuild.gserviceaccount.com" \
+  --role="roles/artifactregistry.writer"
+
+gcloud projects add-iam-policy-binding PROJECT_ID \
+  --member="serviceAccount:PROJECT_NUMBER@cloudbuild.gserviceaccount.com" \
+  --role="roles/iam.serviceAccountUser"
 ```
 
 ### Troubleshooting
@@ -457,4 +614,157 @@ gcloud run services describe jasons-mcp-server --region us-central1 --format="ex
 ```properties
 # Suppress JIB processor warning messages
 quarkus.log.category."io.quarkus.container.image.jib.deployment.JibProcessor".level=ERROR
+```
+
+### Cloud Build Troubleshooting
+
+#### Build Failures
+
+##### Maven Dependency Download Issues
+
+**Symptoms**: Builds fail with "Could not resolve dependencies" or network timeouts
+
+**Solution**:
+```bash
+# Check network connectivity in build environment
+# Increase timeout in cloudbuild.yaml
+timeout: '1800s'
+
+# Use dependency caching
+options:
+  machineType: 'E2_HIGHCPU_8'  # More powerful machine
+```
+
+##### Container Image Build Failures
+
+**Symptoms**: "Failed to build quarkus application" or "container-image.tag is empty"
+
+**Solution**: Ensure proper substitution variables:
+```yaml
+# Use BUILD_ID instead of SHORT_SHA for reliability
+'-Dquarkus.container-image.tag=build-${BUILD_ID}'
+```
+
+##### Permission Denied Errors
+
+**Symptoms**: "Permission denied" when pushing to Artifact Registry or deploying to Cloud Run
+
+**Solution**: Verify service account permissions:
+```bash
+# Check Cloud Build service account permissions
+gcloud projects get-iam-policy PROJECT_ID \
+  --flatten="bindings[].members" \
+  --filter="bindings.members~cloudbuild"
+
+# Grant missing permissions
+gcloud projects add-iam-policy-binding PROJECT_ID \
+  --member="serviceAccount:PROJECT_NUMBER@cloudbuild.gserviceaccount.com" \
+  --role="roles/run.admin"
+```
+
+#### Build Performance Issues
+
+##### Slow Build Times
+
+**Root Cause**: Insufficient resources or repeated dependency downloads
+
+**Solutions**:
+1. **Increase Machine Resources**:
+   ```yaml
+   options:
+     machineType: 'E2_HIGHCPU_32'  # For complex builds
+     diskSizeGb: 200
+   ```
+
+2. **Optimize .gcloudignore**:
+   ```bash
+   # Exclude large unnecessary files
+   target/
+   .git/
+   node_modules/
+   staging/
+   ```
+
+3. **Parallel Steps**: Use step dependencies to parallelize where possible
+
+##### Build Timeouts
+
+**Issue**: Builds exceed default timeout limits
+
+**Solution**: Increase timeout in cloudbuild.yaml:
+```yaml
+timeout: '3600s'  # 1 hour for complex builds
+```
+
+#### Debugging Commands
+
+```bash
+# View detailed build logs
+gcloud builds log BUILD_ID
+
+# Monitor build in real-time
+gcloud builds log BUILD_ID --stream
+
+# List recent builds with timing
+gcloud builds list --limit=10 --format="table(id,status,createTime,duration)"
+
+# Check build configuration
+gcloud builds describe BUILD_ID
+
+# Validate cloudbuild.yaml syntax
+gcloud builds submit --config cloudbuild.yaml --dry-run
+
+# Test individual build steps locally (for debugging)
+docker run --rm -v "$(pwd)":/workspace -w /workspace \
+  maven:3.9.9-eclipse-temurin-17 \
+  mvn clean package -DskipTests=true
+```
+
+#### Trigger Issues
+
+##### GitHub Integration Problems
+
+**Issue**: Trigger not firing on repository pushes
+
+**Solutions**:
+1. **Verify Repository Connection**:
+   ```bash
+   gcloud builds triggers list --format="table(name,status,github.name)"
+   ```
+
+2. **Check Branch Pattern**:
+   ```bash
+   # Ensure pattern matches your branch name
+   --branch-pattern="^main$"  # Exact match
+   --branch-pattern=".*"      # All branches
+   ```
+
+3. **Re-authenticate GitHub**:
+   ```bash
+   # May need to reconnect GitHub integration in Cloud Console
+   ```
+
+##### Webhook Delivery Failures
+
+**Issue**: GitHub webhooks not reaching Cloud Build
+
+**Debugging**:
+1. Check GitHub webhook delivery history
+2. Verify Cloud Build API is enabled
+3. Check organization policies blocking external connections
+
+#### Resource Quotas and Limits
+
+```bash
+# Check Cloud Build quotas
+gcloud compute project-info describe \
+  --format="table(quotas.metric,quotas.limit,quotas.usage)" \
+  --filter="quotas.metric~cloudbuild"
+
+# Check concurrent build limits
+gcloud builds list --filter="status=WORKING" --format="table(id,createTime)"
+
+# Regional resource availability
+gcloud compute regions list --format="table(name,status)" \
+  --filter="name~us-central"
 ```

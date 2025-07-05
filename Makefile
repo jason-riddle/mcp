@@ -181,6 +181,37 @@ gcloud-status: ## Check Cloud Run service status
 	@gcloud run services describe $(GCLOUD_SERVICE) --region $(GCLOUD_REGION) --format="table(metadata.name,status.url,status.conditions[0].status,spec.template.spec.containers[0].image)"
 
 # ============================================================================
+# CLOUD BUILD TARGETS
+# ============================================================================
+
+cloud-build: ## Submit build to Google Cloud Build
+	@echo "Submitting build to Google Cloud Build..."
+	@gcloud builds submit --config cloudbuild.yaml . --timeout=1800s
+	@echo "✓ Cloud Build submitted"
+
+cloud-build-status: ## Check recent Cloud Build status
+	@echo "Recent Cloud Build status:"
+	@gcloud builds list --limit=5 --format="table(id,status,createTime,duration)"
+
+cloud-build-logs: ## View logs for the latest Cloud Build
+	@echo "Viewing latest Cloud Build logs..."
+	@gcloud builds log $$(gcloud builds list --limit=1 --format="value(id)")
+
+cloud-build-trigger-create: ## Create GitHub trigger for Cloud Build
+	@echo "Creating Cloud Build trigger for GitHub repository..."
+	@gcloud builds triggers create github \
+		--repo-name=mcp \
+		--repo-owner=$$(git config user.name) \
+		--branch-pattern="^main$$" \
+		--build-config=cloudbuild.yaml \
+		--description="Automatic build and deploy on main branch push"
+	@echo "✓ Cloud Build trigger created"
+
+cloud-build-trigger-list: ## List Cloud Build triggers
+	@echo "Cloud Build triggers:"
+	@gcloud builds triggers list --format="table(name,status,github.name,github.push.branch)"
+
+# ============================================================================
 # UTILITY RULES
 # ============================================================================
 

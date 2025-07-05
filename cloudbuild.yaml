@@ -1,0 +1,57 @@
+---
+# Google Cloud Build configuration for Quarkus MCP Server
+# This file defines the build pipeline for automated CI/CD
+steps:
+  # Step 1: Build and test the application
+  - name: 'maven:3.9.9-eclipse-temurin-17'
+    entrypoint: 'mvn'
+    args: [
+      'clean',
+      'package',
+      '-DskipTests=true',
+      '-Dquarkus.container-image.build=true',
+      '-Dquarkus.container-image.push=true',
+      '-Dquarkus.container-image.registry=us-central1-docker.pkg.dev',
+      '-Dquarkus.container-image.group=${PROJECT_ID}/mcp-servers',
+      '-Dquarkus.container-image.name=jasons-mcp-server',
+      '-Dquarkus.container-image.tag=build-${BUILD_ID}'
+    ]
+    id: 'build-and-push'
+
+  # Step 2: Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args: [
+      'run', 'deploy', 'jasons-mcp-server',
+      '--image=us-central1-docker.pkg.dev/${PROJECT_ID}/mcp-servers/jasons-mcp-server:build-${BUILD_ID}',
+      '--region=us-central1',
+      '--port=8080',
+      '--no-allow-unauthenticated',
+      '--min-instances=0',
+      '--max-instances=1',
+      '--memory=512Mi',
+      '--cpu=1',
+      '--timeout=300',
+      '--quiet'
+    ]
+    id: 'deploy-to-cloud-run'
+
+# Build options for optimization
+options:
+  # Use higher performance machine for faster builds
+  machineType: 'E2_HIGHCPU_8'
+  # Disk size for build
+  diskSizeGb: 100
+
+# Build timeout (20 minutes should be sufficient)
+timeout: '1200s'
+
+# Artifacts to store (optional - for debugging)
+artifacts:
+  objects:
+    location: 'gs://${PROJECT_ID}_cloudbuild/artifacts'
+    paths:
+      - 'target/quarkus-app/quarkus-run.jar'
+
+# Build logs location
+logsBucket: 'gs://${PROJECT_ID}_cloudbuild/logs'
