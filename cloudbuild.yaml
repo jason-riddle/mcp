@@ -11,11 +11,11 @@ steps:
         # Extract Maven project version
         MAVEN_VERSION=$$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
 
-        # Create timestamp (ISO format: YYYYMMDD-HHMMSS)
-        TIMESTAMP=$$(date -u +%Y%m%d-%H%M%S)
+        # Create timestamp (RFC3339-like format: YYYY-MM-DDTHH-MM-SSZ)
+        TIMESTAMP=$$(date -u +%Y-%m-%dT%H-%M-%SZ)
 
-        # Create unique tag with build ID + version + timestamp
-        UNIQUE_TAG="build-${BUILD_ID}-$${MAVEN_VERSION}-$${TIMESTAMP}"
+        # Create unique tag with new format: {MAVEN_VERSION}-build-{BUILD_ID}-timestamp-{TIMESTAMP}
+        UNIQUE_TAG="$${MAVEN_VERSION}-build-${BUILD_ID}-timestamp-$${TIMESTAMP}"
 
         # Save tag to workspace for next step
         echo "$${UNIQUE_TAG}" > /workspace/unique_tag.txt

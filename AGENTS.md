@@ -370,14 +370,14 @@ quarkus.container-image.additional-tags=${quarkus.application.version}
 
 Cloud Build generates unique, traceable tags combining multiple identifiers:
 
-**Tag Format:** `build-{BUILD_ID}-{MAVEN_VERSION}-{TIMESTAMP}`
+**Tag Format:** `{MAVEN_VERSION}-build-{BUILD_ID}-timestamp-{TIMESTAMP}`
 
-**Example:** `build-ffa31445-4f67-41aa-97cf-cd66e1279eba-0.0.1-SNAPSHOT-20250705-163119`
+**Example:** `0.0.1-SNAPSHOT-build-971a5c67-3956-4b22-ba24-5a0ec426cbeb-timestamp-2025-07-05T16-40-34Z`
 
 **Components:**
-- `BUILD_ID` - Google Cloud Build unique identifier
 - `MAVEN_VERSION` - Extracted from `pom.xml` using `mvn help:evaluate`
-- `TIMESTAMP` - ISO format: `YYYYMMDD-HHMMSS` (UTC)
+- `BUILD_ID` - Google Cloud Build unique identifier
+- `TIMESTAMP` - RFC3339-like format: `YYYY-MM-DDTHH-MM-SSZ` (UTC)
 
 #### Tag Generation Process
 
@@ -389,8 +389,8 @@ Cloud Build uses a two-step process in `cloudbuild.yaml`:
 ```bash
 # Extract version and create unique tag
 MAVEN_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-TIMESTAMP=$(date -u +%Y%m%d-%H%M%S)
-UNIQUE_TAG="build-${BUILD_ID}-${MAVEN_VERSION}-${TIMESTAMP}"
+TIMESTAMP=$(date -u +%Y-%m-%dT%H-%M-%SZ)
+UNIQUE_TAG="${MAVEN_VERSION}-build-${BUILD_ID}-timestamp-${TIMESTAMP}"
 
 # Build with unique tag
 mvn clean package -DskipTests=true \
@@ -415,7 +415,7 @@ make cloud-build-status
 
 # Deploy specific tag
 gcloud run deploy jasons-mcp-server \
-  --image=us-central1-docker.pkg.dev/PROJECT_ID/mcp-servers/jasons-mcp-server:build-ABC123-0.0.1-SNAPSHOT-20250705-120000 \
+  --image=us-central1-docker.pkg.dev/PROJECT_ID/mcp-servers/jasons-mcp-server:0.0.1-SNAPSHOT-build-ABC123-timestamp-2025-07-05T12-00-00Z \
   --region=us-central1
 ```
 
