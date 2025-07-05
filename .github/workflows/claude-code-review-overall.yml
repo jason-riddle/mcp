@@ -1,15 +1,16 @@
 ---
 name: Claude Code Review - Overall
 
-on:
-  pull_request:
-    types: [opened, synchronize]
-    # Optional: Only run on specific file changes
-    # paths:
-    #   - "src/**/*.java"
-    #   - "pom.xml"
-    #   - "checkstyle.xml"
-    #   - "src/**/package-info.java"
+# Temporarily disabled - uncomment to re-enable
+# on:
+#   pull_request:
+#     types: [opened, synchronize]
+#     # Optional: Only run on specific file changes
+#     # paths:
+#     #   - "src/**/*.java"
+#     #   - "pom.xml"
+#     #   - "checkstyle.xml"
+#     #   - "src/**/package-info.java"
 
 jobs:
   claude-code-review-overall:
