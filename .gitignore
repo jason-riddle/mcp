@@ -1,5 +1,3 @@
-
-
 *.after*
 *.before*
 *.class
@@ -11,6 +9,7 @@
 *.sqlite
 *.tmp
 *.txt
+*baseline
 .DS_Store
 .aider.chat.*
 .aider.input.*

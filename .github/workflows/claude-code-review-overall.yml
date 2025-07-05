@@ -1,5 +1,5 @@
 ---
-name: Claude Code Review
+name: Claude Code Review - Overall
 
 on:
   pull_request:
@@ -12,7 +12,7 @@ on:
     #   - "src/**/package-info.java"
 
 jobs:
-  claude-review:
+  claude-code-review-overall:
     if: |
       github.actor == 'jason-riddle' &&
       github.event.pull_request.head.repo.full_name == github.repository &&
