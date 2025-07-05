@@ -235,7 +235,7 @@ src/main/java/com/jasonriddle/mcp/
 ### Code Quality
 
 For detailed style guidelines and contributor workflows see
-[CLAUDE.md](CLAUDE.md) and [AGENTS.md](AGENTS.md).
+[AGENTS.md](AGENTS.md).
 The project uses Palantir Java Format via Spotless and enhanced Checkstyle rules.
 Run `make format` and `make checkstyle` before committing.
 
