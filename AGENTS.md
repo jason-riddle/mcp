@@ -7,6 +7,7 @@ This guide provides instructions for automated agents contributing to this repos
 - [Code Quality](#code-quality)
 - [Java Best Practices](#java-best-practices)
 - [Package Structure](#package-structure)
+- [Deployment](#deployment)
 
 ## Quick Start
 
@@ -191,3 +192,58 @@ Each package contains a `package-info.java` file with purpose and responsibiliti
 - **Clear separation**: MCP-specific classes in root, domain logic in memory package
 - **Consistent naming**: Package names reflect their primary responsibility
 - **Single responsibility**: Each package has one clear purpose and set of related classes
+
+## Deployment
+
+### Overview
+The MCP server is deployed to Google Cloud Run with IAM authentication. For local development, see [Quick Start](#quick-start).
+
+**Quick Reference:**
+```bash
+make gcloud-push && make gcloud-deploy  # Deploy updated version
+make gcloud-proxy                       # Start local proxy for MCP clients
+make gcloud-status                      # Check deployment status
+make gcloud-logs                        # View service logs
+```
+
+### Service Configuration
+- **Project**: jasons-mcp-server-20250705
+- **Service**: jasons-mcp-server
+- **Region**: us-central1
+- **Service URL**: https://jasons-mcp-server-711952654932.us-central1.run.app
+- **MCP Endpoint**: `/v1/mcp/sse` (Server-Sent Events transport)
+- **Authentication**: Google Cloud IAM required (no unauthenticated access)
+- **Scaling**: Auto-scaling from 0 to 10 instances
+- **Resources**: 512Mi memory, 1 CPU, 300s timeout
+
+### Local Access
+Use the Cloud Run proxy for secure local MCP client connections:
+
+```bash
+# Start proxy
+make gcloud-proxy
+
+# Configure MCP client
+# URL: http://localhost:3000/v1/mcp/sse
+```
+
+### Troubleshooting
+
+#### Common Issues
+1. **Authentication errors**: Ensure `gcloud auth login` is current
+2. **Billing not enabled**: Link a billing account to the project
+3. **Permission denied**: Verify IAM roles (Cloud Run Admin, Artifact Registry Writer)
+4. **Proxy connection fails**: Check port 3000 availability and service status
+
+#### Debug Commands
+```bash
+# Check authentication and project
+gcloud auth list
+gcloud config list
+
+# Verify service deployment
+gcloud run services list --region us-central1
+
+# Test proxy connection
+curl -I http://localhost:3000/v1/mcp/sse
+```

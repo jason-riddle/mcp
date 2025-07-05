@@ -6,6 +6,7 @@ A Model Context Protocol (MCP) server implementation with persistent memory grap
 
 - [Installation](#installation)
 - [Usage](#usage)
+- [Deployment](#deployment)
 - [Development](#development)
 - [Testing](#testing)
 - [License](#license)
@@ -55,6 +56,13 @@ make run         # Production mode
 make docker-build
 make docker-run
 
+# Google Cloud (Cloud Run deployment)
+make gcloud-push    # Build and push to Artifact Registry
+make gcloud-deploy  # Deploy to Cloud Run
+make gcloud-proxy   # Start local proxy for MCP clients
+make gcloud-logs    # View service logs
+make gcloud-status  # Check deployment status
+
 # Cleanup
 make clean
 ```
@@ -66,6 +74,7 @@ make clean
 make docker-build
 make docker-run
 ```
+
 
 ## Usage
 
@@ -209,6 +218,136 @@ memory.file.path=memory.jsonl
 
 # Server port (default: 8080)
 quarkus.http.port=8080
+```
+
+## Deployment
+
+The MCP Memory Server can be deployed in multiple environments, from local development to cloud production.
+
+### Local Deployment
+
+#### Development Mode
+Run the server locally with live reload for development:
+```bash
+make dev
+```
+Access the development UI at http://localhost:8080/q/dev/
+
+#### Production Mode
+Run the server locally in production mode:
+```bash
+make build
+make run
+```
+
+#### Docker
+Run the server in a containerized environment:
+```bash
+make docker-build
+make docker-run
+```
+
+### Cloud Deployment
+
+The server is designed for cloud deployment with Google Cloud Run, providing scalable, managed hosting with built-in authentication.
+
+#### Google Cloud Run
+
+##### Prerequisites
+- Google Cloud account with billing enabled
+- `gcloud` CLI installed and authenticated
+- Docker installed and running
+
+##### Quick Deployment
+Deploy to Google Cloud Run in three simple steps:
+```bash
+# 1. Build and push Docker image to Artifact Registry
+make gcloud-push
+
+# 2. Deploy to Cloud Run with authentication
+make gcloud-deploy
+
+# 3. Start local proxy for MCP client connections
+make gcloud-proxy
+```
+
+#### MCP Client Configuration
+
+##### Using Cloud Run Proxy (Recommended)
+For local MCP clients, use the Cloud Run proxy for secure access:
+
+1. **Start the proxy**:
+   ```bash
+   make gcloud-proxy
+   ```
+
+2. **Configure your MCP client**:
+   ```json
+   {
+     "mcpServers": {
+       "jasons-mcp": {
+         "url": "http://localhost:3000/v1/mcp/sse"
+       }
+     }
+   }
+   ```
+
+   For clients that don't support the `url` attribute:
+   ```json
+   {
+     "mcpServers": {
+       "jasons-mcp": {
+         "command": "npx",
+         "args": ["-y", "mcp-remote", "http://localhost:3000/v1/mcp/sse"]
+       }
+     }
+   }
+   ```
+
+##### Direct Access (Advanced)
+For direct access to the Cloud Run service, users need the Cloud Run Invoker IAM role:
+```bash
+gcloud run services add-iam-policy-binding jasons-mcp-server \
+  --region=us-central1 \
+  --member="user:email@example.com" \
+  --role="roles/run.invoker"
+```
+
+#### Management Commands
+
+##### Monitoring
+```bash
+# Check service status
+make gcloud-status
+
+# View recent logs
+make gcloud-logs
+
+# Get detailed service information
+gcloud run services describe jasons-mcp-server --region us-central1
+```
+
+##### Updates
+```bash
+# Deploy updated version
+make gcloud-push && make gcloud-deploy
+
+# Update with new configuration
+gcloud run deploy jasons-mcp-server \
+  --image IMAGE_URL \
+  --region us-central1 \
+  --memory 1Gi \
+  --cpu 2
+```
+
+### Alternative Deployment Options
+
+#### Self-Hosted
+Deploy on your own infrastructure:
+```bash
+# Pull and run the image
+docker pull us-central1-docker.pkg.dev/jasons-mcp-server-20250705/mcp-servers/jasons-mcp-server:latest
+docker run -p 8080:8080 -v $(pwd)/data:/app/data IMAGE_ID
 ```
 
 ## Development
