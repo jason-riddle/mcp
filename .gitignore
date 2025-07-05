@@ -24,7 +24,6 @@
 .idea
 .mcp.json
 .pre-commit-config.yaml
-AGENTS.md
 AIDER.md
 CLAUDE.local.md
 CONVENTIONS.md

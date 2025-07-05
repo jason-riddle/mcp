@@ -234,23 +234,10 @@ src/main/java/com/jasonriddle/mcp/
 
 ### Code Quality
 
-This project follows strict code quality standards:
-
-- **Palantir Java Format** for code formatting
-- **Enhanced Checkstyle** rules for style verification
-- **Comprehensive Javadoc** documentation for all public APIs
-- **Final parameters** required for all methods
-- **120 character line limit**
-
-Run code formatting:
-```bash
-make format
-```
-
-Run style checks:
-```bash
-make checkstyle
-```
+For detailed style guidelines and contributor workflows see
+[CLAUDE.md](CLAUDE.md) and [AGENTS.md](AGENTS.md).
+The project uses Palantir Java Format via Spotless and enhanced Checkstyle rules.
+Run `make format` and `make checkstyle` before committing.
 
 ### Development Mode
 
