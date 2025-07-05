@@ -106,7 +106,7 @@ final class McpServerSseIntegrationTest {
                         connectionLatch.countDown();
                     },
                     throwable -> {
-                        throwable.printStackTrace();
+                        // Expected connection errors during test cleanup
                         connectionLatch.countDown();
                     });
 
@@ -142,7 +142,7 @@ final class McpServerSseIntegrationTest {
                         }
                     },
                     throwable -> {
-                        throwable.printStackTrace();
+                        // Expected connection errors during test cleanup
                         initializeLatch.countDown();
                     });
 
@@ -177,7 +177,7 @@ final class McpServerSseIntegrationTest {
                         }
                     },
                     throwable -> {
-                        throwable.printStackTrace();
+                        // Expected connection errors during test cleanup
                         promptsLatch.countDown();
                     });
 
@@ -210,7 +210,7 @@ final class McpServerSseIntegrationTest {
                         }
                     },
                     throwable -> {
-                        throwable.printStackTrace();
+                        // Expected connection errors during test cleanup
                         promptExecutionLatch.countDown();
                     });
 
