@@ -381,19 +381,24 @@ class StagedDocumentationGenerator:
             'Graph Operations': [t for t in tools if any(x in t['name'] for x in ['read_graph', 'search_nodes', 'open_nodes'])]
         }
 
+        first_category = True
         for category, category_tools in categories.items():
             if not category_tools:
                 continue
 
-            lines.append("<details>")
-            lines.append(f"<summary><b>{category}</b></summary>")
-            lines.append("")
+            # Add spacing before category headers (except the first one)
+            if not first_category:
+                lines.append("")
 
-            for tool in category_tools:
+            lines.append(f"#### {category}")
+            lines.append("")
+            first_category = False
+
+            for i, tool in enumerate(category_tools):
                 lines.extend(self.format_tool(tool))
-
-            lines.append("</details>")
-            lines.append("")
+                # Add spacing between tools within the same category, but not after the last tool
+                if i < len(category_tools) - 1:
+                    lines.append("")
 
         return '\n'.join(lines)
 
@@ -402,12 +407,13 @@ class StagedDocumentationGenerator:
         if not resources:
             return "No resources found."
 
-        lines = ["<details>", "<summary><b>Memory Resources</b></summary>", ""]
+        lines = []
 
-        for resource in resources:
+        for i, resource in enumerate(resources):
             lines.extend(self.format_resource(resource))
-
-        lines.extend(["</details>", ""])
+            # Add spacing between resources, but not after the last resource
+            if i < len(resources) - 1:
+                lines.append("")
 
         return '\n'.join(lines)
 
@@ -430,7 +436,6 @@ class StagedDocumentationGenerator:
             lines.append("  - Parameters: None")
 
         lines.append(f"  - Read-only: **{str(tool.get('read_only', False)).lower()}**")
-        lines.append("")
 
         return lines
 
@@ -441,8 +446,7 @@ class StagedDocumentationGenerator:
             "",
             f"- **{resource['uri']}**",
             f"  - Title: {resource['title']}",
-            f"  - Description: {resource['description']}",
-            ""
+            f"  - Description: {resource['description']}"
         ]
 
     def create_staging_readme(self, content: Dict) -> str:
@@ -550,12 +554,11 @@ class StagedDocumentationGenerator:
             result['errors'].append("Unbalanced code blocks (``` count is odd)")
             result['valid'] = False
 
-        # Check for balanced details tags
-        details_open = content.count('<details>')
-        details_close = content.count('</details>')
-        if details_open != details_close:
-            result['errors'].append(f"Unbalanced details tags: {details_open} open, {details_close} close")
-            result['valid'] = False
+        # Check for category headers
+        category_headers = ['#### Entity Management', '#### Relationship Management', '#### Observation Management', '#### Graph Operations']
+        category_count = sum(1 for header in category_headers if header in content)
+        if category_count == 0:
+            result['warnings'].append("No category headers found in tools section")
 
         result['info'].append(f"Document has {len(lines)} lines")
 
@@ -575,13 +578,13 @@ class StagedDocumentationGenerator:
             if section not in content:
                 result['warnings'].append(f"Missing section: {section}")
 
-        # Check for tools content
-        if 'memory.create_entities' not in content:
+        # Check for tools content (handle both naming conventions)
+        if 'memory.create_entities' not in content and 'memory_create_entities' not in content:
             result['errors'].append("Tools content appears to be missing or incomplete")
             result['valid'] = False
 
         # Check for resources content
-        if 'memory://graph' not in content:
+        if 'memory://' not in content:
             result['errors'].append("Resources content appears to be missing or incomplete")
             result['valid'] = False
 
