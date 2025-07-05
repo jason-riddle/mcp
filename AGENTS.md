@@ -72,13 +72,6 @@ make test-integration                 # Run integration tests
 ./mvnw test -Dtest=MemoryServiceTest  # Run specific test class
 ```
 
-### Documentation Generation
-
-```bash
-make update-readme             # Update README with generated tool docs
-python scripts/update-docs.py  # Run the script directly
-```
-
 ## Code Quality
 
 ### Code Style: Enhanced Palantir Configuration
@@ -304,16 +297,6 @@ UNIQUE_TAG="${MAVEN_VERSION}-build-${BUILD_ID}-timestamp-${TIMESTAMP}"
 # Build with unique tag
 mvn clean package -DskipTests=true \
   -Dquarkus.container-image.tag="${UNIQUE_TAG}"
-```
-
-### Documentation Generation
-
-```bash
-# Update README.md with latest tool and resource documentation
-make update-readme
-
-# Or run directly
-python scripts/update-docs.py
 ```
 
 ### Build Optimization
