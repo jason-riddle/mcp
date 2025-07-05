@@ -503,18 +503,6 @@ gcloud builds triggers create github \
 
 ### Build Optimization
 
-#### Performance Settings
-
-```yaml
-# High-performance machine for faster builds
-options:
-  machineType: 'E2_HIGHCPU_8'
-  diskSizeGb: 100
-
-# Extended timeout for complex builds
-timeout: '1200s'
-```
-
 #### Caching Strategy
 
 - **Maven Dependencies**: Cached in container layers
