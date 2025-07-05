@@ -14,7 +14,7 @@ A Model Context Protocol (MCP) server implementation with persistent memory grap
 
 ### Prerequisites
 
-- Java 21 or later
+- Java 17 or later
 - Maven 3.9+ (or use included `./mvnw` wrapper)
 
 ### Building from Source
