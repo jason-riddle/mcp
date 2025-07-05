@@ -1,5 +1,6 @@
 package com.jasonriddle.mcp;
 
+import io.quarkiverse.mcp.server.McpServer;
 import io.quarkiverse.mcp.server.Prompt;
 import io.quarkiverse.mcp.server.PromptMessage;
 import io.quarkiverse.mcp.server.TextContent;
@@ -9,6 +10,7 @@ import jakarta.enterprise.context.ApplicationScoped;
  * MCP memory prompts providing guidance on memory management best practices.
  */
 @ApplicationScoped
+@McpServer("memory")
 public final class McpMemoryPrompts {
 
     /**

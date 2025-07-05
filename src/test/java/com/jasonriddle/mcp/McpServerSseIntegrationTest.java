@@ -39,7 +39,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 @TestMethodOrder(OrderAnnotation.class)
 final class McpServerSseIntegrationTest {
 
-    @TestHTTPResource("/v1/mcp/sse")
+    @TestHTTPResource("/v1/memory/mcp/sse")
     URI sseEndpoint;
 
     @Inject
@@ -60,9 +60,7 @@ final class McpServerSseIntegrationTest {
     public static final class TestProfile implements QuarkusTestProfile {
         @Override
         public Map<String, String> getConfigOverrides() {
-            return Map.of(
-                    "quarkus.mcp.server.sse.root-path", "/v1/mcp",
-                    "quarkus.log.level", "DEBUG");
+            return Map.of("quarkus.mcp.server.memory.sse.root-path", "/v1/memory/mcp", "quarkus.log.level", "DEBUG");
         }
     }
 
@@ -91,7 +89,7 @@ final class McpServerSseIntegrationTest {
     @Order(1)
     void shouldExposeSSEEndpoint() {
         assertNotNull(sseEndpoint);
-        assertTrue(sseEndpoint.toString().endsWith("/v1/mcp/sse"));
+        assertTrue(sseEndpoint.toString().endsWith("/v1/memory/mcp/sse"));
     }
 
     @Test
