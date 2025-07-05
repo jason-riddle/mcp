@@ -1,4 +1,4 @@
-# MCP Memory Server
+# Jason's MCP Server
 
 A Model Context Protocol (MCP) server implementation with persistent memory graph capabilities, built with Quarkus. This server provides memory tools and resources for managing knowledge graphs with entities, relations, and observations.
 
