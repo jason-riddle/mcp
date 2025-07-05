@@ -90,17 +90,17 @@ checkstyle: ## Run checkstyle verification
 
 test: ## Run unit tests
 	@echo "Running unit tests..."
-	@$(MVN) test -q
+	@$(MVN) test --no-transfer-progress
 	@echo "✓ Unit tests completed"
 
 test-watch: ## Run tests in watch mode
 	@echo "Running tests in watch mode..."
 	@echo "Press Ctrl+C to stop"
-	@$(MVN) quarkus:test -q
+	@$(MVN) quarkus:test
 
 test-integration: ## Run integration tests
 	@echo "Running integration tests..."
-	@$(MVN) verify -DskipITs=false -q
+	@$(MVN) failsafe:integration-test -DskipITs=false --no-transfer-progress
 	@echo "✓ Integration tests completed"
 
 # ============================================================================

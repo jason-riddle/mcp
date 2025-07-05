@@ -20,24 +20,6 @@ on:
       - "src/main/resources/**"
       - "src/test/resources/**"
 
-  push:
-    branches: [main]
-    paths:
-      # Java source files
-      - "src/**/*.java"
-
-      # Build configuration
-      - "pom.xml"
-      - "Makefile"
-
-      # Code quality configuration
-      - "checkstyle.xml"
-      - "checkstyle-suppressions.xml"
-
-      # Resource files
-      - "src/main/resources/**"
-      - "src/test/resources/**"
-
 jobs:
   claude-code-review-java:
     if: |
