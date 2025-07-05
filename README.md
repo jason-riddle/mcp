@@ -237,14 +237,10 @@ make clean                  # Clean build artifacts
 2. **Access development UI**: http://localhost:8080/q/dev/
 3. **Make changes**: Code changes trigger automatic reload
 4. **Run tests**: `make test`
-5. **Format and check**: `make format && make checkstyle`
+5. **Format code**: `make format`
+6. **Check style**: `make checkstyle`
 
 ### Testing
-
-The project includes comprehensive test coverage:
-- Unit tests for memory service operations
-- Integration tests for MCP tools and resources
-- Server-Sent Events (SSE) communication tests
 
 ```bash
 # Run all tests
@@ -271,47 +267,72 @@ make docker-run
 Deploy to Google Cloud Run for scalable, managed hosting with authentication.
 
 #### Prerequisites
+
 - Google Cloud account with billing enabled
 - `gcloud` CLI installed and authenticated
 
 #### Quick Deployment
 
 ```bash
-# Build, push, and deploy
-make gcloud-push && make gcloud-deploy
+# 1. Build and push Docker image to Artifact Registry
+make gcloud-push
 
-# Start local proxy for MCP clients
+# 2. Deploy to Cloud Run with authentication
+make gcloud-deploy
+
+# 3. Start local proxy for MCP client connections
 make gcloud-proxy
 ```
 
 #### MCP Client Configuration
 
-**Recommended: Using Cloud Run Proxy**
-```json
-{
-  "mcpServers": {
-    "jasons-mcp": {
-      "url": "http://localhost:3000/v1/mcp/sse"
-    }
-  }
-}
-```
+For local MCP clients, use the Cloud Run proxy for secure access:
 
-For clients without `url` support:
-```json
-{
-  "mcpServers": {
-    "jasons-mcp": {
-      "command": "npx",
-      "args": ["-y", "mcp-remote", "http://localhost:3000/v1/mcp/sse"]
-    }
-  }
-}
+1. **Start the proxy**:
+   ```bash
+   make gcloud-proxy
+   ```
+
+2. **Configure your MCP client**:
+   ```json
+   {
+     "mcpServers": {
+       "jasons-mcp": {
+         "url": "http://localhost:3000/v1/mcp/sse"
+       }
+     }
+   }
+   ```
+
+   For clients that don't support the `url` attribute:
+   ```json
+   {
+     "mcpServers": {
+       "jasons-mcp": {
+         "command": "npx",
+         "args": ["-y", "mcp-remote", "http://localhost:3000/v1/mcp/sse"]
+       }
+     }
+   }
+   ```
+
+##### Direct Access (Advanced)
+
+For direct access to the Cloud Run service, users need the Cloud Run Invoker IAM role:
+
+```bash
+gcloud run services add-iam-policy-binding jasons-mcp-server \
+  --region=us-central1 \
+  --member="user:email@example.com" \
+  --role="roles/run.invoker"
 ```
 
 ### Self-Hosted Deployment
 
+Deploy on your own infrastructure:
+
 ```bash
+# Pull and run the image
 docker pull us-central1-docker.pkg.dev/jasons-mcp-server-20250705/mcp-servers/jasons-mcp-server:latest
 docker run -p 8080:8080 -v $(pwd)/data:/app/data IMAGE_ID
 ```
