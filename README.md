@@ -4,12 +4,30 @@ A Model Context Protocol (MCP) server implementation with persistent memory grap
 
 ## Table of Contents
 
+- [Quick Start](#quick-start)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Deployment](#deployment)
 - [Development](#development)
 - [Testing](#testing)
+- [Deployment](#deployment)
 - [License](#license)
+
+## Quick Start
+
+```bash
+# Clone and build
+git clone https://github.com/jason-riddle/mcp.git
+cd mcp
+make build
+
+# Run in development mode
+make dev
+
+# Or run in production mode
+make run
+```
+
+Run `make help` to see all available commands.
 
 ## Installation
 
@@ -21,19 +39,10 @@ A Model Context Protocol (MCP) server implementation with persistent memory grap
 ### Building from Source
 
 ```bash
-# Clone the repository
 git clone https://github.com/jason-riddle/mcp.git
 cd mcp
-
-# Build the project
 make build
-
-# Run in development mode
-make dev
 ```
-
-Run `make help` to see all available commands.
-
 
 ## Usage
 
@@ -167,24 +176,69 @@ Guidance prompts for memory management:
 
 <!--- End of prompts generated section -->
 
+## Development
+
+### Available Commands
+
+```bash
+# Build and run
+make build        # Build the project
+make dev          # Development mode with live reload
+make run          # Production mode
+
+# Code quality
+make format       # Format code with Spotless
+make checkstyle   # Run style checks
+
+# Testing
+make test         # Run unit tests
+make test-integration  # Run integration tests
+
+# Docker
+make docker-build # Build Docker image
+make docker-run   # Run Docker container
+
+# Documentation
+make update-readme # Update README with generated docs
+
+# Cleanup
+make clean        # Clean build artifacts
+```
+
+### Development Workflow
+
+1. **Start development server**: `make dev`
+2. **Access development UI**: http://localhost:8080/q/dev/
+3. **Make changes**: Code changes trigger automatic reload
+4. **Run tests**: `make test`
+5. **Format code**: `make format`
+6. **Check style**: `make checkstyle`
+
+## Testing
+
+### Running Tests
+
+```bash
+# Run all tests
+make test
+
+# Run integration tests
+make test-integration
+
+# Run specific test class
+./mvnw test -Dtest=MemoryServiceTest
+```
+
+### Test Coverage
+
+The project includes:
+- Unit tests for memory service operations
+- Integration tests for MCP tools and resources
+- Server-Sent Events (SSE) communication tests
 
 ## Deployment
 
 ### Local Deployment
-
-#### Development Mode
-Run the server locally with live reload for development:
-```bash
-make dev
-```
-Access the development UI at http://localhost:8080/q/dev/
-
-#### Production Mode
-Run the server locally in production mode:
-```bash
-make build
-make run
-```
 
 #### Docker
 Run the server in a containerized environment:
