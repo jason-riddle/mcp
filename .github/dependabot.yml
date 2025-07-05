@@ -63,16 +63,6 @@ updates:
       prefix: "deps"
       include: "scope"
 
-  - package-ecosystem: "yarn"
-    directory: "/"
-    schedule:
-      interval: "daily"
-    labels:
-      - "dependencies"
-      - "yarn"
-    commit-message:
-      prefix: "deps"
-      include: "scope"
 
   # Git submodules support (commented out - enable when needed)
   # - package-ecosystem: "gitsubmodule"
