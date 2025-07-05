@@ -33,8 +33,8 @@ jobs:
       - name: Check code formatting
         run: ./mvnw spotless:check --no-transfer-progress
 
-  checkstyle:
-    name: Checkstyle
+  checkstyle-check:
+    name: Checkstyle Check
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -110,7 +110,7 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    needs: [format-check, checkstyle, unit-tests, integration-tests]
+    needs: [format-check, checkstyle-check, unit-tests, integration-tests]
 
     steps:
       - name: Checkout code
