@@ -355,6 +355,60 @@ python scripts/update-docs.py
 3. **Permission denied**: Verify IAM roles (Cloud Run Admin, Artifact Registry Writer)
 4. **Proxy connection fails**: Check port 3000 availability and service status
 
+#### Quarkus Container Image Issues
+
+##### Invalid Registry Configuration Error
+
+**Error**: `The supplied container-image registry 'us-central1-docker.pkg.dev/project/repo' is invalid`
+
+**Root Cause**: Quarkus container-image extension expects registry hostname and group to be separated
+
+**Solution**: Split the configuration properly in `application.properties`:
+
+```properties
+# ❌ Incorrect - includes full path in registry
+quarkus.container-image.registry=us-central1-docker.pkg.dev/jasons-mcp-server-20250705/mcp-servers
+quarkus.container-image.group=jasons-mcp-server
+
+# ✅ Correct - separate hostname from project/repository path
+quarkus.container-image.registry=us-central1-docker.pkg.dev
+quarkus.container-image.group=jasons-mcp-server-20250705/mcp-servers
+quarkus.container-image.name=jasons-mcp-server
+quarkus.container-image.tag=latest
+```
+
+##### Docker Authentication for Artifact Registry
+
+**Issue**: Push operations fail even with valid gcloud authentication
+
+**Solution**: Configure Docker authentication for Artifact Registry explicitly:
+
+```bash
+# Configure Docker to use gcloud as credential helper for Artifact Registry
+gcloud auth configure-docker us-central1-docker.pkg.dev
+
+# Verify credential helper is configured
+cat ~/.docker/config.json
+# Should include: "us-central1-docker.pkg.dev": "gcloud"
+```
+
+**Note**: Unlike Container Registry (`*.gcr.io`), Artifact Registry requires explicit host configuration.
+
+##### Build vs Push Distinction
+
+The Makefile uses different approaches:
+
+```bash
+# docker-build: Builds local image using Quarkus container-image extension
+make docker-build
+
+# gcloud-push: Tags local image and pushes to Artifact Registry
+make gcloud-push  # Runs docker-build first, then tags and pushes
+
+# Complete deployment workflow
+make gcloud-push && make gcloud-deploy
+```
+
 #### Debug Commands
 
 ```bash
@@ -367,4 +421,40 @@ gcloud run services list --region us-central1
 
 # Test proxy connection
 curl -I http://localhost:3000/v1/mcp/sse
+
+# Check Artifact Registry repository
+gcloud artifacts repositories describe mcp-servers --location=us-central1
+
+# Verify Docker authentication
+docker system info | grep -A5 "Registry Mirrors"
+
+# Test container image build locally
+./mvnw clean package -Dquarkus.container-image.build=true
+
+# Check running containers
+docker images | grep jasons-mcp-server
+
+# View detailed Cloud Run service info
+gcloud run services describe jasons-mcp-server --region us-central1 --format="export"
+```
+
+#### Quarkus Development Issues
+
+##### Integration Test Connection Failures
+
+**Symptoms**: Tests show `HttpClosedException: Connection was closed` during build
+
+**Explanation**: These are normal integration test connection attempts to verify SSE endpoints. They don't indicate build failures if the main build succeeds.
+
+**Resolution**: The errors are expected during testing and don't affect deployment. Monitor for actual build failure messages in Maven output.
+
+##### JIB Multi-platform Warnings
+
+**Symptoms**: Warnings about base image digests and multi-platform builds
+
+**Solution**: These are suppressed in `application.properties`:
+
+```properties
+# Suppress JIB processor warning messages
+quarkus.log.category."io.quarkus.container.image.jib.deployment.JibProcessor".level=ERROR
 ```
