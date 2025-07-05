@@ -4,23 +4,36 @@ name: Claude Code Review - Java
 on:
   pull_request:
     types: [opened, synchronize]
-    paths:
-      # Only run when specific Java paths are modified
+    paths: &java_paths
+      # Java source files
       - "src/**/*.java"
-      - "src/**/package-info.java"
+
+      # Build configuration
       - "pom.xml"
+      - "Makefile"
+
+      # Code quality configuration
       - "checkstyle.xml"
-      - "src/test/**/*.java"
-      - "src/main/resources/application.properties"
-      - "src/test/resources/application.properties"
-      # You can add more specific patterns as needed
+      - "checkstyle-suppressions.xml"
+
+      # Resource files
+      - "src/main/resources/**"
+      - "src/test/resources/**"
+
+  push:
+    branches: [main]
+    paths: *java_paths
 
 jobs:
   claude-code-review-java:
     if: |
       github.actor == 'jason-riddle' &&
-      github.event.pull_request.head.repo.full_name == github.repository &&
-      (github.event.pull_request.base.ref == 'main' || github.event.pull_request.base.ref == 'develop')
+      (
+        (github.event_name == 'pull_request' &&
+         github.event.pull_request.head.repo.full_name == github.repository &&
+         (github.event.pull_request.base.ref == 'main' || github.event.pull_request.base.ref == 'develop')) ||
+        (github.event_name == 'push' && github.ref == 'refs/heads/main')
+      )
 
     runs-on: ubuntu-latest
     permissions:
@@ -47,21 +60,20 @@ jobs:
 
           timeout_minutes: "60"
           direct_prompt: |
-            Please review this pull request focusing on the changed Java files.
-            Provide feedback on:
-            - Code quality and adherence to Palantir Java Format standards
-            - Proper javadoc documentation following project standards
-            - Potential bugs or edge cases
-            - Performance considerations
-            - Security implications
-            - Single Responsibility Principle and method design
-            - Proper use of final parameters and interface types
-            - Checkstyle compliance and code organization
-            - Suggestions for improvement
+            Please review this code change focusing on the modified Java files, build configuration, and resources.
 
-            Since this PR touches critical Java source code paths, please be thorough
-            in your review and provide inline comments where appropriate.
-            Pay special attention to package organization and naming conventions.
+            This is an MCP server with memory graph capabilities using Quarkus and Palantir Java Format standards.
+
+            Focus on:
+            - Code quality and Palantir Java Format compliance
+            - Proper javadoc documentation
+            - Final parameters and interface types
+            - Single Responsibility Principle and method design
+            - Memory graph domain model consistency
+            - Potential bugs, performance, and security issues
+            - Package organization and naming conventions
+
+            For each issue, include the relevant code snippet with line numbers and a link to the specific line(s) in the file.
 
           # Optional: Add Java-specific tools for validation
           # allowed_tools: "Bash(./mvnw checkstyle:check),Bash(./mvnw spotless:check),Bash(./mvnw test),Bash(./mvnw compile)"
