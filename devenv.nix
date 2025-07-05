@@ -74,7 +74,7 @@
 
     # ========== SLOWER CHECKS (5-30s) ==========
 
-    # Java code quality - CHECK ONLY (don't modify files during commit)
+    # Java code quality - BLOCKS COMMIT ON FAILURE
     spotless-check = {
       enable = true;
       name = "spotless-check";
@@ -84,7 +84,7 @@
       pass_filenames = false;
     };
 
-    # Maven checkstyle validation
+    # Maven checkstyle validation - BLOCKS COMMIT ON FAILURE
     maven-checkstyle = {
       enable = true;
       name = "maven-checkstyle";
@@ -94,13 +94,23 @@
       pass_filenames = false;
     };
 
-    # Javadoc validation
+    # Javadoc validation - BLOCKS COMMIT ON FAILURE
     javadoc-check = {
       enable = true;
       name = "javadoc-check";
       entry = "./mvnw javadoc:javadoc -Dadditionalparam=-Xdoclint:all -Ddoclint=all,-missing";
       language = "system";
       files = "\\.java$";
+      pass_filenames = false;
+    };
+
+    # Unit tests - BLOCKS COMMIT ON FAILURE
+    maven-test = {
+      enable = true;
+      name = "maven-test";
+      entry = "./mvnw test";
+      language = "system";
+      files = "\\.(java|xml|properties)$";
       pass_filenames = false;
     };
 
