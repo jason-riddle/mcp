@@ -321,7 +321,7 @@ Listing the config vars for your app displays the URL that your app uses to conn
 ```
 $ heroku config
 === peaceful-inlet-84135 Config Vars
-DATABASE_URL:         postgres://avhrhofbiyvpct:3ab23026d0fc225bde4544cedabc356904980e6a02a2418ca44d7fd19dad8e03@ec2-23-21-4-7.compute-1.amazonaws.com:5432/d8e8ojni26668k
+DATABASE_URL:         [REDACTED]
 PAPERTRAIL_API_TOKEN: [REDACTED]
 ```
 
