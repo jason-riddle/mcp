@@ -46,7 +46,6 @@ This project follows **Palantir Java Format** with enhanced Checkstyle rules bas
 - **Checkstyle** with Palantir-inspired configuration for style verification
 
 #### Key Style Rules
-- **Line length:** 120 characters maximum
 - **Final parameters:** All method and constructor parameters must be `final`
 - **Method length:** Maximum 150 lines per method
 - **Parameter count:** Maximum 8 parameters per method
