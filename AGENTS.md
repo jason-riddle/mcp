@@ -2,7 +2,13 @@
 
 This guide provides instructions for automated agents or developers contributing to this repository.
 
-## Development Workflow
+## Table of Contents
+- [Quick Start](#quick-start)
+- [Code Quality](#code-quality)
+- [Java Best Practices](#java-best-practices)
+- [Package Structure](#package-structure)
+
+## Quick Start
 
 ### Building and Running
 ```bash
