@@ -1,5 +1,5 @@
 # Modern Makefile best practices
-.PHONY: help clean build dev run format checkstyle test test-watch test-integration docker-build docker-run docker-clean update-readme gcloud-deploy gcloud-push gcloud-proxy gcloud-logs gcloud-status
+.PHONY: help clean build dev run format checkstyle test test-watch test-integration docker-build docker-run docker-clean update-readme
 .DELETE_ON_ERROR:
 .ONESHELL:
 
@@ -18,15 +18,6 @@ MVN := ./mvnw
 # DOCKER CONFIGURATION
 # ============================================================================
 DOCKER_IMAGE := $(PROJECT_NAME):latest
-
-# ============================================================================
-# GOOGLE CLOUD CONFIGURATION
-# ============================================================================
-GCLOUD_PROJECT := jasons-mcp-server-20250705
-GCLOUD_REGION := us-central1
-GCLOUD_SERVICE := jasons-mcp-server
-GCLOUD_REGISTRY := $(GCLOUD_REGION)-docker.pkg.dev/$(GCLOUD_PROJECT)/mcp-servers
-GCLOUD_IMAGE := $(GCLOUD_REGISTRY)/$(PROJECT_NAME):latest
 
 # Default goal
 .DEFAULT_GOAL := help
@@ -139,77 +130,6 @@ update-readme: $(JAR_FILE) ## Update README.md with generated tool documentation
 	@echo "Updating README.md with generated documentation..."
 	@python scripts/update-docs.py
 	@echo "✓ README.md updated with latest tool and resource documentation"
-
-# ============================================================================
-# GOOGLE CLOUD TARGETS
-# ============================================================================
-
-gcloud-push: docker-build ## Build and push Docker image to Artifact Registry
-	@echo "Tagging image for Artifact Registry..."
-	@docker tag registry.fly.io/$(PROJECT_NAME)/$(PROJECT_NAME):latest $(GCLOUD_IMAGE)
-	@echo "Pushing to Artifact Registry..."
-	@docker push $(GCLOUD_IMAGE)
-	@echo "✓ Image pushed to $(GCLOUD_IMAGE)"
-
-gcloud-deploy: ## Deploy to Google Cloud Run
-	@echo "Deploying to Cloud Run..."
-	@gcloud run deploy $(GCLOUD_SERVICE) \
-		--image $(GCLOUD_IMAGE) \
-		--region $(GCLOUD_REGION) \
-		--port 8080 \
-		--no-allow-unauthenticated \
-		--min-instances 0 \
-		--max-instances 1 \
-		--memory 512Mi \
-		--cpu 1 \
-		--timeout 300
-	@echo "✓ Deployed to Cloud Run"
-	@echo "Service URL: $$(gcloud run services describe $(GCLOUD_SERVICE) --region $(GCLOUD_REGION) --format='value(status.url)')"
-
-gcloud-proxy: ## Start Cloud Run proxy for local access
-	@echo "Starting Cloud Run proxy..."
-	@echo "MCP endpoint will be available at: http://localhost:3000/v1/mcp/sse"
-	@echo "Press Ctrl+C to stop"
-	@gcloud run services proxy $(GCLOUD_SERVICE) --region $(GCLOUD_REGION) --port 3000
-
-gcloud-logs: ## View Cloud Run service logs
-	@echo "Viewing Cloud Run logs..."
-	@gcloud run services logs read $(GCLOUD_SERVICE) --region $(GCLOUD_REGION) --limit 50
-
-gcloud-status: ## Check Cloud Run service status
-	@echo "Cloud Run service status:"
-	@gcloud run services describe $(GCLOUD_SERVICE) --region $(GCLOUD_REGION) --format="table(metadata.name,status.url,status.conditions[0].status,spec.template.spec.containers[0].image)"
-
-# ============================================================================
-# CLOUD BUILD TARGETS
-# ============================================================================
-
-cloud-build: ## Submit build to Google Cloud Build
-	@echo "Submitting build to Google Cloud Build..."
-	@gcloud builds submit --config cloudbuild.yaml . --timeout=1800s
-	@echo "✓ Cloud Build submitted"
-
-cloud-build-status: ## Check recent Cloud Build status
-	@echo "Recent Cloud Build status:"
-	@gcloud builds list --limit=5 --format="table(id,status,createTime,duration)"
-
-cloud-build-logs: ## View logs for the latest Cloud Build
-	@echo "Viewing latest Cloud Build logs..."
-	@gcloud builds log $$(gcloud builds list --limit=1 --format="value(id)")
-
-cloud-build-trigger-create: ## Create GitHub trigger for Cloud Build
-	@echo "Creating Cloud Build trigger for GitHub repository..."
-	@gcloud builds triggers create github \
-		--repo-name=mcp \
-		--repo-owner=$$(git config user.name) \
-		--branch-pattern="^main$$" \
-		--build-config=cloudbuild.yaml \
-		--description="Automatic build and deploy on main branch push"
-	@echo "✓ Cloud Build trigger created"
-
-cloud-build-trigger-list: ## List Cloud Build triggers
-	@echo "Cloud Build triggers:"
-	@gcloud builds triggers list --format="table(name,status,github.name,github.push.branch)"
 
 # ============================================================================
 # UTILITY RULES
