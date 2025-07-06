@@ -427,6 +427,13 @@ quarkus.log.category."io.quarkus.container.image.jib.deployment.JibProcessor".le
 
 The project is configured for deployment to Heroku as an MCP STDIO server compatible with Heroku's Managed Inference and Agents platform.
 
+#### Prerequisites
+
+- Heroku account with billing enabled (for Managed Inference and Agents add-on)
+- Heroku CLI installed
+- Git installed
+- Java 17+ and Maven for local building
+
 #### Configuration Files
 
 - **`Procfile`** - Defines the `mcp-memory` process type required for MCP server registration
@@ -442,25 +449,86 @@ The deployment uses a targeted approach that preserves local container build cap
 - **Heroku Deployment**: Container image building disabled via `MAVEN_CUSTOM_OPTS` config variable
 - **No Broad Overrides**: Avoids global Maven configuration that would affect local builds
 
-#### Deployment Commands
+#### Deployment Process
 
 ```bash
-# Initial setup
+# 1. Login and create app
+heroku login
 heroku create your-mcp-server-name
+heroku git:remote -a your-mcp-server-name
+
+# 2. Configure Maven options for Heroku
 heroku config:set MAVEN_CUSTOM_OPTS="-DskipTests -Dquarkus.container-image.build=false"
 
-# Deploy
+# 3. Deploy
 git push heroku main
 
-# Add MCP functionality
+# 4. Add MCP functionality
 heroku addons:create heroku-inference:claude-3-5-haiku
+
+# 5. Verify deployment
+heroku logs --tail
+heroku ps
 ```
 
-#### Heroku MCP Integration
+#### Using Your MCP Server
 
-Once deployed with the Managed Inference add-on:
-- MCP tools are automatically available to Heroku's inference models
-- External clients can access via MCP Toolkit URL and Token
-- Server automatically scales to zero when not in use
+**With Heroku Managed Inference:**
+- MCP tools are automatically available to your selected inference model
 
-For detailed deployment instructions, see [docs/HEROKU_DEPLOYMENT.md](docs/HEROKU_DEPLOYMENT.md).
+**With External Clients:**
+1. Get MCP Toolkit URL and Token from Heroku Dashboard → Add-on → Tools tab
+2. Configure external clients (Claude Desktop, Cursor):
+   ```json
+   {
+     "mcpServers": {
+       "heroku-memory": {
+         "url": "YOUR_MCP_TOOLKIT_URL",
+         "headers": {
+           "Authorization": "Bearer YOUR_MCP_TOOLKIT_TOKEN"
+         }
+       }
+     }
+   }
+   ```
+
+#### Important Considerations
+
+**Memory Persistence:**
+- Memory stored at `/app/memory.jsonl` on ephemeral filesystem
+- Resets on dyno restart
+- For persistence, consider Heroku Postgres or Redis add-ons
+
+**Scaling and Cost:**
+- MCP servers auto-scale to 0 when not in use
+- Spin up on demand (tool calls limited to 300 seconds)
+- Cost: ~$0.0008/second for eco dynos when running
+
+**Environment Variables:**
+- `PORT` - Set automatically by Heroku
+- `QUARKUS_PROFILE=heroku` - Set via Procfile
+
+#### Troubleshooting
+
+**Container Image Build Error:**
+```bash
+heroku config:set MAVEN_CUSTOM_OPTS="-DskipTests -Dquarkus.container-image.build=false"
+```
+
+**Server Not Starting:**
+```bash
+heroku logs --tail -a your-app-name
+```
+
+**MCP Tools Not Showing:**
+- Verify Procfile has `mcp-` prefix
+- Ensure Managed Inference add-on is attached
+- Check Tools tab in add-on dashboard
+
+#### Local Testing
+
+Test Heroku configuration locally:
+```bash
+./mvnw clean package -Dquarkus.profile=heroku
+PORT=8080 java -Dquarkus.profile=heroku -jar target/quarkus-app/quarkus-run.jar
+```
