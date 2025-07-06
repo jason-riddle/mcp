@@ -63,7 +63,7 @@ public class ApiKeyAuthenticationDisabledIntegrationTest {
             return Map.of(
                     "mcp.security.enabled", "false",
                     "quarkus.mcp.server.memory.sse.root-path", "/v1/memory/mcp",
-                    "quarkus.http.test-port", "9093"); // Use specific available port
+                    "quarkus.http.test-port", "0"); // Use port 0 for automatic assignment
         }
     }
 

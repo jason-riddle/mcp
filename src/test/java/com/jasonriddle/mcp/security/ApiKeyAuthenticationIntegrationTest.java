@@ -66,7 +66,7 @@ public class ApiKeyAuthenticationIntegrationTest {
                     "mcp.security.enabled", "true",
                     "mcp.security.api-key", VALID_API_KEY,
                     "quarkus.mcp.server.memory.sse.root-path", "/v1/memory/mcp",
-                    "quarkus.http.test-port", "9092"); // Use specific available port
+                    "quarkus.http.test-port", "0"); // Use port 0 for automatic assignment
         }
     }
 
