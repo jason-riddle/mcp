@@ -268,9 +268,6 @@
                         <native.image.path>${project.build.directory}/${project.build.finalName}-runner</native.image.path>
                         <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
                         <maven.home>${maven.home}</maven.home>
-                        <!-- <quarkus.log.level>WARN</quarkus.log.level> -->
-                        <!-- <quarkus.log.min-level>WARN</quarkus.log.min-level> -->
-                        <!-- <quarkus.log.console.level>WARN</quarkus.log.console.level> -->
                     </systemPropertyVariables>
                     <reportsDirectory>${project.build.directory}/failsafe-reports</reportsDirectory>
                 </configuration>
@@ -315,8 +312,6 @@
                         <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
                         <maven.home>${maven.home}</maven.home>
                         <quarkus.log.level>WARN</quarkus.log.level>
-                        <!-- <quarkus.log.min-level>WARN</quarkus.log.min-level> -->
-                        <!-- <quarkus.log.console.level>WARN</quarkus.log.console.level> -->
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
