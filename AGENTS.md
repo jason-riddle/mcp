@@ -386,7 +386,7 @@ docker images | grep jasons-mcp-server
 
 **Symptoms**: Tests show `HttpClosedException: Connection was closed` during build
 
-**Explanation**: These are normal integration test connection attempts to verify SSE endpoints. They don't indicate build failures if the main build succeeds.
+**Explanation**: These are normal integration test connection attempts. They don't indicate build failures if the main build succeeds.
 
 **Resolution**: The errors are expected during testing and don't affect deployment. Monitor for actual build failure messages in Maven output.
 
@@ -405,10 +405,10 @@ quarkus.log.category."io.quarkus.container.image.jib.deployment.JibProcessor".le
 
 **Symptoms**: `ApiKeyAuthenticationIntegrationTest` failures with authentication errors expected but not received
 
-**Root Cause**: MCP SSE endpoints (`/v1/memory/mcp/sse`) are created by the Quarkus MCP extension and bypass standard authentication mechanisms including:
-- JAX-RS `@Provider` filters
-- Quarkus HTTP authentication mechanisms
-- Custom security filters
+**Root Cause**: MCP STDIO transport operates via standard input/output and doesn't use HTTP endpoints, so traditional HTTP authentication mechanisms don't apply:
+- No JAX-RS `@Provider` filters for STDIO
+- No HTTP authentication for STDIO transport
+- Authentication must be handled at the process level
 
 **Resolution**: Authentication integration tests have been removed. The `ApiKeyAuthenticationDisabledIntegrationTest` verifies functionality without authentication.
 

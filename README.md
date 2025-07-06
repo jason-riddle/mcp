@@ -1,6 +1,6 @@
 # Jason's MCP Server
 
-A Model Context Protocol (MCP) server implementation with persistent memory graph capabilities, built with Quarkus. This server provides memory tools and resources for managing knowledge graphs with entities, relations, and observations.
+A Model Context Protocol (MCP) server implementation with persistent memory graph capabilities, built with Quarkus. This server provides memory tools and resources for managing knowledge graphs with entities, relations, and observations. It uses STDIO transport for communication, making it suitable for subprocess-based MCP integrations.
 
 ## Table of Contents
 
@@ -33,7 +33,7 @@ make dev
 make run
 ```
 
-The server starts on http://localhost:8080 with memory persisted to `memory.jsonl`.
+The server communicates via standard input/output (STDIO) with memory persisted to `memory.jsonl`.
 
 Run `make help` to see all available commands.
 
@@ -63,8 +63,8 @@ Configure via `application.properties`:
 # Memory file path (default: memory.jsonl)
 memory.file.path=memory.jsonl
 
-# Server port (default: 8080)
-quarkus.http.port=8080
+# STDIO transport is enabled for MCP communication
+quarkus.mcp.server.memory.stdio.enabled=true
 ```
 
 ## Usage
@@ -82,7 +82,7 @@ make run
 make docker-build && make docker-run
 ```
 
-Access the development UI at http://localhost:8080/q/dev/ when running in dev mode.
+The server runs in STDIO mode, communicating via stdin/stdout for MCP protocol messages.
 
 ### Memory Tools
 
