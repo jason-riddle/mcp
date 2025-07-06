@@ -460,8 +460,8 @@ heroku git:remote -a your-mcp-server-name
 # 2. Configure Maven options for Heroku
 heroku config:set MAVEN_CUSTOM_OPTS="-DskipTests -Dquarkus.container-image.build=false"
 
-# 3. Deploy
-git push heroku main
+# 3. Deploy (Automatic deploys from main branch are enabled)
+git push origin main
 
 # 4. Add MCP functionality
 heroku addons:create heroku-inference:claude-3-5-haiku
