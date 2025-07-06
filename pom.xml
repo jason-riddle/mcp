@@ -106,11 +106,13 @@
         </dependency>
 
         <!-- MCP Server Support -->
-        <dependency>
+        <!-- SSE transport dependency (commented out - using STDIO instead) -->
+        <!-- <dependency>
             <groupId>io.quarkiverse.mcp</groupId>
             <artifactId>quarkus-mcp-server-sse</artifactId>
             <version>${mcp.version}</version>
-        </dependency>
+        </dependency> -->
+        <!-- STDIO transport dependency for MCP server -->
         <dependency>
             <groupId>io.quarkiverse.mcp</groupId>
             <artifactId>quarkus-mcp-server-stdio</artifactId>
@@ -126,6 +128,13 @@
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-rest-client</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- LangChain4j MCP Client for STDIO integration testing -->
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-mcp</artifactId>
+            <version>1.0.0-alpha1</version>
             <scope>test</scope>
         </dependency>
         <!-- <dependency>

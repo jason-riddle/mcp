@@ -4,7 +4,6 @@ import com.jasonriddle.mcp.memory.Entity;
 import com.jasonriddle.mcp.memory.MemoryGraph;
 import com.jasonriddle.mcp.memory.MemoryService;
 import com.jasonriddle.mcp.memory.Relation;
-import io.quarkiverse.mcp.server.McpServer;
 import io.quarkiverse.mcp.server.Tool;
 import io.quarkiverse.mcp.server.ToolArg;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -18,7 +17,6 @@ import java.util.Map;
  * MCP memory tools for knowledge graph operations.
  */
 @ApplicationScoped
-@McpServer("memory")
 public final class McpMemoryTools {
 
     @Inject
