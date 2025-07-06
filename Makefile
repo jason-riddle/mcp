@@ -102,7 +102,7 @@ test-watch: ## Run tests in watch mode
 test-integration: ## Run integration tests
 	@echo "Running integration tests..."
 	@rm -f memory.jsonl
-	@$(MVN) failsafe:integration-test -DskipITs=false --no-transfer-progress
+	@$(MVN) verify -DskipITs=false --no-transfer-progress
 	@echo "✓ Integration tests completed"
 
 # ============================================================================
