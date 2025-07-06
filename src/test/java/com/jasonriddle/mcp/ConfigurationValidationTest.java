@@ -59,17 +59,17 @@ final class ConfigurationValidationTest {
 
         // Validate application-specific logging levels
         assertEquals(
-                "DEBUG",
+                "INFO",
                 config.getValue("quarkus.log.category.\"com.jasonriddle.mcp\".level", String.class),
-                "MCP package log level should be DEBUG");
+                "MCP package log level should be INFO");
         assertEquals(
-                "DEBUG",
+                "INFO",
                 config.getValue("quarkus.log.category.\"io.quarkiverse.mcp\".level", String.class),
-                "Quarkus MCP extension log level should be DEBUG");
+                "Quarkus MCP extension log level should be INFO");
         assertEquals(
-                "DEBUG",
+                "INFO",
                 config.getValue("quarkus.log.category.\"dev.langchain4j.mcp\".level", String.class),
-                "LangChain4j MCP log level should be DEBUG");
+                "LangChain4j MCP log level should be INFO");
 
         // Validate JIB processor warning suppression
         assertEquals(
