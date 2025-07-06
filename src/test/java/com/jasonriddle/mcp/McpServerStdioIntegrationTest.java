@@ -59,10 +59,7 @@ final class McpServerStdioIntegrationTest {
                     "memory.file.path", TEST_MEMORY_FILE,
                     // Reduce log noise during testing
                     "quarkus.log.level", "WARN",
-                    "quarkus.log.category.\"com.jasonriddle.mcp\"", "INFO",
-                    // Ensure STDIO transport is enabled
-                    "quarkus.mcp.server.stdio.enabled", "true",
-                    "quarkus.mcp.server.stdio.initialization-enabled", "true");
+                    "quarkus.log.category.\"com.jasonriddle.mcp\"", "INFO");
         }
     }
 
