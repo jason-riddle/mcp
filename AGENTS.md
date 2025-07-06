@@ -420,3 +420,47 @@ quarkus.log.category."io.quarkus.container.image.jib.deployment.JibProcessor".le
 ./mvnw verify -DskipITs=false                                   # Include integration tests
 ./mvnw test -Dtest=ApiKeyAuthenticationDisabledIntegrationTest  # Security tests
 ```
+
+## Deployment
+
+### Heroku Deployment
+
+The project is configured for deployment to Heroku as an MCP STDIO server compatible with Heroku's Managed Inference and Agents platform.
+
+#### Configuration Files
+
+- **`Procfile`** - Defines the `mcp-memory` process type required for MCP server registration
+- **`system.properties`** - Specifies Java 17 runtime for Heroku
+- **`app.json`** - Enables one-click deployment with Managed Inference add-on
+- **`application-heroku.properties`** - Heroku-specific Quarkus configuration
+
+#### Key Configuration Approach
+
+The deployment uses a targeted approach that preserves local container build capability while disabling it only for Heroku:
+
+- **Local Development**: Container image building enabled via `application.properties`
+- **Heroku Deployment**: Container image building disabled via `MAVEN_CUSTOM_OPTS` config variable
+- **No Broad Overrides**: Avoids global Maven configuration that would affect local builds
+
+#### Deployment Commands
+
+```bash
+# Initial setup
+heroku create your-mcp-server-name
+heroku config:set MAVEN_CUSTOM_OPTS="-DskipTests -Dquarkus.container-image.build=false"
+
+# Deploy
+git push heroku main
+
+# Add MCP functionality
+heroku addons:create heroku-inference:claude-3-5-haiku
+```
+
+#### Heroku MCP Integration
+
+Once deployed with the Managed Inference add-on:
+- MCP tools are automatically available to Heroku's inference models
+- External clients can access via MCP Toolkit URL and Token
+- Server automatically scales to zero when not in use
+
+For detailed deployment instructions, see [docs/HEROKU_DEPLOYMENT.md](docs/HEROKU_DEPLOYMENT.md).
