@@ -90,6 +90,7 @@ checkstyle: ## Run checkstyle verification
 
 test: ## Run unit tests
 	@echo "Running unit tests..."
+	@rm -f memory.jsonl
 	@$(MVN) test --no-transfer-progress
 	@echo "✓ Unit tests completed"
 
@@ -100,6 +101,7 @@ test-watch: ## Run tests in watch mode
 
 test-integration: ## Run integration tests
 	@echo "Running integration tests..."
+	@rm -f memory.jsonl
 	@$(MVN) failsafe:integration-test -DskipITs=false --no-transfer-progress
 	@echo "✓ Integration tests completed"
 
