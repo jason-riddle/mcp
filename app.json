@@ -15,12 +15,6 @@
       "size": "eco"
     }
   },
-  "addons": [
-    {
-      "plan": "heroku-inference:claude-3-5-haiku",
-      "as": "INFERENCE"
-    }
-  ],
   "env": {
     "JAVA_OPTS": {
       "description": "Java runtime options",
