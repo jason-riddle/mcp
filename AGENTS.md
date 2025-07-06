@@ -253,6 +253,32 @@ memory.file.path=memory.jsonl
 
 # Server port (default: 8080)
 quarkus.http.port=8080
+
+# Security Configuration (optional)
+# Enable API key authentication
+mcp.security.enabled=false
+# API key value (use environment variable in production)
+mcp.security.api-key=${MCP_API_KEY:}
+```
+
+#### Security Setup
+
+The MCP server supports simple header-based authentication using API keys:
+
+1. **Enable Security**: Set `mcp.security.enabled=true`
+2. **Set API Key**: Configure `MCP_API_KEY` environment variable
+3. **Client Usage**: Include `X-API-Key` header in all requests
+
+Example usage:
+```bash
+# Set API key via environment variable
+export MCP_API_KEY="your-secure-api-key-here"
+
+# Start server with security enabled
+java -Dmcp.security.enabled=true -jar target/quarkus-app/quarkus-run.jar
+
+# Make authenticated request
+curl -H "X-API-Key: your-secure-api-key-here" http://localhost:8080/v1/memory/mcp
 ```
 
 ### Container Image Tagging Strategy
