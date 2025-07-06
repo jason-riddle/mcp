@@ -42,13 +42,15 @@
         <compiler-plugin.version>3.14.0</compiler-plugin.version>
         <surefire-plugin.version>3.5.3</surefire-plugin.version>
         <spotless.version>2.44.5</spotless.version>
+        <checkstyle.version>3.6.0</checkstyle.version>
+        <maven-release-plugin.version>3.1.1</maven-release-plugin.version>
+        <maven-javadoc-plugin.version>3.11.2</maven-javadoc-plugin.version>
+        <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
 
         <!-- MCP Versions -->
         <mcp.version>1.3.1</mcp.version>
 
-        <!-- Container & Test Configuration -->
-        <!-- <quarkus.container-image.group>com.jasonriddle.mcp</quarkus.container-image.group>
-        <quarkus.container-image.name>jasons-mcp-server</quarkus.container-image.name> -->
+        <!-- Test Configuration -->
         <skipITs>true</skipITs>
     </properties>
 
@@ -72,46 +74,18 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-arc</artifactId>
         </dependency>
-        <!-- <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-rest</artifactId>
-        </dependency> -->
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-rest-jackson</artifactId>
         </dependency>
 
-        <!-- Security & Monitoring -->
-        <!-- <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-security</artifactId>
-        </dependency> -->
-        <!-- <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-smallrye-health</artifactId>
-        </dependency> -->
-        <!-- <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-micrometer-registry-prometheus</artifactId>
-        </dependency> -->
-
-        <!-- Documentation & Container -->
-        <!-- <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-smallrye-openapi</artifactId>
-        </dependency> -->
+        <!-- Container Image Support -->
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-container-image-jib</artifactId>
         </dependency>
 
         <!-- MCP Server Support -->
-        <!-- SSE transport dependency (commented out - using STDIO instead) -->
-        <!-- <dependency>
-            <groupId>io.quarkiverse.mcp</groupId>
-            <artifactId>quarkus-mcp-server-sse</artifactId>
-            <version>${mcp.version}</version>
-        </dependency> -->
         <!-- STDIO transport dependency for MCP server -->
         <dependency>
             <groupId>io.quarkiverse.mcp</groupId>
@@ -137,16 +111,6 @@
             <version>1.1.0-beta7</version>
             <scope>test</scope>
         </dependency>
-        <!-- <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-junit5-mockito</artifactId>
-            <scope>test</scope>
-        </dependency> -->
-        <!-- <dependency>
-            <groupId>io.rest-assured</groupId>
-            <artifactId>rest-assured</artifactId>
-            <scope>test</scope>
-        </dependency> -->
     </dependencies>
 
     <!-- Build Configuration -->
@@ -227,7 +191,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>3.6.0</version>
+                <version>${checkstyle.version}</version>
                 <configuration>
                     <configLocation>checkstyle.xml</configLocation>
                     <consoleOutput>true</consoleOutput>
@@ -285,7 +249,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>3.1.1</version>
+                <version>${maven-release-plugin.version}</version>
                 <configuration>
                     <tagNameFormat>@{project.version}</tagNameFormat>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
@@ -321,6 +285,20 @@
 
     <!-- Build Profiles -->
     <profiles>
+        <!-- Development Profile -->
+        <profile>
+            <id>dev</id>
+            <properties>
+                <quarkus.profile>dev</quarkus.profile>
+            </properties>
+        </profile>
+        <!-- Production Profile -->
+        <profile>
+            <id>prod</id>
+            <properties>
+                <quarkus.profile>prod</quarkus.profile>
+            </properties>
+        </profile>
         <!-- Native Compilation Profile -->
         <profile>
             <id>native</id>
@@ -342,7 +320,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.11.2</version>
+                        <version>${maven-javadoc-plugin.version}</version>
                         <executions>
                             <execution>
                                 <id>attach-javadocs</id>
@@ -355,7 +333,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
-                        <version>3.3.1</version>
+                        <version>${maven-source-plugin.version}</version>
                         <executions>
                             <execution>
                                 <id>attach-sources</id>

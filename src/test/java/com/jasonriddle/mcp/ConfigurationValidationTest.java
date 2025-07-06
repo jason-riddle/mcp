@@ -48,28 +48,8 @@ final class ConfigurationValidationTest {
                 config.getValue("quarkus.log.console.stderr", Boolean.class),
                 "Console logging should go to stderr for STDIO transport compatibility");
 
-        // Validate file logging
-        assertTrue(config.getValue("quarkus.log.file.enable", Boolean.class), "File logging should be enabled");
-        // Note: During unit tests, Quarkus uses "target/quarkus.log" instead of production value
-        String logFilePath = config.getValue("quarkus.log.file.path", String.class);
-        assertTrue(
-                logFilePath.equals("jasons-mcp-server.log") || logFilePath.equals("target/quarkus.log"),
-                "Log file path should be production (jasons-mcp-server.log) or test (target/quarkus.log), got: "
-                        + logFilePath);
-
-        // Validate application-specific logging levels
-        assertEquals(
-                "INFO",
-                config.getValue("quarkus.log.category.\"com.jasonriddle.mcp\".level", String.class),
-                "MCP package log level should be INFO");
-        assertEquals(
-                "INFO",
-                config.getValue("quarkus.log.category.\"io.quarkiverse.mcp\".level", String.class),
-                "Quarkus MCP extension log level should be INFO");
-        assertEquals(
-                "INFO",
-                config.getValue("quarkus.log.category.\"dev.langchain4j.mcp\".level", String.class),
-                "LangChain4j MCP log level should be INFO");
+        // File logging and application-specific levels are now in profile-specific properties
+        // Base config only contains console logging and JIB suppression
 
         // Validate JIB processor warning suppression
         assertEquals(
@@ -82,10 +62,10 @@ final class ConfigurationValidationTest {
 
     @Test
     void shouldValidateContainerImageConfiguration() {
-        // Validate container build configuration
-        assertTrue(
+        // Validate container build configuration - disabled for tests
+        assertFalse(
                 config.getValue("quarkus.container-image.build", Boolean.class),
-                "Container image build should be enabled");
+                "Container image build should be disabled for tests");
         assertEquals(
                 "us-central1-docker.pkg.dev",
                 config.getValue("quarkus.container-image.registry", String.class),
@@ -122,9 +102,9 @@ final class ConfigurationValidationTest {
     void shouldValidateMemoryConfiguration() {
         // Validate memory persistence configuration
         assertEquals(
-                "memory.jsonl",
+                "test-memory.jsonl",
                 config.getValue("memory.file.path", String.class),
-                "Memory file path should use default production value");
+                "Memory file path should use test-specific value from test properties");
     }
 
     @Test
@@ -171,8 +151,9 @@ final class ConfigurationValidationTest {
         // This test verifies that our test configuration override mechanism works
         // by checking that we can properly override the memory file path in tests
 
-        // Get the current memory file path - in unit tests this should be the default
+        // Get the current memory file path - in unit tests this should be test-specific
         String memoryFilePath = config.getValue("memory.file.path", String.class);
-        assertEquals("memory.jsonl", memoryFilePath, "In unit tests, memory file path should use production default");
+        assertEquals(
+                "test-memory.jsonl", memoryFilePath, "In unit tests, memory file path should use test-specific value");
     }
 }
