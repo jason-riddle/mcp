@@ -29,10 +29,6 @@
     "QUARKUS_PROFILE": {
       "description": "Quarkus configuration profile",
       "value": "heroku"
-    },
-    "MAVEN_CUSTOM_OPTS": {
-      "description": "Custom Maven options for build",
-      "value": "-DskipTests -Dquarkus.container-image.build=false"
     }
   },
   "scripts": {

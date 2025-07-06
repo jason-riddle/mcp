@@ -21,7 +21,7 @@ The repository is already configured with all necessary Heroku files:
 
 ### 2. Deploy to Heroku
 
-The repository is configured to automatically handle the build process on Heroku. The `app.json` file includes `MAVEN_CUSTOM_OPTS` that disable container image building during the Heroku build process.
+The repository is configured to automatically handle the build process on Heroku. Container image building is disabled specifically for Heroku deployments via the `MAVEN_CUSTOM_OPTS` config variable, while preserving local container build capability.
 
 ### 3. Create Heroku App
 
@@ -139,15 +139,13 @@ java.lang.IllegalStateException: No container runtime was found
 
 This happens because the pom.xml includes the `quarkus-container-image-jib` dependency, but Heroku doesn't have Docker/Podman available during builds.
 
-**Solution**: The `app.json` file already includes the necessary configuration to disable container image building:
-```json
-"MAVEN_CUSTOM_OPTS": {
-  "description": "Custom Maven options for build",
-  "value": "-DskipTests -Dquarkus.container-image.build=false"
-}
+**Solution**: Container image building is disabled for Heroku deployments via the `MAVEN_CUSTOM_OPTS` config variable:
+
+```bash
+heroku config:set MAVEN_CUSTOM_OPTS="-DskipTests -Dquarkus.container-image.build=false" -a your-app-name
 ```
 
-If you still encounter issues, ensure your `app.json` contains this environment variable.
+This approach preserves local container build capability while preventing build failures on Heroku.
 
 ### Server Not Starting
 
