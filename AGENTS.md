@@ -68,7 +68,11 @@ make checkstyle  # Run style checks
 
 ```bash
 make test                             # Run unit tests
+
 make test-integration                 # Run integration tests
+# or run directly
+# ./mvnw verify -DskipITs=false
+
 ./mvnw test -Dtest=MemoryServiceTest  # Run specific test class
 ```
 
