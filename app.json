@@ -1,0 +1,41 @@
+{
+  "name": "Jason's MCP Memory Server",
+  "description": "A Model Context Protocol (MCP) server with persistent memory graph capabilities",
+  "repository": "https://github.com/jason-riddle/mcp",
+  "keywords": ["mcp", "model-context-protocol", "ai", "memory", "quarkus", "java"],
+  "stack": "heroku-24",
+  "buildpacks": [
+    {
+      "url": "heroku/java"
+    }
+  ],
+  "formation": {
+    "mcp-memory": {
+      "quantity": 1,
+      "size": "eco"
+    }
+  },
+  "addons": [
+    {
+      "plan": "heroku-inference:claude-3-5-haiku",
+      "as": "INFERENCE"
+    }
+  ],
+  "env": {
+    "JAVA_OPTS": {
+      "description": "Java runtime options",
+      "value": "-Xmx512m -Xms512m"
+    },
+    "QUARKUS_PROFILE": {
+      "description": "Quarkus configuration profile",
+      "value": "heroku"
+    },
+    "MAVEN_CUSTOM_OPTS": {
+      "description": "Custom Maven options for build",
+      "value": "-DskipTests -Dquarkus.container-image.build=false"
+    }
+  },
+  "scripts": {
+    "postdeploy": "echo 'MCP Memory Server deployed successfully!'"
+  }
+}
