@@ -1,0 +1,310 @@
+package com.jasonriddle.mcp;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.quarkiverse.mcp.server.Tool;
+import io.quarkiverse.mcp.server.ToolArg;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Duration;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import org.eclipse.microprofile.config.Config;
+
+/**
+ * MCP tools for configuration debugging and validation.
+ *
+ * These tools provide access to application configuration values for debugging
+ * purposes while filtering out sensitive information. They are intended for
+ * development and troubleshooting scenarios.
+ */
+@ApplicationScoped
+public final class McpConfigurationTools {
+
+    private static final Set<String> SENSITIVE_KEYS =
+            Set.of("password", "secret", "token", "key", "credential", "private", "cert", "certificate");
+
+    private static final List<String> SAFE_CONFIG_KEYS = Arrays.asList(
+            "memory.file.path",
+            "quarkus.log.level",
+            "quarkus.log.console.enable",
+            "quarkus.log.console.stderr",
+            "quarkus.log.file.enable",
+            "quarkus.log.file.path",
+            "quarkus.shutdown.timeout",
+            "quarkus.shutdown.delay-enabled",
+            "quarkus.smallrye-health.root-path",
+            "mcp.security.enabled",
+            "quarkus.application.name",
+            "quarkus.application.version",
+            "quarkus.container-image.name",
+            "quarkus.container-image.tag");
+
+    @Inject
+    Config config;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    /**
+     * Gets a single configuration value for debugging purposes.
+     */
+    @Tool(description = "Get a configuration value for debugging (filters sensitive keys)")
+    public String getConfigValue(@ToolArg(description = "Configuration key to retrieve") final String configKey) {
+        try {
+            // Security check: filter out sensitive configuration keys
+            if (isSensitiveKey(configKey)) {
+                return createErrorResponse("Access denied: Configuration key appears to contain sensitive information");
+            }
+
+            // Get the configuration value
+            Optional<String> configValue = config.getOptionalValue(configKey, String.class);
+
+            ObjectNode response = objectMapper.createObjectNode();
+            response.put("key", configKey);
+
+            if (configValue.isPresent()) {
+                response.put("value", configValue.get());
+                response.put("present", Boolean.TRUE);
+            } else {
+                response.putNull("value");
+                response.put("present", Boolean.FALSE);
+            }
+
+            return objectMapper.writeValueAsString(response);
+
+        } catch (JsonProcessingException e) {
+            return createErrorResponse("Error processing configuration: " + e.getMessage());
+        } catch (Exception e) {
+            return createErrorResponse("Error retrieving configuration: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Gets multiple safe configuration properties for debugging.
+     */
+    @Tool(description = "Get safe configuration properties for debugging")
+    public String getAllSafeConfigProperties() {
+        try {
+            ObjectNode response = objectMapper.createObjectNode();
+            ObjectNode configData = objectMapper.createObjectNode();
+
+            // Get only safe, predefined configuration keys
+            for (String key : SAFE_CONFIG_KEYS) {
+                Optional<String> value = config.getOptionalValue(key, String.class);
+                if (value.isPresent()) {
+                    configData.put(key, value.get());
+                } else {
+                    configData.putNull(key);
+                }
+            }
+
+            response.set("configuration", configData);
+            response.put("keys_returned", SAFE_CONFIG_KEYS.size());
+            response.put("filtered_for_security", Boolean.TRUE);
+
+            return objectMapper.writeValueAsString(response);
+
+        } catch (JsonProcessingException e) {
+            return createErrorResponse("Error processing configuration: " + e.getMessage());
+        } catch (Exception e) {
+            return createErrorResponse("Error retrieving configuration: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Validates application configuration and returns detailed status.
+     */
+    @Tool(description = "Validate application configuration and return detailed status")
+    public String validateConfiguration() {
+        try {
+            ObjectNode response = objectMapper.createObjectNode();
+            ObjectNode validation = objectMapper.createObjectNode();
+
+            // Validate memory configuration
+            ObjectNode memoryValidation = validateMemoryConfig();
+            validation.set("memory", memoryValidation);
+
+            // Validate logging configuration
+            ObjectNode loggingValidation = validateLoggingConfig();
+            validation.set("logging", loggingValidation);
+
+            // Validate shutdown configuration
+            ObjectNode shutdownValidation = validateShutdownConfig();
+            validation.set("shutdown", shutdownValidation);
+
+            // Validate security configuration
+            ObjectNode securityValidation = validateSecurityConfig();
+            validation.set("security", securityValidation);
+
+            // Overall validation status
+            boolean overallValid = memoryValidation.get("valid").asBoolean()
+                    && loggingValidation.get("valid").asBoolean()
+                    && shutdownValidation.get("valid").asBoolean()
+                    && securityValidation.get("valid").asBoolean();
+
+            response.set("validation_results", validation);
+            response.put("overall_valid", Boolean.valueOf(overallValid));
+            response.put("validation_timestamp", System.currentTimeMillis());
+
+            return objectMapper.writeValueAsString(response);
+
+        } catch (JsonProcessingException e) {
+            return createErrorResponse("Error processing validation: " + e.getMessage());
+        } catch (Exception e) {
+            return createErrorResponse("Error validating configuration: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Validates memory-related configuration.
+     */
+    private ObjectNode validateMemoryConfig() {
+        ObjectNode memoryValidation = objectMapper.createObjectNode();
+
+        try {
+            String memoryFilePath = config.getValue("memory.file.path", String.class);
+            memoryValidation.put("file_path", memoryFilePath);
+
+            if (memoryFilePath == null || memoryFilePath.trim().isEmpty()) {
+                memoryValidation.put("valid", Boolean.FALSE);
+                memoryValidation.put("error", "Memory file path is null or empty");
+                return memoryValidation;
+            }
+
+            Path memoryPath = Paths.get(memoryFilePath);
+            memoryValidation.put("file_exists", Files.exists(memoryPath));
+
+            boolean writable = Files.isWritable(memoryPath.getParent());
+            memoryValidation.put("directory_writable", writable);
+
+            memoryValidation.put("valid", Boolean.valueOf(writable));
+
+        } catch (Exception e) {
+            memoryValidation.put("valid", Boolean.FALSE);
+            memoryValidation.put("error", e.getMessage());
+        }
+
+        return memoryValidation;
+    }
+
+    /**
+     * Validates logging-related configuration.
+     */
+    private ObjectNode validateLoggingConfig() {
+        ObjectNode loggingValidation = objectMapper.createObjectNode();
+
+        try {
+            String logLevel = config.getValue("quarkus.log.level", String.class);
+            loggingValidation.put("log_level", logLevel);
+
+            boolean logLevelValid = logLevel != null
+                    && (logLevel.equals("DEBUG")
+                            || logLevel.equals("INFO")
+                            || logLevel.equals("WARN")
+                            || logLevel.equals("ERROR"));
+            loggingValidation.put("log_level_valid", Boolean.valueOf(logLevelValid));
+
+            boolean consoleEnabled = config.getValue("quarkus.log.console.enable", Boolean.class);
+            loggingValidation.put("console_enabled", consoleEnabled);
+
+            boolean consoleStderr = config.getValue("quarkus.log.console.stderr", Boolean.class);
+            loggingValidation.put("console_stderr", consoleStderr);
+
+            loggingValidation.put("valid", Boolean.valueOf(logLevelValid && consoleEnabled));
+
+        } catch (Exception e) {
+            loggingValidation.put("valid", Boolean.FALSE);
+            loggingValidation.put("error", e.getMessage());
+        }
+
+        return loggingValidation;
+    }
+
+    /**
+     * Validates shutdown-related configuration.
+     */
+    private ObjectNode validateShutdownConfig() {
+        ObjectNode shutdownValidation = objectMapper.createObjectNode();
+
+        try {
+            Duration shutdownTimeout = config.getOptionalValue("quarkus.shutdown.timeout", Duration.class)
+                    .orElse(Duration.ofSeconds(10));
+            shutdownValidation.put("timeout", shutdownTimeout.toString());
+
+            boolean timeoutValid = shutdownTimeout.toSeconds() > 0;
+            shutdownValidation.put("timeout_valid", Boolean.valueOf(timeoutValid));
+
+            boolean delayEnabled = config.getOptionalValue("quarkus.shutdown.delay-enabled", Boolean.class)
+                    .orElse(false);
+            shutdownValidation.put("delay_enabled", delayEnabled);
+
+            shutdownValidation.put("valid", Boolean.valueOf(timeoutValid));
+
+        } catch (Exception e) {
+            shutdownValidation.put("valid", Boolean.FALSE);
+            shutdownValidation.put("error", e.getMessage());
+        }
+
+        return shutdownValidation;
+    }
+
+    /**
+     * Validates security-related configuration.
+     */
+    private ObjectNode validateSecurityConfig() {
+        ObjectNode securityValidation = objectMapper.createObjectNode();
+
+        try {
+            boolean securityEnabled = config.getOptionalValue("mcp.security.enabled", Boolean.class)
+                    .orElse(false);
+            securityValidation.put("security_enabled", securityEnabled);
+
+            // Security should be disabled for MCP STDIO transport
+            boolean securityValid = !securityEnabled;
+            securityValidation.put("valid", Boolean.valueOf(securityValid));
+
+            if (securityEnabled) {
+                securityValidation.put(
+                        "warning", "Security is not functional for MCP STDIO transport and should be disabled");
+            }
+
+        } catch (Exception e) {
+            securityValidation.put("valid", Boolean.FALSE);
+            securityValidation.put("error", e.getMessage());
+        }
+
+        return securityValidation;
+    }
+
+    /**
+     * Checks if a configuration key appears to contain sensitive information.
+     */
+    private boolean isSensitiveKey(final String key) {
+        if (key == null) {
+            return true;
+        }
+
+        String lowerKey = key.toLowerCase();
+        return SENSITIVE_KEYS.stream().anyMatch(lowerKey::contains);
+    }
+
+    /**
+     * Creates a standardized error response.
+     */
+    private String createErrorResponse(final String errorMessage) {
+        try {
+            ObjectNode errorResponse = objectMapper.createObjectNode();
+            errorResponse.put("error", errorMessage);
+            errorResponse.put("success", Boolean.FALSE);
+            return objectMapper.writeValueAsString(errorResponse);
+        } catch (JsonProcessingException e) {
+            return "{\"error\":\"Error creating error response\",\"success\":false}";
+        }
+    }
+}

@@ -1,0 +1,238 @@
+package com.jasonriddle.mcp;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
+import org.eclipse.microprofile.config.Config;
+import org.eclipse.microprofile.health.HealthCheck;
+import org.eclipse.microprofile.health.HealthCheckResponse;
+import org.eclipse.microprofile.health.Readiness;
+
+/**
+ * Custom health check for application configuration validation.
+ *
+ * This health check validates critical configuration properties and verifies
+ * that the application is properly configured for operation. It exposes
+ * configuration values as health check data for monitoring and debugging.
+ */
+@ApplicationScoped
+@Readiness
+public final class ConfigurationHealthCheck implements HealthCheck {
+
+    @Inject
+    Config config;
+
+    @Override
+    public HealthCheckResponse call() {
+        Map<String, Object> data = new HashMap<>();
+        boolean isHealthy = true;
+
+        try {
+            // Validate memory configuration
+            boolean memoryConfigValid = validateMemoryConfiguration(data);
+            isHealthy = isHealthy && memoryConfigValid;
+
+            // Validate logging configuration
+            boolean loggingConfigValid = validateLoggingConfiguration(data);
+            isHealthy = isHealthy && loggingConfigValid;
+
+            // Validate shutdown configuration
+            boolean shutdownConfigValid = validateShutdownConfiguration(data);
+            isHealthy = isHealthy && shutdownConfigValid;
+
+            // Validate security configuration
+            boolean securityConfigValid = validateSecurityConfiguration(data);
+            isHealthy = isHealthy && securityConfigValid;
+
+            // Overall configuration validity
+            data.put("configuration.valid", isHealthy);
+
+            var builder = HealthCheckResponse.builder().name("configuration").status(isHealthy);
+
+            // Add each data entry individually
+            for (var entry : data.entrySet()) {
+                Object value = entry.getValue();
+                if (value instanceof String) {
+                    builder.withData(entry.getKey(), (String) value);
+                } else if (value instanceof Boolean) {
+                    builder.withData(entry.getKey(), (Boolean) value);
+                } else if (value instanceof Long) {
+                    builder.withData(entry.getKey(), (Long) value);
+                } else {
+                    builder.withData(entry.getKey(), String.valueOf(value));
+                }
+            }
+
+            return builder.build();
+
+        } catch (Exception e) {
+            data.put("configuration.error", e.getMessage());
+            data.put("configuration.valid", false);
+
+            var errorBuilder =
+                    HealthCheckResponse.builder().name("configuration").status(false);
+
+            // Add each data entry individually
+            for (var entry : data.entrySet()) {
+                Object value = entry.getValue();
+                if (value instanceof String) {
+                    errorBuilder.withData(entry.getKey(), (String) value);
+                } else if (value instanceof Boolean) {
+                    errorBuilder.withData(entry.getKey(), (Boolean) value);
+                } else if (value instanceof Long) {
+                    errorBuilder.withData(entry.getKey(), (Long) value);
+                } else {
+                    errorBuilder.withData(entry.getKey(), String.valueOf(value));
+                }
+            }
+
+            return errorBuilder.build();
+        }
+    }
+
+    /**
+     * Validates memory-related configuration.
+     */
+    private boolean validateMemoryConfiguration(final Map<String, Object> data) {
+        try {
+            // Get memory file path
+            String memoryFilePath = config.getValue("memory.file.path", String.class);
+            data.put("memory.file.path", memoryFilePath);
+
+            if (memoryFilePath == null || memoryFilePath.trim().isEmpty()) {
+                data.put("memory.file.path.valid", false);
+                return false;
+            }
+
+            // Check if memory file exists and is accessible
+            Path memoryPath = Paths.get(memoryFilePath);
+            boolean memoryFileExists = Files.exists(memoryPath);
+            data.put("memory.file.exists", memoryFileExists);
+
+            // Check if memory file is writable (create parent directories if needed)
+            boolean memoryFileWritable = false;
+            try {
+                if (!memoryFileExists) {
+                    // Create parent directories if they don't exist
+                    Path parentDir = memoryPath.getParent();
+                    if (parentDir != null && !Files.exists(parentDir)) {
+                        Files.createDirectories(parentDir);
+                    }
+                }
+                memoryFileWritable = Files.isWritable(memoryPath.getParent());
+            } catch (IOException e) {
+                data.put("memory.file.error", e.getMessage());
+            }
+            data.put("memory.file.writable", memoryFileWritable);
+
+            data.put("memory.configuration.valid", true);
+            return true;
+
+        } catch (Exception e) {
+            data.put("memory.configuration.error", e.getMessage());
+            data.put("memory.configuration.valid", false);
+            return false;
+        }
+    }
+
+    /**
+     * Validates logging-related configuration.
+     */
+    private boolean validateLoggingConfiguration(final Map<String, Object> data) {
+        try {
+            // Validate log level
+            String logLevel = config.getValue("quarkus.log.level", String.class);
+            data.put("quarkus.log.level", logLevel);
+
+            boolean logLevelValid = logLevel != null
+                    && (logLevel.equals("DEBUG")
+                            || logLevel.equals("INFO")
+                            || logLevel.equals("WARN")
+                            || logLevel.equals("ERROR"));
+            data.put("logging.level.valid", logLevelValid);
+
+            // Validate console logging configuration
+            boolean consoleEnabled = config.getValue("quarkus.log.console.enable", Boolean.class);
+            data.put("quarkus.log.console.enable", consoleEnabled);
+
+            boolean consoleStderr = config.getValue("quarkus.log.console.stderr", Boolean.class);
+            data.put("quarkus.log.console.stderr", consoleStderr);
+
+            // Validate file logging configuration
+            boolean fileEnabled = config.getValue("quarkus.log.file.enable", Boolean.class);
+            data.put("quarkus.log.file.enable", fileEnabled);
+
+            String filePath = config.getValue("quarkus.log.file.path", String.class);
+            data.put("quarkus.log.file.path", filePath);
+
+            data.put("logging.configuration.valid", logLevelValid && consoleEnabled);
+            return logLevelValid && consoleEnabled;
+
+        } catch (Exception e) {
+            data.put("logging.configuration.error", e.getMessage());
+            data.put("logging.configuration.valid", false);
+            return false;
+        }
+    }
+
+    /**
+     * Validates shutdown-related configuration.
+     */
+    private boolean validateShutdownConfiguration(final Map<String, Object> data) {
+        try {
+            // Validate shutdown timeout
+            Duration shutdownTimeout = config.getOptionalValue("quarkus.shutdown.timeout", Duration.class)
+                    .orElse(Duration.ofSeconds(10));
+            data.put("quarkus.shutdown.timeout", shutdownTimeout.toString());
+
+            boolean shutdownTimeoutValid = shutdownTimeout.toSeconds() > 0;
+            data.put("shutdown.timeout.valid", shutdownTimeoutValid);
+
+            // Check if shutdown delay is enabled
+            boolean shutdownDelayEnabled = config.getOptionalValue("quarkus.shutdown.delay-enabled", Boolean.class)
+                    .orElse(false);
+            data.put("quarkus.shutdown.delay-enabled", shutdownDelayEnabled);
+
+            data.put("shutdown.configuration.valid", shutdownTimeoutValid);
+            return shutdownTimeoutValid;
+
+        } catch (Exception e) {
+            data.put("shutdown.configuration.error", e.getMessage());
+            data.put("shutdown.configuration.valid", false);
+            return false;
+        }
+    }
+
+    /**
+     * Validates security-related configuration.
+     */
+    private boolean validateSecurityConfiguration(final Map<String, Object> data) {
+        try {
+            // Check security configuration (currently not functional for MCP STDIO)
+            boolean securityEnabled = config.getOptionalValue("mcp.security.enabled", Boolean.class)
+                    .orElse(false);
+            data.put("mcp.security.enabled", securityEnabled);
+
+            // Security is currently not functional for MCP STDIO transport, so we expect it to be false
+            boolean securityConfigValid = !securityEnabled;
+            data.put("security.configuration.valid", securityConfigValid);
+
+            if (securityEnabled) {
+                data.put("security.warning", "Security is not functional for MCP STDIO transport - should be disabled");
+            }
+
+            return securityConfigValid;
+
+        } catch (Exception e) {
+            data.put("security.configuration.error", e.getMessage());
+            data.put("security.configuration.valid", false);
+            return false;
+        }
+    }
+}
