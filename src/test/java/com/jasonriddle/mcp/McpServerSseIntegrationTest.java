@@ -60,7 +60,10 @@ final class McpServerSseIntegrationTest {
     public static final class TestProfile implements QuarkusTestProfile {
         @Override
         public Map<String, String> getConfigOverrides() {
-            return Map.of("quarkus.mcp.server.memory.sse.root-path", "/v1/memory/mcp", "quarkus.log.level", "WARN");
+            return Map.of(
+                    "quarkus.mcp.server.memory.sse.root-path", "/v1/memory/mcp",
+                    "quarkus.log.level", "WARN",
+                    "quarkus.http.test-port", "9091"); // Use specific available port
         }
     }
 
