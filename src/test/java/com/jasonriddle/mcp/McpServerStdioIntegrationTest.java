@@ -255,6 +255,74 @@ final class McpServerStdioIntegrationTest {
 
     @Test
     @Order(5)
+    void shouldDiscoverPrompts() throws Exception {
+        // Test that prompts are discovered and available
+        // This test should fail if prompts aren't properly registered
+
+        // For now, we'll try to get the prompts list via the MCP client
+        // This may not be directly supported by the current client, but we can attempt it
+        // Note: This test is expected to fail until prompts are properly discovered
+
+        try {
+            // Use LangChain4j MCP client API to list prompts
+            var prompts = mcpClient.listPrompts();
+
+            assertNotNull(prompts, "Prompts list should not be null");
+            assertFalse(prompts.isEmpty(), "Should have at least one prompt registered");
+
+            // Look for our memory_best_practices prompt
+            boolean foundMemoryPrompt =
+                    prompts.stream().anyMatch(prompt -> "memory_best_practices".equals(prompt.name()));
+
+            assertTrue(foundMemoryPrompt, "Should find memory_best_practices prompt");
+
+            // Test getting the actual prompt content
+            var promptArgs = Map.<String, Object>of();
+            var promptResult = mcpClient.getPrompt("memory_best_practices", promptArgs);
+            assertNotNull(promptResult, "Should be able to get prompt content");
+            assertFalse(promptResult.messages().isEmpty(), "Prompt should have message content");
+
+        } catch (Exception e) {
+            // If this fails, it means prompts aren't being discovered
+            throw new AssertionError("Prompts not discovered by MCP server: " + e.getMessage(), e);
+        }
+    }
+
+    @Test
+    @Order(6)
+    void shouldDiscoverResources() throws Exception {
+        // Test that resources are discovered and available
+        // This test should fail if resources aren't properly registered
+
+        try {
+            // Use LangChain4j MCP client API to list resources
+            var resources = mcpClient.listResources();
+
+            assertNotNull(resources, "Resources list should not be null");
+            assertFalse(resources.isEmpty(), "Should have at least one resource registered");
+
+            // Look for our memory:// resources
+            boolean foundTypesResource =
+                    resources.stream().anyMatch(resource -> "memory://types".equals(resource.uri()));
+            boolean foundStatusResource =
+                    resources.stream().anyMatch(resource -> "memory://status".equals(resource.uri()));
+
+            assertTrue(foundTypesResource, "Should find memory://types resource");
+            assertTrue(foundStatusResource, "Should find memory://status resource");
+
+            // Test reading the actual resource content
+            var typesResult = mcpClient.readResource("memory://types");
+            assertNotNull(typesResult, "Should be able to read types resource");
+            assertFalse(typesResult.contents().isEmpty(), "Types resource should have content");
+
+        } catch (Exception e) {
+            // If this fails, it means resources aren't being discovered
+            throw new AssertionError("Resources not discovered by MCP server: " + e.getMessage(), e);
+        }
+    }
+
+    @Test
+    @Order(7)
     void shouldExecuteFullEntityCrudLifecycle() throws Exception {
         // This test covers the complete CRUD lifecycle:
         // A) Create an entity
