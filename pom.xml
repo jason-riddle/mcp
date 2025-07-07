@@ -244,7 +244,7 @@
                         <include>**/*IntegrationTest.java</include>
                     </includes>
                     <systemPropertyVariables>
-                        <native.image.path>${project.build.directory}/${project.build.finalName}-runner</native.image.path>
+                        <!-- <native.image.path>${project.build.directory}/${project.build.finalName}-runner</native.image.path> -->
                         <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
                         <maven.home>${maven.home}</maven.home>
                     </systemPropertyVariables>
@@ -290,7 +290,6 @@
                     <systemPropertyVariables>
                         <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
                         <maven.home>${maven.home}</maven.home>
-                        <quarkus.log.level>WARN</quarkus.log.level>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
@@ -300,13 +299,6 @@
 
     <!-- Build Profiles -->
     <profiles>
-        <!-- Development Profile -->
-        <profile>
-            <id>dev</id>
-            <properties>
-                <quarkus.profile>dev</quarkus.profile>
-            </properties>
-        </profile>
         <!-- Production Profile -->
         <profile>
             <id>prod</id>

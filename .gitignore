@@ -10,6 +10,7 @@
 *.tmp
 *.txt
 *baseline
+*memory*.jsonl
 .DS_Store
 .aider.chat.*
 .aider.input.*
@@ -44,5 +45,4 @@ settings.json
 settings.local.json
 staging
 target
-test-memory.jsonl
 tmp
