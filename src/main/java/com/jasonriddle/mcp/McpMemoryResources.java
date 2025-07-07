@@ -89,11 +89,12 @@ public final class McpMemoryResources {
                     case "preferences" -> content.append("- **preferences**: Technical_Preferences, UI_Preferences\n");
                     case "project" -> content.append("- **project**: Project_Alpha, Website_Redesign\n");
                     case "system" -> content.append("- **system**: Production_Database, Development_Server\n");
-                    default -> content.append("- **")
-                            .append(entityType)
-                            .append("**: ")
-                            .append(entityType)
-                            .append("_Example\n");
+                    default ->
+                        content.append("- **")
+                                .append(entityType)
+                                .append("**: ")
+                                .append(entityType)
+                                .append("_Example\n");
                 }
             }
             content.append("\n### Relationship Examples\n");
@@ -124,7 +125,7 @@ public final class McpMemoryResources {
         content.append("# Memory Graph Status\n\n");
 
         // Basic counts
-        content.append("## Overview\n");
+        content.append("## Overview\n\n");
         content.append("- **Total Entities:** ").append(graph.entities().size()).append("\n");
         content.append("- **Total Relations:** ")
                 .append(graph.relations().size())
@@ -138,7 +139,7 @@ public final class McpMemoryResources {
         final Map<String, Long> entityTypeCounts =
                 graph.entities().stream().collect(Collectors.groupingBy(Entity::entityType, Collectors.counting()));
 
-        content.append("## Entity Types\n");
+        content.append("## Entity Types\n\n");
         if (entityTypeCounts.isEmpty()) {
             content.append("*No entities found.*\n");
         } else {
@@ -156,7 +157,7 @@ public final class McpMemoryResources {
         final Map<String, Long> relationTypeCounts = graph.relations().stream()
                 .collect(Collectors.groupingBy(Relation::relationType, Collectors.counting()));
 
-        content.append("## Relation Types\n");
+        content.append("## Relation Types\n\n");
         if (relationTypeCounts.isEmpty()) {
             content.append("*No relations found.*\n");
         } else {
@@ -171,7 +172,7 @@ public final class McpMemoryResources {
         content.append("\n");
 
         // File information
-        content.append("## Storage Information\n");
+        content.append("## Storage Information\n\n");
         try {
             final Path path = Paths.get(memoryFilePath);
             if (Files.exists(path)) {
@@ -194,7 +195,7 @@ public final class McpMemoryResources {
         content.append("\n");
 
         // Data integrity
-        content.append("## Data Integrity\n");
+        content.append("## Data Integrity\n\n");
 
         // Check for orphaned relations
         final List<String> entityNames =
@@ -221,7 +222,7 @@ public final class McpMemoryResources {
                 .count();
         content.append("- **Isolated Entities:** ").append(isolatedEntities).append("\n");
 
-        content.append("\n## Health Status\n");
+        content.append("\n## Health Status\n\n");
         if (orphanedRelations == 0 && emptyEntities == 0) {
             content.append("✅ **Status:** Healthy - No data integrity issues detected\n");
         } else {
