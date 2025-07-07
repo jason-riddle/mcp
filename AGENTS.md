@@ -212,29 +212,32 @@ com.jasonriddle.mcp/
 ├── McpMemoryPrompts.java      # MCP prompts providing memory guidance
 ├── McpMemoryResources.java    # MCP resources (memory://) for graph access
 ├── McpMemoryTools.java        # MCP tools for graph operations
+├── package-info.java          # Package documentation
 └── memory/                    # Memory graph implementation
     ├── Entity.java            # Entity record representing graph nodes
     ├── MemoryGraph.java       # Complete graph structure record
     ├── MemoryRecord.java      # Base interface for JSONL records
     ├── MemoryService.java     # Core service for graph persistence and operations
-    └── Relation.java          # Relation record representing graph edges
+    ├── Relation.java          # Relation record representing graph edges
+    └── package-info.java      # Package documentation
 ```
 
 ### Test Package Structure
 
 ```text
 com.jasonriddle.mcp/
-├── McpMemoryPromptsTest.java                        # Tests for memory prompts
-├── McpMemoryResourcesTest.java                      # Tests for memory resources
-├── McpMemoryToolsTest.java                          # Tests for memory tools
-├── McpServerSseIntegrationTest.java                 # Integration tests for SSE server
-├── security/                                        # Security-related tests
-│   └── ApiKeyAuthenticationDisabledIntegrationTest.java  # Tests with security disabled
-└── memory/                                          # Memory implementation tests
-    └── MemoryServiceTest.java                       # Tests for memory service
+├── ConfigurationValidationTest.java                # Tests for configuration validation
+├── McpMemoryPromptsTest.java                       # Tests for memory prompts
+├── McpMemoryResourcesTest.java                     # Tests for memory resources
+├── McpMemoryToolsTest.java                         # Tests for memory tools
+├── McpServerStdioIntegrationTest.java              # Integration tests for STDIO server
+├── package-info.java                               # Package documentation
+└── memory/                                         # Memory implementation tests
+    ├── MemoryServiceTest.java                      # Tests for memory service
+    └── package-info.java                           # Package documentation
 ```
 
-**Note**: Authentication integration tests were removed because authentication is not functional for MCP SSE endpoints.
+**Note**: Authentication integration tests were removed because authentication is not functional for MCP STDIO endpoints.
 
 ### Package Documentation
 
@@ -268,28 +271,6 @@ mcp.security.enabled=false
 # API key value (use environment variable in production)
 mcp.security.api-key=${MCP_API_KEY:}
 ```
-
-#### Security Setup
-
-**⚠️ IMPORTANT: Authentication is currently NOT FUNCTIONAL**
-
-The MCP server configuration includes security settings, but authentication is not implemented for MCP SSE endpoints due to Quarkus MCP extension limitations.
-
-**Current Status**:
-- Configuration exists but does not secure endpoints
-- All requests succeed regardless of API key validity
-
-**Configuration (Non-functional)**:
-```properties
-# Security Configuration (NON-FUNCTIONAL)
-mcp.security.enabled=false  # Must remain false
-mcp.security.api-key=${MCP_API_KEY:}
-```
-
-**Production Recommendations**:
-- Deploy behind a reverse proxy with authentication (nginx, Apache)
-- Use network-level security (VPN, firewall rules)
-- Consider container-level authentication if required
 
 ### Container Image Tagging Strategy
 
