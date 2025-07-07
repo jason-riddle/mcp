@@ -52,9 +52,7 @@ final class McpServerSseIntegrationTest {
         @Override
         public Map<String, String> getConfigOverrides() {
             return Map.of(
-                    "quarkus.mcp.server.memory.sse.root-path", "/v1/memory/mcp",
-                    "quarkus.log.level", "WARN",
-                    "quarkus.http.test-port", "0"); // Use port 0 for automatic assignment
+                    "quarkus.mcp.server.memory.sse.root-path", "/v1/memory/mcp"); // Use port 0 for automatic assignment
         }
     }
 

@@ -26,7 +26,7 @@ class MemoryServiceTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        tempMemoryFile = Files.createTempFile("test-memory", ".jsonl");
+        tempMemoryFile = Files.createTempFile("memory-service-test", ".jsonl");
         memoryService = new MemoryService(new ObjectMapper(), tempMemoryFile.toString());
     }
 

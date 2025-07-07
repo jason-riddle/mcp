@@ -30,7 +30,7 @@ final class McpMemoryResourcesTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        tempMemoryFile = Files.createTempFile("test-memory", ".jsonl");
+        tempMemoryFile = Files.createTempFile("memory-resources-test", ".jsonl");
         memoryService = new MemoryService(new ObjectMapper(), tempMemoryFile.toString());
         mcpMemoryResources = new McpMemoryResources();
         mcpMemoryResources.memoryService = memoryService;

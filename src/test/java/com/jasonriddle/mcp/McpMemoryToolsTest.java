@@ -4,36 +4,40 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jasonriddle.mcp.memory.Entity;
 import com.jasonriddle.mcp.memory.MemoryGraph;
 import com.jasonriddle.mcp.memory.MemoryService;
-import io.quarkus.test.junit.QuarkusTest;
-import jakarta.inject.Inject;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
  * Tests for McpMemoryTools MCP integration.
  */
-@QuarkusTest
 final class McpMemoryToolsTest {
 
-    @Inject
-    McpMemoryTools mcpMemoryTools;
-
-    @Inject
-    MemoryService memoryService;
+    private Path tempMemoryFile;
+    private MemoryService memoryService;
+    private McpMemoryTools mcpMemoryTools;
 
     @BeforeEach
-    void setUp() {
-        // Clear memory before each test
-        final MemoryGraph graph = memoryService.readGraph();
-        if (!graph.entities().isEmpty()) {
-            final List<String> entityNames =
-                    graph.entities().stream().map(Entity::name).toList();
-            memoryService.deleteEntities(entityNames);
+    void setUp() throws IOException {
+        tempMemoryFile = Files.createTempFile("memory-tools-test", ".jsonl");
+        memoryService = new MemoryService(new ObjectMapper(), tempMemoryFile.toString());
+        mcpMemoryTools = new McpMemoryTools();
+        mcpMemoryTools.memoryService = memoryService;
+    }
+
+    @AfterEach
+    void tearDown() throws IOException {
+        if (tempMemoryFile != null) {
+            Files.deleteIfExists(tempMemoryFile);
         }
     }
 

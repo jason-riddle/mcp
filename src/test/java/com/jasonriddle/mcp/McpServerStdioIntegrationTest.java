@@ -43,7 +43,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 final class McpServerStdioIntegrationTest {
 
     private static final Duration CLIENT_TIMEOUT = Duration.ofSeconds(10);
-    private static final String TEST_MEMORY_FILE = "test-memory-stdio.jsonl";
+    private static final String TEST_MEMORY_FILE = "memory-stdio-int-test.jsonl";
 
     private McpClient mcpClient;
     private ObjectMapper objectMapper;
@@ -56,10 +56,7 @@ final class McpServerStdioIntegrationTest {
         public Map<String, String> getConfigOverrides() {
             return Map.of(
                     // Use separate memory file for integration tests
-                    "memory.file.path", TEST_MEMORY_FILE,
-                    // Reduce log noise during testing
-                    "quarkus.log.level", "WARN",
-                    "quarkus.log.category.\"com.jasonriddle.mcp\"", "INFO");
+                    "memory.file.path", TEST_MEMORY_FILE);
         }
     }
 
