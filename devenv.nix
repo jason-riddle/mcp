@@ -115,14 +115,14 @@
     };
 
     # Integration tests - BLOCKS COMMIT ON FAILURE (disabled by default)
-    # maven-integration-test = {
-    #   enable = true;
-    #   name = "maven-integration-test";
-    #   entry = "./mvnw verify -DskipITs=false";
-    #   language = "system";
-    #   files = "\\.(java|xml|properties)$";
-    #   pass_filenames = false;
-    # };
+    maven-integration-test = {
+      enable = true;
+      name = "maven-integration-test";
+      entry = "./mvnw verify -DskipITs=false";
+      language = "system";
+      files = "\\.(java|xml|properties)$";
+      pass_filenames = false;
+    };
 
     # Maven package - BLOCKS COMMIT ON FAILURE (disabled by default)
     # maven-package = {
