@@ -264,12 +264,6 @@ memory.file.path=memory.jsonl
 
 # Server port (default: 8080)
 quarkus.http.port=8080
-
-# Security Configuration (optional)
-# Enable API key authentication
-mcp.security.enabled=false
-# API key value (use environment variable in production)
-mcp.security.api-key=${MCP_API_KEY:}
 ```
 
 ### Container Image Tagging Strategy
