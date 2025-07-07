@@ -89,12 +89,11 @@ public final class McpMemoryResources {
                     case "preferences" -> content.append("- **preferences**: Technical_Preferences, UI_Preferences\n");
                     case "project" -> content.append("- **project**: Project_Alpha, Website_Redesign\n");
                     case "system" -> content.append("- **system**: Production_Database, Development_Server\n");
-                    default ->
-                        content.append("- **")
-                                .append(entityType)
-                                .append("**: ")
-                                .append(entityType)
-                                .append("_Example\n");
+                    default -> content.append("- **")
+                            .append(entityType)
+                            .append("**: ")
+                            .append(entityType)
+                            .append("_Example\n");
                 }
             }
             content.append("\n### Relationship Examples\n");
