@@ -71,6 +71,7 @@ run: $(JAR_FILE) ## Run the MCP server
 
 format: ## Format code using Spotless
 	@echo "Code formatting..."
+	$(MVN) spotless:check
 	$(MVN) spotless:apply
 	@echo "✓ Formatted files"
 
