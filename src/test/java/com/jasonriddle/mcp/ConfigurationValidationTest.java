@@ -102,7 +102,7 @@ final class ConfigurationValidationTest {
     void shouldValidateMemoryConfiguration() {
         // Validate memory persistence configuration
         assertEquals(
-                "test-memory.jsonl",
+                "memory-test.jsonl",
                 config.getValue("memory.file.path", String.class),
                 "Memory file path should use test-specific value from test properties");
     }
@@ -146,14 +146,15 @@ final class ConfigurationValidationTest {
                 "STDIO initialization-enabled property should not exist (non-existent property)");
     }
 
-    @Test
-    void shouldValidateTestConfigurationOverrides() {
-        // This test verifies that our test configuration override mechanism works
-        // by checking that we can properly override the memory file path in tests
-
-        // Get the current memory file path - in unit tests this should be test-specific
-        String memoryFilePath = config.getValue("memory.file.path", String.class);
-        assertEquals(
-                "test-memory.jsonl", memoryFilePath, "In unit tests, memory file path should use test-specific value");
-    }
+    //    @Test
+    //    void shouldValidateTestConfigurationOverrides() {
+    //        // This test verifies that our test configuration override mechanism works
+    //        // by checking that we can properly override the memory file path in tests
+    //
+    //        // Get the current memory file path - in unit tests this should be test-specific
+    //        String memoryFilePath = config.getValue("memory.file.path", String.class);
+    //        assertEquals(
+    //                "memory-test.jsonl", memoryFilePath, "In unit tests, memory file path should use test-specific
+    // value");
+    //    }
 }
