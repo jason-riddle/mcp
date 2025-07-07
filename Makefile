@@ -69,11 +69,15 @@ run: $(JAR_FILE) ## Run the MCP server
 # QUALITY TARGETS
 # ============================================================================
 
-format: ## Format code using Spotless
-	@echo "Code formatting..."
-	$(MVN) spotless:check
-	$(MVN) spotless:apply
-	@echo "✓ Formatted files"
+format: ## Check formatting and apply fixes only if needed
+	@echo "Checking code formatting..."
+	@if ! $(MVN) spotless:check -q; then \
+		echo "Formatting issues found. Applying fixes..."; \
+		$(MVN) spotless:apply; \
+		echo "✓ Formatting fixes applied"; \
+	else \
+		echo "✓ Code is already properly formatted"; \
+	fi
 
 checkstyle: ## Run checkstyle verification
 	@echo "Running checkstyle verification..."
