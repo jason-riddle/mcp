@@ -74,7 +74,7 @@
 
     # ========== SLOWER CHECKS (5-30s) ==========
 
-    # Java code quality - BLOCKS COMMIT ON FAILURE
+    # Java code quality
     spotless-check = {
       enable = true;
       name = "spotless-check";
@@ -84,7 +84,7 @@
       pass_filenames = false;
     };
 
-    # Maven checkstyle validation - BLOCKS COMMIT ON FAILURE
+    # Maven checkstyle validation
     maven-checkstyle = {
       enable = true;
       name = "maven-checkstyle";
@@ -94,7 +94,7 @@
       pass_filenames = false;
     };
 
-    # Javadoc validation - BLOCKS COMMIT ON FAILURE
+    # Javadoc validation
     javadoc-check = {
       enable = true;
       name = "javadoc-check";
@@ -104,7 +104,7 @@
       pass_filenames = false;
     };
 
-    # Unit tests - BLOCKS COMMIT ON FAILURE
+    # Unit tests
     maven-test = {
       enable = true;
       name = "maven-test";
@@ -114,7 +114,7 @@
       pass_filenames = false;
     };
 
-    # SSE Integration tests - BLOCKS COMMIT ON FAILURE (disabled by default)
+    # SSE Integration tests
     maven-sse-integration-test = {
       enable = true;
       name = "maven-sse-integration-test";
@@ -124,17 +124,17 @@
       pass_filenames = false;
     };
 
-    # STDIO Integration tests - BLOCKS COMMIT ON FAILURE (disabled by default)
+    # STDIO Integration tests
     maven-stdio-integration-test = {
       enable = true;
       name = "maven-stdio-integration-test";
-      entry = "./mvnw verify -DskipITs=false -Dtest=McpServerStdioIntegrationTest";
+      entry = "./mvnw test -Dtest=McpServerStdioIntegrationTest";
       language = "system";
       files = "\\.(java|xml|properties)$";
       pass_filenames = false;
     };
 
-    # Maven package - BLOCKS COMMIT ON FAILURE (disabled by default)
+    # Maven package
     # maven-package = {
     #   enable = true;
     #   name = "maven-package";
