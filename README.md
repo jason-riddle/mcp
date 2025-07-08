@@ -64,7 +64,7 @@ Configure via `application.properties`:
 memory.file.path=memory.jsonl
 
 # STDIO transport is enabled for MCP communication
-quarkus.mcp.server.memory.stdio.enabled=true
+quarkus.mcp.server.stdio.enabled=true
 ```
 
 ## Usage
@@ -188,8 +188,6 @@ make checkstyle             # Run style checks
 make test                   # Run unit tests
 make test-integration       # Run integration tests
 
-# Documentation
-make update-readme          # Update README with generated docs
 
 # Cleanup
 make clean                  # Clean build artifacts
@@ -225,6 +223,28 @@ make test-integration
 make docker-build
 make docker-run
 ```
+
+### Heroku Deployment
+
+Deploy as an MCP server compatible with Heroku's Managed Inference platform:
+
+```bash
+# Create and configure Heroku app
+heroku create your-mcp-server-name
+heroku config:set MAVEN_CUSTOM_OPTS="-DskipTests -Dquarkus.container-image.build=false"
+
+# Deploy (automatic from main branch)
+git push heroku main
+
+# Add MCP functionality
+heroku addons:create heroku-inference:claude-3-5-haiku
+```
+
+**Important Notes:**
+- Memory persists at `/app/memory.jsonl` on ephemeral filesystem
+- Resets on dyno restart - consider Heroku Postgres for persistence
+- Uses `mcp-memory` process type for MCP server registration
+- Configured for STDIO transport with Heroku's MCP Toolkit
 
 ### Self-Hosted Deployment
 
