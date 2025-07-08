@@ -10,151 +10,198 @@ import org.eclipse.microprofile.config.Config;
 import org.junit.jupiter.api.Test;
 
 /**
- * Unit tests for validating application configuration properties.
+ * Configuration validation tests for the MCP server application.
  *
- * These tests ensure that configuration properties are properly set and help catch
- * any unexpected overrides that might occur at different configuration levels.
+ * These tests validate that all configuration properties are set to their expected values
+ * in the test environment. This ensures configuration consistency and helps catch
+ * unexpected overrides or misconfigurations. Additionally validates Maven project
+ * information from pom.xml is properly configured and accessible through Quarkus config.
  */
 @QuarkusTest
 final class ConfigurationValidationTest {
+
+    private static final String EXPECTED_VERSION = "0.0.1-SNAPSHOT";
 
     @Inject
     Config config;
 
     @Test
-    void shouldValidateCoreApplicationConfiguration() {
-        // Validate shutdown configuration for graceful STDIO handling
+    void shouldValidateShutdownConfiguration() {
         assertEquals(
                 "30s",
                 config.getValue("quarkus.shutdown.timeout", String.class),
-                "Shutdown timeout should be 30 seconds to prevent race conditions");
+                "Shutdown timeout must be 30 seconds for graceful STDIO handling");
         assertTrue(
                 config.getValue("quarkus.shutdown.delay-enabled", Boolean.class),
-                "Shutdown delay should be enabled for tool execution completion");
+                "Shutdown delay must be enabled for tool execution completion");
+    }
+
+    @Test
+    void shouldValidateHttpConfiguration() {
+        // Validate that test profile is set
+        assertEquals(
+                "test",
+                config.getValue("quarkus.test.profile", String.class),
+                "Test profile must be explicitly set to test");
+
+        // Validate that HTTP test port is configured for dynamic assignment
+        // Note: During runtime, Quarkus may override this with the actual assigned port
+        String httpTestPort = config.getValue("quarkus.http.test-port", String.class);
+        assertTrue(
+                httpTestPort.equals("0") || Integer.parseInt(httpTestPort) > 1024,
+                "HTTP test port must be 0 (configured) or a dynamic port (>1024), got: " + httpTestPort);
+    }
+
+    @Test
+    void shouldValidateProjectConfiguration() {
+        // Validate that Maven project information is properly configured
+        assertEquals(
+                "jasons-mcp-server",
+                config.getValue("quarkus.application.name", String.class),
+                "Application name must be set to jasons-mcp-server");
+        assertEquals(
+                EXPECTED_VERSION,
+                config.getValue("quarkus.application.version", String.class),
+                "Maven version must be set to " + EXPECTED_VERSION);
     }
 
     @Test
     void shouldValidateLoggingConfiguration() {
-        // Validate base logging configuration
-        // Note: During unit tests, Quarkus may override log level to WARN for reduced noise
-        String logLevel = config.getValue("quarkus.log.level", String.class);
+        // Console logging configuration
         assertTrue(
-                logLevel.equals("INFO") || logLevel.equals("WARN"),
-                "Global log level should be INFO (production) or WARN (test), got: " + logLevel);
-
-        // Validate console logging (required for STDIO transport)
-        assertTrue(config.getValue("quarkus.log.console.enable", Boolean.class), "Console logging should be enabled");
+                config.getValue("quarkus.log.console.enable", Boolean.class),
+                "Console logging must be enabled for STDIO transport");
         assertTrue(
                 config.getValue("quarkus.log.console.stderr", Boolean.class),
-                "Console logging should go to stderr for STDIO transport compatibility");
+                "Console logging must output to stderr for STDIO transport compatibility");
 
-        // File logging and application-specific levels are now in profile-specific properties
-        // Base config only contains console logging and JIB suppression
+        // Test-specific logging levels
+        assertEquals(
+                "ERROR",
+                config.getValue("quarkus.log.category.\"org.junit\".level", String.class),
+                "JUnit logging must be set to ERROR to reduce test noise");
+        assertEquals(
+                "DEBUG",
+                config.getValue("quarkus.log.category.\"com.jasonriddle.mcp\".level", String.class),
+                "Application logging must be set to DEBUG for test debugging");
+        assertEquals(
+                "DEBUG",
+                config.getValue("quarkus.log.category.\"dev.langchain4j.mcp\".level", String.class),
+                "MCP library logging must be set to DEBUG for test debugging");
 
-        // Validate JIB processor warning suppression
+        // JIB processor warning suppression
         assertEquals(
                 "ERROR",
                 config.getValue(
                         "quarkus.log.category.\"io.quarkus.container.image.jib.deployment.JibProcessor\".level",
                         String.class),
-                "JIB processor warnings should be suppressed to ERROR level");
+                "JIB processor warnings must be suppressed to ERROR level");
     }
 
     @Test
     void shouldValidateContainerImageConfiguration() {
-        // Validate container build configuration - disabled for tests
+        // Container build must be disabled for tests
         assertFalse(
                 config.getValue("quarkus.container-image.build", Boolean.class),
-                "Container image build should be disabled for tests");
+                "Container image build must be disabled for tests");
+
+        // Container registry configuration
         assertEquals(
                 "us-central1-docker.pkg.dev",
                 config.getValue("quarkus.container-image.registry", String.class),
-                "Container registry should be set to Google Cloud");
+                "Container registry must be set to Google Cloud Artifact Registry");
         assertEquals(
                 "jasons-mcp-server-20250705/mcp-servers",
                 config.getValue("quarkus.container-image.group", String.class),
-                "Container group should be set correctly");
+                "Container group must be set to project/repository path");
         assertEquals(
                 "jasons-mcp-server",
                 config.getValue("quarkus.container-image.name", String.class),
-                "Container name should be set correctly");
+                "Container name must be set to jasons-mcp-server");
         assertEquals(
                 "latest",
                 config.getValue("quarkus.container-image.tag", String.class),
-                "Container tag should be latest");
+                "Container tag must be set to latest");
         assertEquals(
-                "0.0.1-SNAPSHOT",
+                EXPECTED_VERSION,
                 config.getValue("quarkus.container-image.additional-tags", String.class),
-                "Container additional tags should include project version");
+                "Container additional tags must include project version");
 
-        // Validate JIB configuration
+        // JIB configuration
         assertEquals(
                 "registry.access.redhat.com/ubi9/openjdk-17-runtime",
                 config.getValue("quarkus.jib.base-jvm-image", String.class),
-                "JIB base image should be UBI 9 OpenJDK 17 runtime");
+                "JIB base image must be UBI 9 OpenJDK 17 runtime");
         assertEquals(
                 "linux/amd64,linux/arm64",
                 config.getValue("quarkus.jib.platforms", String.class),
-                "JIB should support both AMD64 and ARM64 platforms");
+                "JIB must support both AMD64 and ARM64 platforms");
     }
 
     @Test
     void shouldValidateMemoryConfiguration() {
-        // Validate memory persistence configuration
         assertEquals(
                 "memory-test.jsonl",
                 config.getValue("memory.file.path", String.class),
-                "Memory file path should use test-specific value from test properties");
+                "Memory file path must use test-specific value in test environment");
     }
 
     @Test
-    void shouldValidateUnusedPropertiesAreNotSet() {
-        // Validate that SSE transport properties are NOT configured (using STDIO instead)
-        assertFalse(
-                config.getOptionalValue("quarkus.mcp.server.memory.server-info.name", String.class)
-                        .isPresent(),
-                "MCP server name should not be explicitly configured (using defaults)");
-        assertFalse(
-                config.getOptionalValue("quarkus.mcp.server.memory.server-info.version", String.class)
-                        .isPresent(),
-                "MCP server version should not be explicitly configured (using defaults)");
-        // SSE root path configuration - may be set by Quarkus MCP extension or test profiles
-        // The important thing is that it's not explicitly configured in base application.properties
-        // In the test environment, it might be set by the extension or test profile
-        String sseRootPath = config.getOptionalValue("quarkus.mcp.server.sse.root-path", String.class)
-                .orElse("NOT_SET");
-        // We don't assert a specific value as it depends on the Quarkus MCP extension behavior
-        // The key is that base application.properties doesn't explicitly configure it
-        // Note: During unit tests, Quarkus automatically assigns random test ports
-        // The important thing is that we didn't explicitly configure it in our application.properties
-        String httpPort =
-                config.getOptionalValue("quarkus.http.port", String.class).orElse("8080");
-        // Test ports are typically high numbers (e.g., 49669), production default is 8080
-        assertTrue(
-                httpPort.equals("8080") || httpPort.equals("0") || Integer.parseInt(httpPort) > 1024,
-                "HTTP port should be default (8080), test-disabled (0), or dynamic test port (>1024), got: "
-                        + httpPort);
+    void shouldValidateMcpServerConfiguration() {
+        // MCP server information
+        assertEquals(
+                "jasons-mcp-server",
+                config.getValue("quarkus.mcp.server.server-info.name", String.class),
+                "MCP server name must be set to jasons-mcp-server");
+        assertEquals(
+                EXPECTED_VERSION,
+                config.getValue("quarkus.mcp.server.server-info.version", String.class),
+                "MCP server version must be set to project version");
 
-        // Validate STDIO properties - the actual behavior depends on Quarkus MCP extension
-        // In practice, the extension may enable STDIO by default or when SSE is not configured
-        String stdioEnabled = config.getOptionalValue("quarkus.mcp.server.stdio.enabled", String.class)
-                .orElse("NOT_SET");
-        String stdioInitEnabled = config.getOptionalValue(
-                        "quarkus.mcp.server.stdio.initialization-enabled", String.class)
-                .orElse("NOT_SET");
-        // The key thing is that these are not explicitly configured in base application.properties
-        // Their actual values depend on the Quarkus MCP extension's default behavior
+        // MCP traffic logging (enabled for tests)
+        assertTrue(
+                config.getValue("quarkus.mcp.server.traffic-logging.enabled", Boolean.class),
+                "MCP traffic logging must be enabled for test debugging");
+        assertEquals(
+                500,
+                config.getValue("quarkus.mcp.server.traffic-logging.text-limit", Integer.class),
+                "MCP traffic logging text limit must be set to 500");
     }
 
-    //    @Test
-    //    void shouldValidateTestConfigurationOverrides() {
-    //        // This test verifies that our test configuration override mechanism works
-    //        // by checking that we can properly override the memory file path in tests
-    //
-    //        // Get the current memory file path - in unit tests this should be test-specific
-    //        String memoryFilePath = config.getValue("memory.file.path", String.class);
-    //        assertEquals(
-    //                "memory-test.jsonl", memoryFilePath, "In unit tests, memory file path should use test-specific
-    // value");
-    //    }
+    @Test
+    void shouldValidateStdioTransportConfiguration() {
+        // STDIO transport must be disabled in base test profile
+        assertFalse(
+                config.getValue("quarkus.mcp.server.stdio.enabled", Boolean.class),
+                "STDIO transport must be disabled in base test profile");
+        assertFalse(
+                config.getValue("quarkus.mcp.server.stdio.initialization-enabled", Boolean.class),
+                "STDIO initialization must be disabled in base test profile");
+    }
+
+    @Test
+    void shouldValidateAutomaticQuarkusTestConfiguration() {
+        // Quarkus may automatically configure certain properties during testing
+        // We validate that if HTTP host is configured, it has a reasonable value
+        String httpHost =
+                config.getOptionalValue("quarkus.http.host", String.class).orElse(null);
+        if (httpHost != null) {
+            assertTrue(
+                    httpHost.equals("localhost") || httpHost.equals("0.0.0.0") || httpHost.equals("127.0.0.1"),
+                    "HTTP host must be a valid host if configured, got: " + httpHost);
+        }
+    }
+
+    @Test
+    void shouldValidateAutomaticMcpExtensionConfiguration() {
+        // SSE transport properties may be automatically configured by MCP extension
+        // We validate that if SSE root path is configured, it has a reasonable value
+        String sseRootPath = config.getOptionalValue("quarkus.mcp.server.sse.root-path", String.class)
+                .orElse(null);
+        if (sseRootPath != null) {
+            assertTrue(
+                    sseRootPath.startsWith("/"),
+                    "SSE root path must start with '/' if configured, got: " + sseRootPath);
+        }
+    }
 }
