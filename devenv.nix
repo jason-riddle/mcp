@@ -118,7 +118,7 @@
     maven-sse-integration-test = {
       enable = true;
       name = "maven-sse-integration-test";
-      entry = "./mvnw test -Dtest=McpServerSseIntegrationTest";
+      entry = "./mvnw verify -Dtest=McpServerSseIntegrationTest";
       language = "system";
       files = "\\.(java|xml|properties)$";
       pass_filenames = false;
@@ -128,7 +128,7 @@
     maven-stdio-integration-test = {
       enable = true;
       name = "maven-stdio-integration-test";
-      entry = "./mvnw test -Dtest=McpServerStdioIntegrationTest";
+      entry = "./mvnw verify -Dtest=McpServerStdioIntegrationTest";
       language = "system";
       files = "\\.(java|xml|properties)$";
       pass_filenames = false;

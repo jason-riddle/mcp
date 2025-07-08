@@ -42,6 +42,10 @@ clean: ## Clean build artifacts
 	else \
 		echo "✓ No staging directory to clean"; \
 	fi
+	@echo "Cleaning log files..."
+	@rm -f *.log *.log.*
+	@echo "Cleaning memory files..."
+	@rm -f *.jsonl
 	@echo "✓ Clean complete"
 
 build: ## Build the project
@@ -93,12 +97,9 @@ checkstyle: ## Run checkstyle verification
 # TESTING TARGETS
 # ============================================================================
 
-test: ## Run unit tests
+test: clean ## Run unit tests
 	@echo "Running unit tests..."
-	@rm -f memory-test.jsonl
 	@$(MVN) test --no-transfer-progress
-	@echo "Cleaning up test artifacts..."
-	@rm -f memory-test.jsonl
 	@echo "✓ Unit tests completed"
 
 test-watch: ## Run tests in watch mode
@@ -106,28 +107,19 @@ test-watch: ## Run tests in watch mode
 	@echo "Press Ctrl+C to stop"
 	@$(MVN) quarkus:test
 
-test-integration: ## Run integration tests
+test-integration: clean ## Run integration tests
 	@echo "Running integration tests..."
-	@rm -f memory-test.jsonl
 	@$(MVN) verify -DskipITs=false --no-transfer-progress
-	@echo "Cleaning up test artifacts..."
-	@rm -f memory-test.jsonl
 	@echo "✓ Integration tests completed"
 
-test-stdio: ## Run STDIO integration tests only
+test-stdio: clean ## Run STDIO integration tests only
 	@echo "Running STDIO integration tests..."
-	@rm -f memory-stdio-test.jsonl
-	@$(MVN) test -Dtest=McpServerStdioIntegrationTest --no-transfer-progress
-	@echo "Cleaning up test artifacts..."
-	@rm -f memory-stdio-test.jsonl
+	@$(MVN) verify -Dtest=McpServerStdioIntegrationTest --no-transfer-progress
 	@echo "✓ STDIO integration tests completed"
 
-test-sse: ## Run SSE integration tests only
+test-sse: clean ## Run SSE integration tests only
 	@echo "Running SSE integration tests..."
-	@rm -f memory-sse-test.jsonl
-	@$(MVN) test -Dtest=McpServerSseIntegrationTest --no-transfer-progress
-	@echo "Cleaning up test artifacts..."
-	@rm -f memory-sse-test.jsonl
+	@$(MVN) verify -Dtest=McpServerSseIntegrationTest --no-transfer-progress
 	@echo "✓ SSE integration tests completed"
 
 # ============================================================================
