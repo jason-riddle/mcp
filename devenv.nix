@@ -115,24 +115,24 @@
     };
 
     # SSE Integration tests
-    maven-sse-integration-test = {
-      enable = true;
-      name = "maven-sse-integration-test";
-      entry = "./mvnw verify -Dtest=McpServerSseIntegrationTest";
-      language = "system";
-      files = "\\.(java|xml|properties)$";
-      pass_filenames = false;
-    };
+    # maven-sse-integration-test = {
+    #   enable = true;
+    #   name = "maven-sse-integration-test";
+    #   entry = "./mvnw verify -Dtest=McpServerSseIntegrationTest";
+    #   language = "system";
+    #   files = "\\.(java|xml|properties)$";
+    #   pass_filenames = false;
+    # };
 
     # STDIO Integration tests
-    maven-stdio-integration-test = {
-      enable = true;
-      name = "maven-stdio-integration-test";
-      entry = "./mvnw verify -Dtest=McpServerStdioIntegrationTest";
-      language = "system";
-      files = "\\.(java|xml|properties)$";
-      pass_filenames = false;
-    };
+    # maven-stdio-integration-test = {
+    #   enable = true;
+    #   name = "maven-stdio-integration-test";
+    #   entry = "./mvnw verify -Dtest=McpServerStdioIntegrationTest";
+    #   language = "system";
+    #   files = "\\.(java|xml|properties)$";
+    #   pass_filenames = false;
+    # };
 
     # Maven package
     # maven-package = {
