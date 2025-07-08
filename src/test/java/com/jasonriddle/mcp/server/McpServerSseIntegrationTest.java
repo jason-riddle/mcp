@@ -1,8 +1,6 @@
 package com.jasonriddle.mcp.server;
 
-// TODO: Fix SSE integration tests - currently failing due to endpoint configuration issues
-// The SSE endpoint is not being properly configured or exposed during test execution
-// This needs to be addressed after the SSE transport configuration is stabilized
+// SSE integration tests for MCP server HTTP/SSE transport functionality
 
 import dev.langchain4j.mcp.client.DefaultMcpClient;
 import dev.langchain4j.mcp.client.transport.McpTransport;
@@ -29,10 +27,10 @@ import org.junit.jupiter.api.TestMethodOrder;
 @TestMethodOrder(OrderAnnotation.class)
 final class McpServerSseIntegrationTest extends McpIntegrationTestBase {
 
-    @TestHTTPResource("/v1/memory/mcp/sse")
+    @TestHTTPResource("/mcp/sse")
     URI sseEndpoint;
 
-    @TestHTTPResource("/v1/memory/mcp")
+    @TestHTTPResource("/mcp")
     URI httpEndpoint;
 
     /**
@@ -45,7 +43,7 @@ final class McpServerSseIntegrationTest extends McpIntegrationTestBase {
                     // Use separate memory file for integration tests
                     "memory.file.path", SSE_TEST_MEMORY_FILE,
                     // Configure SSE endpoint for default server
-                    "quarkus.mcp.server.sse.root-path", "/v1/memory/mcp",
+                    "quarkus.mcp.server.sse.root-path", "/mcp",
                     // Enable traffic logging for debugging (default server)
                     "quarkus.mcp.server.traffic-logging.enabled", "true",
                     // Disable STDIO transport for SSE-only testing
