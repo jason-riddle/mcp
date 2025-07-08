@@ -95,8 +95,10 @@ checkstyle: ## Run checkstyle verification
 
 test: ## Run unit tests
 	@echo "Running unit tests..."
-	@rm -f memory.jsonl memory-test.jsonl memory-stdio-test.jsonl memory-sse-test.jsonl
+	@rm -f memory-test.jsonl
 	@$(MVN) test --no-transfer-progress
+	@echo "Cleaning up test artifacts..."
+	@rm -f memory-test.jsonl
 	@echo "✓ Unit tests completed"
 
 test-watch: ## Run tests in watch mode
@@ -106,20 +108,26 @@ test-watch: ## Run tests in watch mode
 
 test-integration: ## Run integration tests
 	@echo "Running integration tests..."
-	@rm -f memory.jsonl memory-test.jsonl memory-stdio-test.jsonl memory-sse-test.jsonl
+	@rm -f memory-test.jsonl
 	@$(MVN) verify -DskipITs=false --no-transfer-progress
+	@echo "Cleaning up test artifacts..."
+	@rm -f memory-test.jsonl
 	@echo "✓ Integration tests completed"
 
 test-stdio: ## Run STDIO integration tests only
 	@echo "Running STDIO integration tests..."
-	@rm -f memory.jsonl memory-test.jsonl memory-stdio-test.jsonl memory-sse-test.jsonl
-	@$(MVN) verify -DskipITs=false -Dtest=McpServerStdioIntegrationTest --no-transfer-progress
+	@rm -f memory-stdio-test.jsonl
+	@$(MVN) test -Dtest=McpServerStdioIntegrationTest --no-transfer-progress
+	@echo "Cleaning up test artifacts..."
+	@rm -f memory-stdio-test.jsonl
 	@echo "✓ STDIO integration tests completed"
 
 test-sse: ## Run SSE integration tests only
 	@echo "Running SSE integration tests..."
-	@rm -f memory.jsonl memory-test.jsonl memory-stdio-test.jsonl memory-sse-test.jsonl
+	@rm -f memory-sse-test.jsonl
 	@$(MVN) test -Dtest=McpServerSseIntegrationTest --no-transfer-progress
+	@echo "Cleaning up test artifacts..."
+	@rm -f memory-sse-test.jsonl
 	@echo "✓ SSE integration tests completed"
 
 # ============================================================================
