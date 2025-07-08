@@ -1,0 +1,113 @@
+package com.jasonriddle.mcp.server;
+
+import dev.langchain4j.mcp.client.DefaultMcpClient;
+import dev.langchain4j.mcp.client.transport.McpTransport;
+import dev.langchain4j.mcp.client.transport.http.HttpMcpTransport;
+import io.quarkus.test.common.http.TestHTTPResource;
+import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.junit.QuarkusTestProfile;
+import io.quarkus.test.junit.TestProfile;
+import java.net.URI;
+import java.util.Map;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+
+/**
+ * Integration tests for MCP Server SSE/HTTP transport.
+ *
+ * This test suite verifies that the MCP server properly handles SSE connections
+ * and communicates using the Model Context Protocol over HTTP/SSE transport.
+ */
+@QuarkusTest
+@TestProfile(McpServerSseIntegrationTest.TestProfile.class)
+@TestMethodOrder(OrderAnnotation.class)
+final class McpServerSseIntegrationTest extends McpIntegrationTestBase {
+
+    @TestHTTPResource("/v1/memory/mcp/sse")
+    URI sseEndpoint;
+
+    @TestHTTPResource("/v1/memory/mcp")
+    URI httpEndpoint;
+
+    /**
+     * Test profile configuration for MCP SSE integration tests.
+     */
+    public static final class TestProfile implements QuarkusTestProfile {
+        @Override
+        public Map<String, String> getConfigOverrides() {
+            return Map.of(
+                    // Use separate memory file for integration tests
+                    "memory.file.path", SSE_TEST_MEMORY_FILE,
+                    // Configure SSE endpoint for default server
+                    "quarkus.mcp.server.sse.root-path", "/v1/memory/mcp",
+                    // Enable traffic logging for debugging (default server)
+                    "quarkus.mcp.server.traffic-logging.enabled", "true",
+                    // Disable STDIO transport for SSE-only testing
+                    "quarkus.mcp.server.stdio.enabled", "false",
+                    "quarkus.mcp.server.stdio.initialization-enabled", "false");
+        }
+
+        @Override
+        public String getConfigProfile() {
+            return "sse-test";
+        }
+    }
+
+    @Override
+    protected String getTestMemoryFile() {
+        return SSE_TEST_MEMORY_FILE;
+    }
+
+    @Override
+    protected void setupMcpClient() throws Exception {
+        McpTransport transport = new HttpMcpTransport.Builder()
+                .sseUrl(sseEndpoint.toString())
+                .timeout(CLIENT_TIMEOUT)
+                .build();
+
+        mcpClient = new DefaultMcpClient.Builder()
+                .clientName("sse-integration-test-client")
+                .protocolVersion("2024-11-05")
+                .toolExecutionTimeout(CLIENT_TIMEOUT)
+                .transport(transport)
+                .build();
+
+        Thread.sleep(2000); // Give the client time to complete initialization
+    }
+
+    @Test
+    @Order(1)
+    void shouldEstablishSseConnection() throws Exception {
+        testBasicConnection();
+    }
+
+    @Test
+    @Order(2)
+    void shouldExecuteCreateEntitiesAndReadGraph() throws Exception {
+        testCreateEntitiesAndReadGraph("SSETestEntity");
+    }
+
+    @Test
+    @Order(3)
+    void shouldExecuteSearchNodesTool() throws Exception {
+        // First, create an entity to search for
+        testCreateEntitiesAndReadGraph("SearchTestEntity");
+
+        // Now search for the entity we just created
+        testSearchNodes("SearchTest", "SearchTestEntity");
+    }
+
+    @Test
+    @Order(4)
+    void shouldDiscoverPrompts() throws Exception {
+        testPromptDiscovery();
+    }
+
+    @Test
+    @Order(5)
+    void shouldDiscoverResources() throws Exception {
+        testResourceDiscovery();
+    }
+}

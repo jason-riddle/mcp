@@ -1,4 +1,4 @@
-package com.jasonriddle.mcp;
+package com.jasonriddle.mcp.server;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -6,10 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.langchain4j.agent.tool.ToolExecutionRequest;
 import dev.langchain4j.mcp.client.DefaultMcpClient;
-import dev.langchain4j.mcp.client.McpClient;
 import dev.langchain4j.mcp.client.transport.McpTransport;
 import dev.langchain4j.mcp.client.transport.stdio.StdioMcpTransport;
 import io.quarkus.test.junit.QuarkusIntegrationTest;
@@ -19,12 +17,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Duration;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -40,13 +34,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 @QuarkusIntegrationTest
 @TestProfile(McpServerStdioIntegrationTest.TestProfile.class)
 @TestMethodOrder(OrderAnnotation.class)
-final class McpServerStdioIntegrationTest {
-
-    private static final Duration CLIENT_TIMEOUT = Duration.ofSeconds(10);
-    private static final String TEST_MEMORY_FILE = "memory-stdio-int-test.jsonl";
-
-    private McpClient mcpClient;
-    private ObjectMapper objectMapper;
+final class McpServerStdioIntegrationTest extends McpIntegrationTestBase {
 
     /**
      * Test profile configuration for MCP STDIO integration tests.
@@ -56,154 +44,58 @@ final class McpServerStdioIntegrationTest {
         public Map<String, String> getConfigOverrides() {
             return Map.of(
                     // Use separate memory file for integration tests
-                    "memory.file.path", TEST_MEMORY_FILE);
+                    "memory.file.path", STDIO_TEST_MEMORY_FILE,
+                    // Enable STDIO transport for this test profile
+                    "quarkus.mcp.server.stdio.enabled", "true",
+                    "quarkus.mcp.server.stdio.initialization-enabled", "true",
+                    "quarkus.mcp.server.stdio.null-system-out", "true");
+        }
+
+        @Override
+        public String getConfigProfile() {
+            return "stdio-test";
         }
     }
 
-    @BeforeEach
-    void setUp() throws Exception {
-        objectMapper = new ObjectMapper();
+    @Override
+    protected String getTestMemoryFile() {
+        return STDIO_TEST_MEMORY_FILE;
+    }
 
-        // Clean up any existing test memory file
-        cleanupTestMemoryFile();
-
-        // Determine the path to the packaged JAR
+    @Override
+    protected void setupMcpClient() throws Exception {
         String jarPath = getQuarkusJarPath();
 
-        // Configure STDIO transport to spawn MCP server subprocess
         McpTransport transport = new StdioMcpTransport.Builder()
                 .command(List.of("java", "-jar", jarPath))
-                .logEvents(true) // Enable logging for debugging
+                .logEvents(true)
                 .build();
 
-        // Create MCP client with configured transport
         mcpClient = new DefaultMcpClient.Builder()
                 .clientName("stdio-integration-test-client")
                 .toolExecutionTimeout(CLIENT_TIMEOUT)
                 .transport(transport)
                 .build();
 
-        // Wait for client to be properly initialized
-        // The LangChain4j alpha version has a known issue where it doesn't automatically send
-        // the "initialized" notification after the initialize response. We need to wait longer
-        // and potentially retry to allow the server to be ready for tool calls.
         Thread.sleep(3000); // Give the client time to complete initialization
-
-        // Verify the client is ready by attempting a simple tool call with retry logic
-        waitForClientReady();
-    }
-
-    @AfterEach
-    void tearDown() throws Exception {
-        if (mcpClient != null) {
-            try {
-                mcpClient.close();
-                // Give the subprocess time to terminate gracefully
-                TimeUnit.SECONDS.sleep(1);
-            } catch (Exception e) {
-                // Expected during shutdown, ignore
-            }
-        }
-
-        // Clean up test memory file
-        cleanupTestMemoryFile();
     }
 
     @Test
     @Order(1)
     void shouldInitializeMcpConnection() throws Exception {
-        // The client should successfully initialize the MCP connection
-        // This happens automatically when the client is created and verified in waitForClientReady()
-        assertNotNull(mcpClient);
-
-        // Execute a tool call to verify initialization (client is already ready)
-        String result = mcpClient.executeTool(ToolExecutionRequest.builder()
-                .name("memory_read_graph")
-                .arguments("{}")
-                .build());
-
-        assertNotNull(result);
-        assertTrue(result.length() > 0);
-
-        // Should be valid JSON containing entities and relations
-        JsonNode jsonNode = objectMapper.readTree(result);
-        assertNotNull(jsonNode);
-        assertTrue(jsonNode.has("entities"));
-        assertTrue(jsonNode.has("relations"));
+        testBasicConnection();
     }
 
     @Test
     @Order(2)
     void shouldExecuteCreateEntitiesAndReadGraph() throws Exception {
-        // Create test entities using JSON string arguments
-        String createEntitiesJson = objectMapper.writeValueAsString(Map.of(
-                "entities",
-                List.of(Map.of(
-                        "name", "STDIOTestEntity",
-                        "entityType", "TestType",
-                        "observations", List.of("This is a test entity for STDIO integration testing")))));
-
-        String createResult = mcpClient.executeTool(ToolExecutionRequest.builder()
-                .name("memory_create_entities")
-                .arguments(createEntitiesJson)
-                .build());
-
-        assertNotNull(createResult);
-        assertTrue(createResult.length() > 0);
-
-        // Read the graph to verify the entity was created
-        String readResult = mcpClient.executeTool(ToolExecutionRequest.builder()
-                .name("memory_read_graph")
-                .arguments("{}")
-                .build());
-
-        assertNotNull(readResult);
-        assertTrue(readResult.length() > 0);
-
-        // Verify the test entity is present in the graph
-        JsonNode graphNode = objectMapper.readTree(readResult);
-        JsonNode entities = graphNode.get("entities");
-        boolean foundTestEntity = false;
-        for (JsonNode entity : entities) {
-            if ("STDIOTestEntity".equals(entity.get("name").asText())) {
-                foundTestEntity = true;
-                break;
-            }
-        }
-        assertTrue(foundTestEntity, "STDIOTestEntity should be found in memory graph");
+        testCreateEntitiesAndReadGraph("STDIOTestEntity");
     }
 
     @Test
     @Order(3)
     void shouldExecuteSearchNodesTool() throws Exception {
-        // Search for nodes using a query
-        String searchArgsJson = objectMapper.writeValueAsString(Map.of("query", "STDIO"));
-
-        String searchResult = mcpClient.executeTool(ToolExecutionRequest.builder()
-                .name("memory_search_nodes")
-                .arguments(searchArgsJson)
-                .build());
-
-        assertNotNull(searchResult);
-        assertTrue(searchResult.length() > 0);
-
-        // Verify search results are valid MemoryGraph JSON object (not array)
-        JsonNode searchNode = objectMapper.readTree(searchResult);
-        assertNotNull(searchNode);
-        assertTrue(searchNode.has("entities"));
-        assertTrue(searchNode.has("relations"));
-
-        // Verify the entities array contains our STDIO test entity
-        JsonNode entities = searchNode.get("entities");
-        assertTrue(entities.isArray());
-        boolean foundSTDIOEntity = false;
-        for (JsonNode entity : entities) {
-            if ("STDIOTestEntity".equals(entity.get("name").asText())) {
-                foundSTDIOEntity = true;
-                break;
-            }
-        }
-        assertTrue(foundSTDIOEntity, "Search should find the STDIOTestEntity");
+        testSearchNodes("STDIO", "STDIOTestEntity");
     }
 
     @Test
@@ -253,69 +145,13 @@ final class McpServerStdioIntegrationTest {
     @Test
     @Order(5)
     void shouldDiscoverPrompts() throws Exception {
-        // Test that prompts are discovered and available
-        // This test should fail if prompts aren't properly registered
-
-        // For now, we'll try to get the prompts list via the MCP client
-        // This may not be directly supported by the current client, but we can attempt it
-        // Note: This test is expected to fail until prompts are properly discovered
-
-        try {
-            // Use LangChain4j MCP client API to list prompts
-            var prompts = mcpClient.listPrompts();
-
-            assertNotNull(prompts, "Prompts list should not be null");
-            assertFalse(prompts.isEmpty(), "Should have at least one prompt registered");
-
-            // Look for our memory_best_practices prompt
-            boolean foundMemoryPrompt =
-                    prompts.stream().anyMatch(prompt -> "memory_best_practices".equals(prompt.name()));
-
-            assertTrue(foundMemoryPrompt, "Should find memory_best_practices prompt");
-
-            // Test getting the actual prompt content
-            var promptArgs = Map.<String, Object>of();
-            var promptResult = mcpClient.getPrompt("memory_best_practices", promptArgs);
-            assertNotNull(promptResult, "Should be able to get prompt content");
-            assertFalse(promptResult.messages().isEmpty(), "Prompt should have message content");
-
-        } catch (Exception e) {
-            // If this fails, it means prompts aren't being discovered
-            throw new AssertionError("Prompts not discovered by MCP server: " + e.getMessage(), e);
-        }
+        testPromptDiscovery();
     }
 
     @Test
     @Order(6)
     void shouldDiscoverResources() throws Exception {
-        // Test that resources are discovered and available
-        // This test should fail if resources aren't properly registered
-
-        try {
-            // Use LangChain4j MCP client API to list resources
-            var resources = mcpClient.listResources();
-
-            assertNotNull(resources, "Resources list should not be null");
-            assertFalse(resources.isEmpty(), "Should have at least one resource registered");
-
-            // Look for our memory:// resources
-            boolean foundTypesResource =
-                    resources.stream().anyMatch(resource -> "memory://types".equals(resource.uri()));
-            boolean foundStatusResource =
-                    resources.stream().anyMatch(resource -> "memory://status".equals(resource.uri()));
-
-            assertTrue(foundTypesResource, "Should find memory://types resource");
-            assertTrue(foundStatusResource, "Should find memory://status resource");
-
-            // Test reading the actual resource content
-            var typesResult = mcpClient.readResource("memory://types");
-            assertNotNull(typesResult, "Should be able to read types resource");
-            assertFalse(typesResult.contents().isEmpty(), "Types resource should have content");
-
-        } catch (Exception e) {
-            // If this fails, it means resources aren't being discovered
-            throw new AssertionError("Resources not discovered by MCP server: " + e.getMessage(), e);
-        }
+        testResourceDiscovery();
     }
 
     @Test
@@ -493,48 +329,5 @@ final class McpServerStdioIntegrationTest {
 
         throw new IOException(
                 "Could not find packaged Quarkus JAR. " + "Make sure to run 'mvn package' before integration tests.");
-    }
-
-    /**
-     * Waits for the MCP client to be ready by retrying a simple tool call.
-     * This is necessary due to a bug in LangChain4j alpha version where the
-     * "initialized" notification is not automatically sent.
-     */
-    private void waitForClientReady() throws Exception {
-        final int maxRetries = 5;
-        final long retryDelayMs = 2000;
-
-        for (int attempt = 1; attempt <= maxRetries; attempt++) {
-            try {
-                // Try a simple tool call to verify the client is ready
-                String result = mcpClient.executeTool(ToolExecutionRequest.builder()
-                        .name("memory_read_graph")
-                        .arguments("{}")
-                        .build());
-
-                // If we get here without exception, the client is ready
-                if (result != null && result.length() > 0) {
-                    return;
-                }
-            } catch (Exception e) {
-                if (attempt == maxRetries) {
-                    throw new RuntimeException("MCP client failed to initialize after " + maxRetries + " attempts", e);
-                }
-                // Wait before retrying
-                Thread.sleep(retryDelayMs);
-            }
-        }
-    }
-
-    /**
-     * Cleans up the test memory file to ensure test isolation.
-     */
-    private void cleanupTestMemoryFile() {
-        try {
-            Path memoryFile = Paths.get(TEST_MEMORY_FILE);
-            Files.deleteIfExists(memoryFile);
-        } catch (IOException e) {
-            // Ignore cleanup failures
-        }
     }
 }
