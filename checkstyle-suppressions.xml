@@ -4,37 +4,42 @@
         "https://checkstyle.org/dtds/suppressions_1_2.dtd">
 
 <suppressions>
-    <!-- Suppress certain checks for test files (Palantir pattern) -->
-    <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="MagicNumber"/>
-    <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="MultipleStringLiterals"/>
-    <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="VisibilityModifier"/>
+    <!-- 1. Test Code Relaxations -->
+    <!-- Suppress certain checks for test files (following Palantir patterns) -->
     <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="AvoidStaticImport"/>
-    <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="RegexpSinglelineJava"/>
     <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="JavadocMethod"/>
     <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="JavadocType"/>
+    <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="MagicNumber"/>
     <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="MissingJavadocMethod"/>
     <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="MissingJavadocType"/>
+    <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="MultipleStringLiterals"/>
+    <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="RegexpSinglelineJava"/>
+    <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="VisibilityModifier"/>
 
-    <!-- Suppress AbbreviationAsWordInName for integration tests (IT suffix and IntegrationTest suffix are standard) -->
+    <!-- Integration test naming patterns -->
     <suppress files=".*IT\.java" checks="AbbreviationAsWordInName"/>
     <suppress files=".*IntegrationTest\.java" checks="AbbreviationAsWordInName"/>
 
-    <!-- Suppress line length for generated files -->
-    <suppress checks="LineLength" files=".*Application\.java"/>
+    <!-- 2. Framework & Generated Code -->
+    <!-- Allow longer lines for generated application files -->
+    <suppress files=".*Application\.java" checks="LineLength"/>
 
-    <!-- Allow public fields in DTOs/data classes -->
-    <suppress checks="VisibilityModifier" files=".*DTO\.java"/>
-    <suppress checks="VisibilityModifier" files=".*Request\.java"/>
-    <suppress checks="VisibilityModifier" files=".*/response/.*\.java|.*Response\.java"/>
+    <!-- 3. Data Transfer Objects -->
+    <!-- Allow public fields in DTOs and data classes -->
+    <suppress files=".*DTO\.java" checks="VisibilityModifier"/>
+    <suppress files=".*Request\.java" checks="VisibilityModifier"/>
+    <suppress files=".*/response/.*\.java|.*Response\.java" checks="VisibilityModifier"/>
 
-    <!-- Allow empty record bodies (conflict with Spotless formatting) -->
-    <suppress checks="WhitespaceAround" files=".*/response/.*\.java|.*Response\.java"/>
+    <!-- 4. Formatting Tool Conflicts -->
+    <!-- Handle conflicts between Checkstyle and Spotless/Palantir Java Format -->
+    <suppress files=".*/response/.*\.java|.*Response\.java" checks="WhitespaceAround"/>
 
-    <!-- Allow longer lines for method chaining patterns (conflict with Palantir Java Format) -->
-    <suppress checks="LineLength" files=".*McpMemoryResources\.java"/>
-    <suppress checks="LineLength" files=".*McpMemoryPrompts\.java"/>
+    <!-- 5. Project-Specific Template Classes -->
+    <!-- Allow longer lines for method chaining in resource/prompt classes -->
+    <suppress files=".*McpMemoryResources\.java" checks="LineLength"/>
+    <suppress files=".*McpMemoryPrompts\.java" checks="LineLength"/>
 
-    <!-- Allow string literals in resource and tools classes (template strings) -->
-    <suppress checks="MultipleStringLiterals" files=".*McpMemoryResources\.java"/>
-    <suppress checks="MultipleStringLiterals" files=".*McpMemoryTools\.java"/>
+    <!-- Allow string literals in template-heavy classes -->
+    <suppress files=".*McpMemoryResources\.java" checks="MultipleStringLiterals"/>
+    <suppress files=".*McpMemoryTools\.java" checks="MultipleStringLiterals"/>
 </suppressions>
