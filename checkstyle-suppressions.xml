@@ -10,6 +10,10 @@
     <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="VisibilityModifier"/>
     <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="AvoidStaticImport"/>
     <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="RegexpSinglelineJava"/>
+    <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="JavadocMethod"/>
+    <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="JavadocType"/>
+    <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="MissingJavadocMethod"/>
+    <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="MissingJavadocType"/>
 
     <!-- Suppress AbbreviationAsWordInName for integration tests (IT suffix and IntegrationTest suffix are standard) -->
     <suppress files=".*IT\.java" checks="AbbreviationAsWordInName"/>
@@ -29,4 +33,8 @@
     <!-- Allow longer lines for method chaining patterns (conflict with Palantir Java Format) -->
     <suppress checks="LineLength" files=".*McpMemoryResources\.java"/>
     <suppress checks="LineLength" files=".*McpMemoryPrompts\.java"/>
+
+    <!-- Allow string literals in resource and tools classes (template strings) -->
+    <suppress checks="MultipleStringLiterals" files=".*McpMemoryResources\.java"/>
+    <suppress checks="MultipleStringLiterals" files=".*McpMemoryTools\.java"/>
 </suppressions>
