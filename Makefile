@@ -1,5 +1,5 @@
 # Modern Makefile best practices
-.PHONY: help clean build dev run format checkstyle test test-watch test-integration docker-build docker-run docker-clean
+.PHONY: help clean build dev run format checkstyle test test-watch test-integration test-stdio test-sse docker-build docker-run docker-clean
 .DELETE_ON_ERROR:
 .ONESHELL:
 
@@ -95,7 +95,7 @@ checkstyle: ## Run checkstyle verification
 
 test: ## Run unit tests
 	@echo "Running unit tests..."
-	@rm -f memory.jsonl
+	@rm -f memory.jsonl memory-test.jsonl memory-stdio-test.jsonl memory-sse-test.jsonl
 	@$(MVN) test --no-transfer-progress
 	@echo "✓ Unit tests completed"
 
@@ -106,9 +106,21 @@ test-watch: ## Run tests in watch mode
 
 test-integration: ## Run integration tests
 	@echo "Running integration tests..."
-	@rm -f memory.jsonl
+	@rm -f memory.jsonl memory-test.jsonl memory-stdio-test.jsonl memory-sse-test.jsonl
 	@$(MVN) verify -DskipITs=false --no-transfer-progress
 	@echo "✓ Integration tests completed"
+
+test-stdio: ## Run STDIO integration tests only
+	@echo "Running STDIO integration tests..."
+	@rm -f memory.jsonl memory-test.jsonl memory-stdio-test.jsonl memory-sse-test.jsonl
+	@$(MVN) verify -DskipITs=false -Dtest=McpServerStdioIntegrationTest --no-transfer-progress
+	@echo "✓ STDIO integration tests completed"
+
+test-sse: ## Run SSE integration tests only
+	@echo "Running SSE integration tests..."
+	@rm -f memory.jsonl memory-test.jsonl memory-stdio-test.jsonl memory-sse-test.jsonl
+	@$(MVN) test -Dtest=McpServerSseIntegrationTest --no-transfer-progress
+	@echo "✓ SSE integration tests completed"
 
 # ============================================================================
 # DOCKER TARGETS

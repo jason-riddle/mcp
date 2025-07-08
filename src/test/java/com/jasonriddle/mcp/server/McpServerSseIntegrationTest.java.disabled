@@ -1,5 +1,9 @@
 package com.jasonriddle.mcp.server;
 
+// TODO: Fix SSE integration tests - currently failing due to endpoint configuration issues
+// The SSE endpoint is not being properly configured or exposed during test execution
+// This needs to be addressed after the SSE transport configuration is stabilized
+
 import dev.langchain4j.mcp.client.DefaultMcpClient;
 import dev.langchain4j.mcp.client.transport.McpTransport;
 import dev.langchain4j.mcp.client.transport.http.HttpMcpTransport;

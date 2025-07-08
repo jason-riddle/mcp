@@ -85,10 +85,16 @@
             <artifactId>quarkus-container-image-jib</artifactId>
         </dependency>
 
-        <!-- MCP Server Support -->
+        <!-- MCP Server Stdio Support -->
         <dependency>
             <groupId>io.quarkiverse.mcp</groupId>
             <artifactId>quarkus-mcp-server-stdio</artifactId>
+            <version>${mcp.version}</version>
+        </dependency>
+        <!-- MCP Server SSE/HTTP Support -->
+        <dependency>
+            <groupId>io.quarkiverse.mcp</groupId>
+            <artifactId>quarkus-mcp-server-sse</artifactId>
             <version>${mcp.version}</version>
         </dependency>
 
@@ -243,7 +249,6 @@
                         <include>**/*IntegrationTest.java</include>
                     </includes>
                     <systemPropertyVariables>
-                        <!-- <native.image.path>${project.build.directory}/${project.build.finalName}-runner</native.image.path> -->
                         <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
                         <maven.home>${maven.home}</maven.home>
                     </systemPropertyVariables>
@@ -287,7 +292,6 @@
                         <exclude>**/*IntegrationTest.java</exclude>
                     </excludes>
                     <systemPropertyVariables>
-                        <!-- <quarkus.log.level>WARN</quarkus.log.level> -->
                         <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
                         <maven.home>${maven.home}</maven.home>
                     </systemPropertyVariables>

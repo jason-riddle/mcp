@@ -226,14 +226,20 @@ com.jasonriddle.mcp/
 
 ```text
 com.jasonriddle.mcp/
-├── ConfigurationValidationTest.java                # Tests for configuration validation
 ├── McpMemoryPromptsTest.java                       # Tests for memory prompts
 ├── McpMemoryResourcesTest.java                     # Tests for memory resources
 ├── McpMemoryToolsTest.java                         # Tests for memory tools
-├── McpServerStdioIntegrationTest.java              # Integration tests for STDIO server
 ├── package-info.java                               # Package documentation
-└── memory/                                         # Memory implementation tests
-    ├── MemoryServiceTest.java                      # Tests for memory service
+├── config/                                         # Configuration tests
+│   ├── ConfigurationValidationTest.java           # Tests for configuration validation
+│   └── package-info.java                          # Package documentation
+├── memory/                                         # Memory implementation tests
+│   ├── MemoryServiceTest.java                     # Tests for memory service
+│   └── package-info.java                          # Package documentation
+└── server/                                         # Server integration tests
+    ├── McpIntegrationTestBase.java                 # Base class for integration tests
+    ├── McpServerSseIntegrationTest.java            # Integration tests for SSE server
+    ├── McpServerStdioIntegrationTest.java          # Integration tests for STDIO server
     └── package-info.java                           # Package documentation
 ```
 
@@ -245,6 +251,9 @@ Each package contains a `package-info.java` file with purpose and responsibiliti
 - **Root package** (`com.jasonriddle.mcp`): Model Context Protocol server implementation with memory graph capabilities
 - **Memory package** (`com.jasonriddle.mcp.memory`): Memory graph implementation for the MCP server
 - **Test packages**: Corresponding test suites for implementation verification
+  - **Config test package** (`com.jasonriddle.mcp.config`): Configuration validation tests
+  - **Memory test package** (`com.jasonriddle.mcp.memory`): Memory service tests
+  - **Server test package** (`com.jasonriddle.mcp.server`): Integration tests for MCP server implementations
 
 ### Design Principles
 
