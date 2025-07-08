@@ -114,11 +114,21 @@
       pass_filenames = false;
     };
 
-    # Integration tests - BLOCKS COMMIT ON FAILURE (disabled by default)
-    maven-integration-test = {
+    # SSE Integration tests - BLOCKS COMMIT ON FAILURE (disabled by default)
+    maven-sse-integration-test = {
       enable = true;
-      name = "maven-integration-test";
-      entry = "./mvnw verify -DskipITs=false";
+      name = "maven-sse-integration-test";
+      entry = "./mvnw test -Dtest=McpServerSseIntegrationTest";
+      language = "system";
+      files = "\\.(java|xml|properties)$";
+      pass_filenames = false;
+    };
+
+    # STDIO Integration tests - BLOCKS COMMIT ON FAILURE (disabled by default)
+    maven-stdio-integration-test = {
+      enable = true;
+      name = "maven-stdio-integration-test";
+      entry = "./mvnw verify -DskipITs=false -Dtest=McpServerStdioIntegrationTest";
       language = "system";
       files = "\\.(java|xml|properties)$";
       pass_filenames = false;
