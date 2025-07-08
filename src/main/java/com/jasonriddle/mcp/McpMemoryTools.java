@@ -8,8 +8,6 @@ import io.quarkiverse.mcp.server.Tool;
 import io.quarkiverse.mcp.server.ToolArg;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +30,7 @@ public final class McpMemoryTools {
     public String createEntities(
             @ToolArg(description = "Array of entities with name, entityType, and observations")
                     final List<Map<String, Object>> entities) {
-        final List<Entity> entitiesToCreate = new ArrayList<>();
+        final List<Entity> entitiesToCreate = new java.util.ArrayList<>();
 
         for (final Map<String, Object> entityData : entities) {
             final String name = (String) entityData.get("name");
@@ -60,7 +58,7 @@ public final class McpMemoryTools {
     public String createRelations(
             @ToolArg(description = "Array of relations with from, to, and relationType")
                     final List<Map<String, String>> relations) {
-        final List<Relation> relationsToCreate = new ArrayList<>();
+        final List<Relation> relationsToCreate = new java.util.ArrayList<>();
 
         for (final Map<String, String> relationData : relations) {
             final String from = relationData.get("from");
@@ -87,7 +85,7 @@ public final class McpMemoryTools {
     public String addObservations(
             @ToolArg(description = "Array of objects with entityName and contents")
                     final List<Map<String, Object>> observations) {
-        final Map<String, List<String>> observationMap = new HashMap<>();
+        final Map<String, List<String>> observationMap = new java.util.HashMap<>();
 
         for (final Map<String, Object> obsData : observations) {
             final String entityName = (String) obsData.get("entityName");
@@ -127,7 +125,7 @@ public final class McpMemoryTools {
     public String deleteObservations(
             @ToolArg(description = "Array of objects with entityName and observations to delete")
                     final List<Map<String, Object>> deletions) {
-        final Map<String, List<String>> deletionMap = new HashMap<>();
+        final Map<String, List<String>> deletionMap = new java.util.HashMap<>();
 
         for (final Map<String, Object> delData : deletions) {
             final String entityName = (String) delData.get("entityName");
@@ -154,7 +152,7 @@ public final class McpMemoryTools {
     public String deleteRelations(
             @ToolArg(description = "Array of relations with from, to, and relationType")
                     final List<Map<String, String>> relations) {
-        final List<Relation> relationsToDelete = new ArrayList<>();
+        final List<Relation> relationsToDelete = new java.util.ArrayList<>();
 
         for (final Map<String, String> relationData : relations) {
             final String from = relationData.get("from");
