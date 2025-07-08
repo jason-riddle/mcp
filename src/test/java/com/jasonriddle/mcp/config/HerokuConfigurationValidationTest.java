@@ -1,5 +1,7 @@
 package com.jasonriddle.mcp.config;
 
+import static com.jasonriddle.mcp.config.ConfigurationTestConstants.EXPECTED_APP_NAME;
+import static com.jasonriddle.mcp.config.ConfigurationTestConstants.EXPECTED_VERSION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -18,9 +20,6 @@ import org.junit.jupiter.api.Test;
 @TestProfile(HerokuTestProfile.class)
 @DisplayName("Heroku Configuration Validation")
 final class HerokuConfigurationValidationTest {
-
-    private static final String EXPECTED_VERSION = "0.0.1-SNAPSHOT";
-    private static final String EXPECTED_APP_NAME = "jasons-mcp-server";
 
     @Inject
     Config config;
