@@ -86,7 +86,6 @@
         </dependency>
 
         <!-- MCP Server Support -->
-        <!-- STDIO transport dependency for MCP server -->
         <dependency>
             <groupId>io.quarkiverse.mcp</groupId>
             <artifactId>quarkus-mcp-server-stdio</artifactId>
