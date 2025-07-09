@@ -57,18 +57,19 @@ public final class McpTimeTools {
             @ToolArg(description = "Target IANA timezone name") final String targetTimezone) {
         final TimeConversionResult conversionResult = timeService.convertTime(sourceTimezone, time, targetTimezone);
 
+        final Map<String, Object> sourceInfo = Map.of(
+                TIMEZONE_KEY, sourceTimezone,
+                DATETIME_KEY, conversionResult.sourceTime().format(ISO_FORMATTER),
+                IS_DST_KEY, timeService.isDaylightSavingTime(conversionResult.sourceTime()));
+
+        final Map<String, Object> targetInfo = Map.of(
+                TIMEZONE_KEY, targetTimezone,
+                DATETIME_KEY, conversionResult.targetTime().format(ISO_FORMATTER),
+                IS_DST_KEY, timeService.isDaylightSavingTime(conversionResult.targetTime()));
+
         return Map.of(
-                "source",
-                Map.of(
-                        TIMEZONE_KEY, sourceTimezone,
-                        DATETIME_KEY, conversionResult.sourceTime().format(ISO_FORMATTER),
-                        IS_DST_KEY, timeService.isDaylightSavingTime(conversionResult.sourceTime())),
-                "target",
-                Map.of(
-                        TIMEZONE_KEY, targetTimezone,
-                        DATETIME_KEY, conversionResult.targetTime().format(ISO_FORMATTER),
-                        IS_DST_KEY, timeService.isDaylightSavingTime(conversionResult.targetTime())),
-                "time_difference",
-                conversionResult.timeDifference());
+                "source", sourceInfo,
+                "target", targetInfo,
+                "time_difference", conversionResult.timeDifference());
     }
 }
