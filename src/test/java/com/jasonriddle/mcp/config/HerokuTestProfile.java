@@ -19,6 +19,7 @@ public final class HerokuTestProfile implements QuarkusTestProfile {
         Map<String, String> overrides = new HashMap<>();
         // Simulate Heroku environment
         overrides.put("PORT", "5000");
+        overrides.put("weather.api.key", "test-api-key");
         return overrides;
     }
 }
