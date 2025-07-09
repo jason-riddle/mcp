@@ -384,43 +384,57 @@ public class MemoryService {
             MemoryGraph graph = readGraph();
             String lowerQuery = query.toLowerCase();
 
-            // Find matching entities
-            List<Entity> matchingEntities = new ArrayList<>();
-            for (Entity e : graph.entities()) {
-                boolean nameMatches = e.name().toLowerCase().contains(lowerQuery);
-                boolean typeMatches = e.entityType().toLowerCase().contains(lowerQuery);
-                boolean observationMatches = false;
-                for (String o : e.observations()) {
-                    if (o.toLowerCase().contains(lowerQuery)) {
-                        observationMatches = true;
-                        break;
-                    }
-                }
-                if (nameMatches || typeMatches || observationMatches) {
-                    matchingEntities.add(e);
-                }
-            }
-
-            // Get entity names for relation filtering
-            List<String> entityNames = new ArrayList<>();
-            for (Entity entity : matchingEntities) {
-                entityNames.add(entity.name());
-            }
-
-            // Find relations between matching entities
-            List<Relation> matchingRelations = new ArrayList<>();
-            for (Relation r : graph.relations()) {
-                boolean fromMatches = entityNames.contains(r.from());
-                boolean toMatches = entityNames.contains(r.to());
-                if (fromMatches && toMatches) {
-                    matchingRelations.add(r);
-                }
-            }
+            List<Entity> matchingEntities = findMatchingEntities(graph, lowerQuery);
+            List<Relation> matchingRelations = findMatchingRelations(graph, matchingEntities);
 
             return new MemoryGraph(matchingEntities, matchingRelations);
         } finally {
             lock.readLock().unlock();
         }
+    }
+
+    private List<Entity> findMatchingEntities(final MemoryGraph graph, final String lowerQuery) {
+        List<Entity> matchingEntities = new ArrayList<>();
+        for (Entity e : graph.entities()) {
+            if (entityMatches(e, lowerQuery)) {
+                matchingEntities.add(e);
+            }
+        }
+        return matchingEntities;
+    }
+
+    private boolean entityMatches(final Entity entity, final String lowerQuery) {
+        if (entity.name().toLowerCase().contains(lowerQuery)) {
+            return true;
+        }
+        if (entity.entityType().toLowerCase().contains(lowerQuery)) {
+            return true;
+        }
+        return hasMatchingObservation(entity, lowerQuery);
+    }
+
+    private boolean hasMatchingObservation(final Entity entity, final String lowerQuery) {
+        for (String observation : entity.observations()) {
+            if (observation.toLowerCase().contains(lowerQuery)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private List<Relation> findMatchingRelations(final MemoryGraph graph, final List<Entity> matchingEntities) {
+        List<String> entityNames = new ArrayList<>();
+        for (Entity entity : matchingEntities) {
+            entityNames.add(entity.name());
+        }
+
+        List<Relation> matchingRelations = new ArrayList<>();
+        for (Relation r : graph.relations()) {
+            if (entityNames.contains(r.from()) && entityNames.contains(r.to())) {
+                matchingRelations.add(r);
+            }
+        }
+        return matchingRelations;
     }
 
     /**

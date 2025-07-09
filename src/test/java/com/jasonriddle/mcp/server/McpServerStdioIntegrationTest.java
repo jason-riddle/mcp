@@ -168,7 +168,15 @@ final class McpServerStdioIntegrationTest extends McpIntegrationTestBase {
         final String testEntityType = "CrudTest";
         final String testObservation = "This entity tests the full CRUD lifecycle";
 
-        // A) Create an entity
+        createTestEntity(testEntityName, testEntityType, testObservation);
+        verifyEntityExists(testEntityName, testEntityType, testObservation);
+        verifyEntityFoundInSearch(testEntityName);
+        deleteTestEntity(testEntityName);
+        verifyEntityNotFoundAfterDeletion(testEntityName);
+    }
+
+    private void createTestEntity(
+            final String testEntityName, final String testEntityType, final String testObservation) throws Exception {
         String createEntitiesJson = objectMapper.writeValueAsString(Map.of(
                 "entities",
                 List.of(Map.of(
@@ -183,8 +191,10 @@ final class McpServerStdioIntegrationTest extends McpIntegrationTestBase {
 
         assertNotNull(createResult);
         assertTrue(createResult.length() > 0);
+    }
 
-        // B) Verify the entity was added (don't check total count since previous tests may have created entities)
+    private void verifyEntityExists(
+            final String testEntityName, final String testEntityType, final String testObservation) throws Exception {
         String readResult = mcpClient.executeTool(ToolExecutionRequest.builder()
                 .name("memory_read_graph")
                 .arguments("{}")
@@ -194,12 +204,10 @@ final class McpServerStdioIntegrationTest extends McpIntegrationTestBase {
         JsonNode graphNode = objectMapper.readTree(readResult);
         JsonNode entities = graphNode.get("entities");
 
-        // Find our test entity and verify its properties
         boolean foundTestEntity = false;
         for (JsonNode entity : entities) {
             if (testEntityName.equals(entity.get("name").asText())) {
                 foundTestEntity = true;
-                // Verify entity properties
                 assertEquals(testEntityType, entity.get("entityType").asText());
                 JsonNode observations = entity.get("observations");
                 assertTrue(observations.isArray());
@@ -210,8 +218,9 @@ final class McpServerStdioIntegrationTest extends McpIntegrationTestBase {
         }
 
         assertTrue(foundTestEntity, "CrudTestEntity should be found in the graph");
+    }
 
-        // C) Search for the entity and find it
+    private void verifyEntityFoundInSearch(final String testEntityName) throws Exception {
         String searchArgsJson = objectMapper.writeValueAsString(Map.of("query", "CrudTest"));
         String searchResult = mcpClient.executeTool(ToolExecutionRequest.builder()
                 .name("memory_search_nodes")
@@ -227,7 +236,6 @@ final class McpServerStdioIntegrationTest extends McpIntegrationTestBase {
         assertTrue(searchEntities.isArray());
         assertTrue(searchEntities.size() > 0, "Search should find the CrudTestEntity");
 
-        // Verify the search result contains our entity
         boolean foundInSearch = false;
         for (JsonNode searchEntity : searchEntities) {
             if (testEntityName.equals(searchEntity.get("name").asText())) {
@@ -236,8 +244,9 @@ final class McpServerStdioIntegrationTest extends McpIntegrationTestBase {
             }
         }
         assertTrue(foundInSearch, "CrudTestEntity should be found in search results");
+    }
 
-        // D) Delete the entity and assert size is 0
+    private void deleteTestEntity(final String testEntityName) throws Exception {
         String deleteEntitiesJson = objectMapper.writeValueAsString(Map.of("entityNames", List.of(testEntityName)));
 
         String deleteResult = mcpClient.executeTool(ToolExecutionRequest.builder()
@@ -247,8 +256,9 @@ final class McpServerStdioIntegrationTest extends McpIntegrationTestBase {
 
         assertNotNull(deleteResult);
         assertTrue(deleteResult.length() > 0);
+    }
 
-        // Verify the entity was deleted - read graph again
+    private void verifyEntityNotFoundAfterDeletion(final String testEntityName) throws Exception {
         String readAfterDeleteResult = mcpClient.executeTool(ToolExecutionRequest.builder()
                 .name("memory_read_graph")
                 .arguments("{}")
@@ -258,7 +268,6 @@ final class McpServerStdioIntegrationTest extends McpIntegrationTestBase {
         JsonNode graphAfterDelete = objectMapper.readTree(readAfterDeleteResult);
         JsonNode entitiesAfterDelete = graphAfterDelete.get("entities");
 
-        // Verify our specific entity was deleted (other entities from previous tests may still exist)
         boolean foundDeletedEntity = false;
         for (JsonNode entity : entitiesAfterDelete) {
             if (testEntityName.equals(entity.get("name").asText())) {
@@ -269,7 +278,8 @@ final class McpServerStdioIntegrationTest extends McpIntegrationTestBase {
 
         assertFalse(foundDeletedEntity, "CrudTestEntity should not be found after deletion");
 
-        // E) Search for the entity and get empty results
+        // Verify search also doesn't find the entity
+        String searchArgsJson = objectMapper.writeValueAsString(Map.of("query", "CrudTest"));
         String searchAfterDeleteResult = mcpClient.executeTool(ToolExecutionRequest.builder()
                 .name("memory_search_nodes")
                 .arguments(searchArgsJson)
@@ -283,7 +293,6 @@ final class McpServerStdioIntegrationTest extends McpIntegrationTestBase {
         JsonNode searchAfterDeleteEntities = searchAfterDeleteGraph.get("entities");
         assertTrue(searchAfterDeleteEntities.isArray());
 
-        // Verify the search no longer finds the deleted entity
         boolean foundDeletedInSearch = false;
         for (JsonNode searchEntity : searchAfterDeleteEntities) {
             if (testEntityName.equals(searchEntity.get("name").asText())) {
