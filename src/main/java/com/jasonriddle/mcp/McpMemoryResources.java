@@ -40,25 +40,39 @@ public final class McpMemoryResources {
     @Resource(uri = "memory://types")
     TextResourceContents typesResource() {
         final MemoryGraph graph = memoryService.readGraph();
-        final List<Entity> allEntitiesForCounting = graph.entities();
-        final Map<String, Long> entityTypeCounts = new HashMap<>();
-        for (final Entity entity : allEntitiesForCounting) {
-            final String entityType = entity.entityType();
-            entityTypeCounts.merge(entityType, 1L, Long::sum);
-        }
-
-        final List<Relation> allRelationsForCounting = graph.relations();
-        final Map<String, Long> relationTypeCounts = new HashMap<>();
-        for (final Relation relation : allRelationsForCounting) {
-            final String relationType = relation.relationType();
-            relationTypeCounts.merge(relationType, 1L, Long::sum);
-        }
+        final Map<String, Long> entityTypeCounts = countEntityTypes(graph.entities());
+        final Map<String, Long> relationTypeCounts = countRelationTypes(graph.relations());
 
         final StringBuilder content = new StringBuilder();
         content.append("# Memory Graph Types and Patterns\n\n");
         content.append("Overview of available entity types, relation types, and usage patterns.\n\n");
 
-        // Entity Types Section
+        appendEntityTypesSection(content, entityTypeCounts);
+        appendRelationTypesSection(content, relationTypeCounts);
+        appendCommonPatternsSection(content, entityTypeCounts, relationTypeCounts);
+
+        return TextResourceContents.create("memory://types", content.toString());
+    }
+
+    private Map<String, Long> countEntityTypes(final List<Entity> entities) {
+        final Map<String, Long> entityTypeCounts = new HashMap<>();
+        for (final Entity entity : entities) {
+            final String entityType = entity.entityType();
+            entityTypeCounts.merge(entityType, 1L, Long::sum);
+        }
+        return entityTypeCounts;
+    }
+
+    private Map<String, Long> countRelationTypes(final List<Relation> relations) {
+        final Map<String, Long> relationTypeCounts = new HashMap<>();
+        for (final Relation relation : relations) {
+            final String relationType = relation.relationType();
+            relationTypeCounts.merge(relationType, 1L, Long::sum);
+        }
+        return relationTypeCounts;
+    }
+
+    private void appendEntityTypesSection(final StringBuilder content, final Map<String, Long> entityTypeCounts) {
         content.append("## Entity Types\n\n");
         if (entityTypeCounts.isEmpty()) {
             content.append("*No entities found in memory graph.*\n\n");
@@ -73,8 +87,9 @@ public final class McpMemoryResources {
             }
             content.append("\n");
         }
+    }
 
-        // Relation Types Section
+    private void appendRelationTypesSection(final StringBuilder content, final Map<String, Long> relationTypeCounts) {
         content.append("## Relation Types\n\n");
         if (relationTypeCounts.isEmpty()) {
             content.append("*No relations found in memory graph.*\n\n");
@@ -89,37 +104,45 @@ public final class McpMemoryResources {
             }
             content.append("\n");
         }
+    }
 
-        // Usage Examples
+    private void appendCommonPatternsSection(final StringBuilder content, final Map<String, Long> entityTypeCounts, final Map<String, Long> relationTypeCounts) {
         content.append("## Common Patterns\n\n");
         if (!entityTypeCounts.isEmpty() && !relationTypeCounts.isEmpty()) {
-            content.append("### Entity Naming Examples\n");
-            for (final String entityType : entityTypeCounts.keySet()) {
-                switch (entityType.toLowerCase()) {
-                    case "person" -> content.append("- **person**: Jason, Alice, Bob\n");
-                    case "preferences" -> content.append("- **preferences**: Technical_Preferences, UI_Preferences\n");
-                    case "project" -> content.append("- **project**: Project_Alpha, Website_Redesign\n");
-                    case "system" -> content.append("- **system**: Production_Database, Development_Server\n");
-                    default -> content.append("- **")
-                            .append(entityType)
-                            .append("**: ")
-                            .append(entityType)
-                            .append("_Example\n");
-                }
-            }
-            content.append("\n### Relationship Examples\n");
-            for (final String relationType : relationTypeCounts.keySet()) {
-                content.append("- **")
-                        .append(relationType)
-                        .append("**: Entity_A ")
-                        .append(relationType)
-                        .append(" Entity_B\n");
-            }
+            appendEntityNamingExamples(content, entityTypeCounts);
+            appendRelationshipExamples(content, relationTypeCounts);
         } else {
             content.append("*Create some entities and relationships to see pattern examples.*\n");
         }
+    }
 
-        return TextResourceContents.create("memory://types", content.toString());
+    private void appendEntityNamingExamples(final StringBuilder content, final Map<String, Long> entityTypeCounts) {
+        content.append("### Entity Naming Examples\n");
+        for (final String entityType : entityTypeCounts.keySet()) {
+            switch (entityType.toLowerCase()) {
+                case "person" -> content.append("- **person**: Jason, Alice, Bob\n");
+                case "preferences" -> content.append("- **preferences**: Technical_Preferences, UI_Preferences\n");
+                case "project" -> content.append("- **project**: Project_Alpha, Website_Redesign\n");
+                case "system" -> content.append("- **system**: Production_Database, Development_Server\n");
+                default -> content.append("- **")
+                        .append(entityType)
+                        .append("**: ")
+                        .append(entityType)
+                        .append("_Example\n");
+            }
+        }
+        content.append("\n");
+    }
+
+    private void appendRelationshipExamples(final StringBuilder content, final Map<String, Long> relationTypeCounts) {
+        content.append("### Relationship Examples\n");
+        for (final String relationType : relationTypeCounts.keySet()) {
+            content.append("- **")
+                    .append(relationType)
+                    .append("**: Entity_A ")
+                    .append(relationType)
+                    .append(" Entity_B\n");
+        }
     }
 
     /**
@@ -134,28 +157,35 @@ public final class McpMemoryResources {
 
         content.append("# Memory Graph Status\n\n");
 
-        // Basic counts
+        appendOverviewSection(content, graph);
+        appendEntityTypesStatusSection(content, graph.entities());
+        appendRelationTypesStatusSection(content, graph.relations());
+        appendStorageInformation(content);
+        appendDataIntegritySection(content, graph);
+        appendHealthStatusSection(content, graph);
+
+        return TextResourceContents.create("memory://status", content.toString());
+    }
+
+    private void appendOverviewSection(final StringBuilder content, final MemoryGraph graph) {
         content.append("## Overview\n\n");
         content.append("- **Total Entities:** ").append(graph.entities().size()).append("\n");
-        content.append("- **Total Relations:** ")
-                .append(graph.relations().size())
-                .append("\n");
+        content.append("- **Total Relations:** ").append(graph.relations().size()).append("\n");
 
-        final List<Entity> allEntities = graph.entities();
+        final int totalObservations = calculateTotalObservations(graph.entities());
+        content.append("- **Total Observations:** ").append(totalObservations).append("\n\n");
+    }
+
+    private int calculateTotalObservations(final List<Entity> entities) {
         int totalObservations = 0;
-        for (Entity e : allEntities) {
+        for (Entity e : entities) {
             totalObservations += e.observations().size();
         }
-        content.append("- **Total Observations:** ").append(totalObservations).append("\n\n");
+        return totalObservations;
+    }
 
-        // Entity type breakdown
-        final List<Entity> entities = graph.entities();
-        final Map<String, Long> entityTypeCounts = new HashMap<>();
-        for (final Entity entity : entities) {
-            final String entityType = entity.entityType();
-            entityTypeCounts.merge(entityType, 1L, Long::sum);
-        }
-
+    private void appendEntityTypesStatusSection(final StringBuilder content, final List<Entity> entities) {
+        final Map<String, Long> entityTypeCounts = countEntityTypes(entities);
         content.append("## Entity Types\n\n");
         if (entityTypeCounts.isEmpty()) {
             content.append("*No entities found.*\n");
@@ -169,15 +199,10 @@ public final class McpMemoryResources {
             }
         }
         content.append("\n");
+    }
 
-        // Relation type breakdown
-        final List<Relation> relations = graph.relations();
-        final Map<String, Long> relationTypeCounts = new HashMap<>();
-        for (final Relation relation : relations) {
-            final String relationType = relation.relationType();
-            relationTypeCounts.merge(relationType, 1L, Long::sum);
-        }
-
+    private void appendRelationTypesStatusSection(final StringBuilder content, final List<Relation> relations) {
+        final Map<String, Long> relationTypeCounts = countRelationTypes(relations);
         content.append("## Relation Types\n\n");
         if (relationTypeCounts.isEmpty()) {
             content.append("*No relations found.*\n");
@@ -191,8 +216,9 @@ public final class McpMemoryResources {
             }
         }
         content.append("\n");
+    }
 
-        // File information
+    private void appendStorageInformation(final StringBuilder content) {
         content.append("## Storage Information\n\n");
         try {
             final Path path = Paths.get(memoryFilePath);
@@ -214,66 +240,74 @@ public final class McpMemoryResources {
                     .append(")\n");
         }
         content.append("\n");
+    }
 
-        // Data integrity
+    private void appendDataIntegritySection(final StringBuilder content, final MemoryGraph graph) {
         content.append("## Data Integrity\n\n");
 
-        // Check for orphaned relations
-        final List<Entity> entitiesForOrphanCheck = graph.entities();
+        final long orphanedRelations = countOrphanedRelations(graph);
+        content.append("- **Orphaned Relations:** ").append(orphanedRelations).append("\n");
+
+        final long emptyEntities = countEmptyEntities(graph.entities());
+        content.append("- **Entities with No Observations:** ").append(emptyEntities).append("\n");
+
+        final long isolatedEntities = countIsolatedEntities(graph);
+        content.append("- **Isolated Entities:** ").append(isolatedEntities).append("\n");
+    }
+
+    private long countOrphanedRelations(final MemoryGraph graph) {
         final Set<String> entityNames = new HashSet<>();
-        for (final Entity entity : entitiesForOrphanCheck) {
+        for (final Entity entity : graph.entities()) {
             entityNames.add(entity.name());
         }
 
-        final List<Relation> allRelations = graph.relations();
         long orphanedRelations = 0;
-        for (final Relation relation : allRelations) {
+        for (final Relation relation : graph.relations()) {
             final boolean fromExists = entityNames.contains(relation.from());
             final boolean toExists = entityNames.contains(relation.to());
             if (!fromExists || !toExists) {
                 orphanedRelations++;
             }
         }
+        return orphanedRelations;
+    }
 
-        content.append("- **Orphaned Relations:** ").append(orphanedRelations).append("\n");
-
-        // Check for entities with no observations
+    private long countEmptyEntities(final List<Entity> entities) {
         long emptyEntities = 0;
-        for (Entity e : graph.entities()) {
+        for (Entity e : entities) {
             if (e.observations().isEmpty()) {
                 emptyEntities++;
             }
         }
-        content.append("- **Entities with No Observations:** ")
-                .append(emptyEntities)
-                .append("\n");
+        return emptyEntities;
+    }
 
-        // Check for isolated entities (no relations)
-        // Reuse existing entities and relations variables
-
-        // Create sets of entity names that appear in relations for efficient lookup
+    private long countIsolatedEntities(final MemoryGraph graph) {
         final Set<String> entitiesInRelations = new HashSet<>();
-        for (final Relation relation : allRelations) {
+        for (final Relation relation : graph.relations()) {
             entitiesInRelations.add(relation.from());
             entitiesInRelations.add(relation.to());
         }
 
         long isolatedEntities = 0;
-        for (final Entity entity : entitiesForOrphanCheck) {
+        for (final Entity entity : graph.entities()) {
             final boolean isConnected = entitiesInRelations.contains(entity.name());
             if (!isConnected) {
                 isolatedEntities++;
             }
         }
-        content.append("- **Isolated Entities:** ").append(isolatedEntities).append("\n");
+        return isolatedEntities;
+    }
 
+    private void appendHealthStatusSection(final StringBuilder content, final MemoryGraph graph) {
         content.append("\n## Health Status\n\n");
+        final long orphanedRelations = countOrphanedRelations(graph);
+        final long emptyEntities = countEmptyEntities(graph.entities());
+
         if (orphanedRelations == 0 && emptyEntities == 0) {
             content.append("✅ **Status:** Healthy - No data integrity issues detected\n");
         } else {
             content.append("⚠️ **Status:** Issues detected - Consider cleanup\n");
         }
-
-        return TextResourceContents.create("memory://status", content.toString());
     }
 }

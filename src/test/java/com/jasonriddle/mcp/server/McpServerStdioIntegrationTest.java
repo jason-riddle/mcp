@@ -320,39 +320,49 @@ final class McpServerStdioIntegrationTest extends McpIntegrationTestBase {
      * This method looks for the standard Quarkus build output locations.
      */
     private String getQuarkusJarPath() throws IOException {
-        // Try different possible JAR locations
         List<String> possiblePaths = List.of(
                 "target/quarkus-app/quarkus-run.jar", // Standard Quarkus JAR
                 "target/jasons-mcp-server-*-runner.jar" // Uber JAR if built
                 );
 
         for (String pathPattern : possiblePaths) {
-            if (pathPattern.contains("*")) {
-                // Handle wildcard patterns for uber JARs
-                Path targetDir = Paths.get("target");
-                if (Files.exists(targetDir)) {
-                    try (var files = Files.list(targetDir)) {
-                        Path matchingFile = null;
-                        for (Path p : (Iterable<Path>) files::iterator) {
-                            if (p.getFileName().toString().contains("runner.jar")) {
-                                matchingFile = p;
-                                break;
-                            }
-                        }
-                        if (matchingFile != null) {
-                            return matchingFile.toAbsolutePath().toString();
-                        }
-                    }
-                }
-            } else {
-                Path jarPath = Paths.get(pathPattern);
-                if (Files.exists(jarPath)) {
-                    return jarPath.toAbsolutePath().toString();
-                }
+            String jarPath = findJarPath(pathPattern);
+            if (jarPath != null) {
+                return jarPath;
             }
         }
 
         throw new IOException(
                 "Could not find packaged Quarkus JAR. " + "Make sure to run 'mvn package' before integration tests.");
+    }
+
+    private String findJarPath(final String pathPattern) throws IOException {
+        if (pathPattern.contains("*")) {
+            return findWildcardJarPath();
+        } else {
+            return findDirectJarPath(pathPattern);
+        }
+    }
+
+    private String findWildcardJarPath() throws IOException {
+        Path targetDir = Paths.get("target");
+        if (Files.exists(targetDir)) {
+            try (var files = Files.list(targetDir)) {
+                for (Path p : (Iterable<Path>) files::iterator) {
+                    if (p.getFileName().toString().contains("runner.jar")) {
+                        return p.toAbsolutePath().toString();
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    private String findDirectJarPath(final String pathPattern) {
+        Path jarPath = Paths.get(pathPattern);
+        if (Files.exists(jarPath)) {
+            return jarPath.toAbsolutePath().toString();
+        }
+        return null;
     }
 }
