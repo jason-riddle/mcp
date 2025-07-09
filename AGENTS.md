@@ -76,7 +76,52 @@ make test-integration                 # Run integration tests
 ./mvnw test -Dtest=MemoryServiceTest  # Run specific test class
 ./mvnw test -Dtest=TimeServiceTest   # Run time service tests
 ./mvnw test -Dtest=WeatherServiceTest # Run weather service tests
+
+# VCR Integration Tests (requires WEATHER_API_KEY)
+./mvnw test -Dtest=WeatherServiceVCRIntegrationTest  # Run VCR tests
+./mvnw verify -Pvcr-tests             # Run VCR tests in CI/CD mode (replay only)
 ```
+
+#### VCR Testing for Weather API
+
+The project includes VCR (Video Cassette Recorder) integration tests for the weather API using EasyVCR Java. These tests record real HTTP interactions with OpenWeatherMap API and replay them for fast, deterministic testing without API costs.
+
+**Key Features:**
+- Records real API responses to cassettes for offline testing
+- Automatically censors API keys for security
+- Supports multiple test modes: Record, Replay, Auto, Bypass
+- Eliminates API costs and network dependencies in CI/CD
+
+**Setup:**
+```bash
+# Set your OpenWeatherMap API key
+export WEATHER_API_KEY=your_api_key_here
+
+# Record new cassettes (first run with real API)
+./mvnw test -Dtest=WeatherServiceVCRIntegrationTest -Dvcr.mode=record
+
+# Replay existing cassettes (subsequent runs, no API key needed)
+./mvnw test -Dtest=WeatherServiceVCRIntegrationTest -Dvcr.mode=replay
+
+# Auto mode (record if not exists, replay if exists)
+./mvnw test -Dtest=WeatherServiceVCRIntegrationTest -Dvcr.mode=auto
+```
+
+**CI/CD Integration:**
+- Use `mvn verify -Pvcr-tests` for CI/CD pipelines
+- Cassettes are committed to version control for replay
+- Tests run in `replay` mode by default in CI/CD
+
+**Test Coverage:**
+- Current weather for multiple cities (New York, London)
+- Weather forecasts (San Francisco)
+- Coordinate-based weather requests (Tokyo)
+- Error handling for invalid locations
+
+**Security:**
+- API keys automatically censored in cassette recordings
+- Safe to commit cassettes to version control
+- No sensitive data exposure in test artifacts
 
 ## Code Quality
 
@@ -322,6 +367,7 @@ src/test/java/com.jasonriddle.mcp/
 │   └── package-info.java                          # Package documentation
 └── weather/                                        # Weather service tests
     ├── WeatherServiceTest.java                    # Tests for weather service
+    ├── WeatherServiceVCRIntegrationTest.java      # VCR integration tests for weather API
     └── package-info.java                          # Package documentation
 ```
 

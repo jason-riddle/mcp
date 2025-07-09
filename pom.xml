@@ -135,6 +135,13 @@
             <artifactId>mockito-junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- EasyVCR for HTTP interaction recording/replaying in tests -->
+        <dependency>
+            <groupId>com.easypost</groupId>
+            <artifactId>easyvcr</artifactId>
+            <version>0.5.3</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <!-- Build Configuration -->
@@ -415,6 +422,29 @@
                                 <maven.home>${maven.home}</maven.home>
                                 <permutation.test.max.size>10</permutation.test.max.size>
                                 <permutation.test.timeout>540</permutation.test.timeout>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <!-- VCR Testing Profile -->
+        <profile>
+            <id>vcr-tests</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <version>${surefire-plugin.version}</version>
+                        <configuration>
+                            <includes>
+                                <include>**/*VCRTest.java</include>
+                                <include>**/*VCRIntegrationTest.java</include>
+                            </includes>
+                            <systemPropertyVariables>
+                                <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+                                <maven.home>${maven.home}</maven.home>
+                                <vcr.mode>replay</vcr.mode>
                             </systemPropertyVariables>
                         </configuration>
                     </plugin>
