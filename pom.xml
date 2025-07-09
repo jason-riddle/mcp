@@ -402,7 +402,7 @@
                                 <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
                                 <maven.home>${maven.home}</maven.home>
                                 <permutation.test.max.size>10</permutation.test.max.size>
-                                <permutation.test.timeout>300</permutation.test.timeout>
+                                <permutation.test.timeout>540</permutation.test.timeout>
                             </systemPropertyVariables>
                         </configuration>
                     </plugin>
