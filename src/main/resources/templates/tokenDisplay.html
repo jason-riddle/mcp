@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MCP Access Token</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        .user-info {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .token-section {
+            margin: 25px 0;
+        }
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            background: #f8f9fa;
+            resize: vertical;
+        }
+        .usage-examples {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        code {
+            background: #e9ecef;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .copy-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .copy-btn:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 MCP Access Token</h1>
+
+        <div class="user-info">
+            <h3>Welcome, {userName}!</h3>
+            <p><strong>Login:</strong> {userLogin}</p>
+            <p><strong>Roles:</strong> {userRoles}</p>
+        </div>
+
+        <div class="warning">
+            <strong>⚠️ Security Notice:</strong> This token provides access to your MCP server.
+            Keep it secure and do not share it. In production, tokens should be obtained through
+            secure OAuth flows rather than displayed in browser pages.
+        </div>
+
+        <div class="token-section">
+            <h3>Your MCP Access Token</h3>
+            <textarea id="accessToken" readonly rows="6" cols="80">{accessToken}</textarea>
+            <button class="copy-btn" onclick="copyToken()">📋 Copy Token</button>
+        </div>
+
+        <div class="usage-examples">
+            <h3>Usage Examples</h3>
+
+            <h4>MCP Inspector</h4>
+            <ol>
+                <li>Run: <code>npx @modelcontextprotocol/inspector</code></li>
+                <li>Set Transport Type to "SSE"</li>
+                <li>Set URL to your MCP server (e.g., <code>http://localhost:8080/mcp/sse</code>)</li>
+                <li>Click "Authorization" and paste your token in the "Bearer Token" field</li>
+                <li>Connect and test your tools</li>
+            </ol>
+
+            <h4>Curl Example</h4>
+            <p>Use the token in the Authorization header:</p>
+            <code>curl -H "Authorization: Bearer YOUR_TOKEN" http://localhost:8080/mcp/sse</code>
+
+            <h4>MCP Client Configuration</h4>
+            <p>For Claude Desktop or other MCP clients:</p>
+            <pre><code>{
+  "mcpServers": {
+    "memory-server": {
+      "url": "http://localhost:8080/mcp/sse",
+      "headers": {
+        "Authorization": "Bearer YOUR_TOKEN"
+      }
+    }
+  }
+}</code></pre>
+        </div>
+    </div>
+
+    <script>
+        function copyToken() {
+            const tokenField = document.getElementById('accessToken');
+            tokenField.select();
+            tokenField.setSelectionRange(0, 99999); // For mobile devices
+            document.execCommand('copy');
+
+            const button = document.querySelector('.copy-btn');
+            const originalText = button.textContent;
+            button.textContent = '✅ Copied!';
+            button.style.background = '#28a745';
+
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = '#007bff';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

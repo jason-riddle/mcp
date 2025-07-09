@@ -4,8 +4,12 @@ import com.jasonriddle.mcp.memory.Entity;
 import com.jasonriddle.mcp.memory.MemoryGraph;
 import com.jasonriddle.mcp.memory.MemoryService;
 import com.jasonriddle.mcp.memory.Relation;
+import io.quarkiverse.mcp.server.McpLog;
 import io.quarkiverse.mcp.server.Tool;
 import io.quarkiverse.mcp.server.ToolArg;
+import io.quarkus.security.Authenticated;
+import io.quarkus.security.identity.SecurityIdentity;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.List;
@@ -15,10 +19,14 @@ import java.util.Map;
  * MCP memory tools for knowledge graph operations.
  */
 @ApplicationScoped
+@Authenticated
 public final class McpMemoryTools {
 
     @Inject
     MemoryService memoryService;
+
+    @Inject
+    SecurityIdentity identity;
 
     /**
      * Creates multiple new entities in the knowledge graph.
@@ -29,7 +37,8 @@ public final class McpMemoryTools {
     @Tool(name = "memory_create_entities", description = "Create multiple new entities in the knowledge graph")
     public String createEntities(
             @ToolArg(description = "Array of entities with name, entityType, and observations")
-                    final List<Map<String, Object>> entities) {
+                    final List<Map<String, Object>> entities,
+            final McpLog log) {
         final List<Entity> entitiesToCreate = new java.util.ArrayList<>();
 
         for (final Map<String, Object> entityData : entities) {
@@ -45,6 +54,8 @@ public final class McpMemoryTools {
         }
 
         final List<Entity> created = memoryService.createEntities(entitiesToCreate);
+        final String userName = identity.getPrincipal().getName();
+        log.info("User %s created %d entities", userName, created.size());
         return "Created " + created.size() + " entities";
     }
 
@@ -109,9 +120,13 @@ public final class McpMemoryTools {
      * @return deleted entity names as JSON string.
      */
     @Tool(name = "memory_delete_entities", description = "Remove entities and their relations from the knowledge graph")
+    @RolesAllowed("admin")
     public String deleteEntities(
-            @ToolArg(description = "Array of entity names to delete") final List<String> entityNames) {
+            @ToolArg(description = "Array of entity names to delete") final List<String> entityNames,
+            final McpLog log) {
         final List<String> deleted = memoryService.deleteEntities(entityNames);
+        final String userName = identity.getPrincipal().getName();
+        log.info("Admin user %s deleted %d entities", userName, deleted.size());
         return "Deleted " + deleted.size() + " entities";
     }
 
