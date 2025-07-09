@@ -8,6 +8,7 @@ import io.quarkiverse.mcp.server.Tool;
 import io.quarkiverse.mcp.server.ToolArg;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -98,7 +99,11 @@ public final class McpMemoryTools {
         }
 
         final Map<String, List<String>> added = memoryService.addObservations(observationMap);
-        final int totalAdded = added.values().stream().mapToInt(List::size).sum();
+        final Collection<List<String>> observationLists = added.values();
+        int totalAdded = 0;
+        for (List<String> observationList : observationLists) {
+            totalAdded += observationList.size();
+        }
         return "Added " + totalAdded + " observations to " + added.size() + " entities";
     }
 
@@ -138,7 +143,11 @@ public final class McpMemoryTools {
         }
 
         final Map<String, List<String>> deleted = memoryService.deleteObservations(deletionMap);
-        final int totalDeleted = deleted.values().stream().mapToInt(List::size).sum();
+        final Collection<List<String>> deletionLists = deleted.values();
+        int totalDeleted = 0;
+        for (List<String> deletionList : deletionLists) {
+            totalDeleted += deletionList.size();
+        }
         return "Deleted " + totalDeleted + " observations from " + deleted.size() + " entities";
     }
 

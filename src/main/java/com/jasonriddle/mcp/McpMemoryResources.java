@@ -12,9 +12,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Set;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 /**
@@ -38,10 +40,19 @@ public final class McpMemoryResources {
     @Resource(uri = "memory://types")
     TextResourceContents typesResource() {
         final MemoryGraph graph = memoryService.readGraph();
-        final Map<String, Long> entityTypeCounts =
-                graph.entities().stream().collect(Collectors.groupingBy(Entity::entityType, Collectors.counting()));
-        final Map<String, Long> relationTypeCounts = graph.relations().stream()
-                .collect(Collectors.groupingBy(Relation::relationType, Collectors.counting()));
+        final List<Entity> allEntitiesForCounting = graph.entities();
+        final Map<String, Long> entityTypeCounts = new HashMap<>();
+        for (final Entity entity : allEntitiesForCounting) {
+            final String entityType = entity.entityType();
+            entityTypeCounts.merge(entityType, 1L, Long::sum);
+        }
+
+        final List<Relation> allRelationsForCounting = graph.relations();
+        final Map<String, Long> relationTypeCounts = new HashMap<>();
+        for (final Relation relation : allRelationsForCounting) {
+            final String relationType = relation.relationType();
+            relationTypeCounts.merge(relationType, 1L, Long::sum);
+        }
 
         final StringBuilder content = new StringBuilder();
         content.append("# Memory Graph Types and Patterns\n\n");
@@ -130,13 +141,20 @@ public final class McpMemoryResources {
                 .append(graph.relations().size())
                 .append("\n");
 
-        final int totalObservations =
-                graph.entities().stream().mapToInt(e -> e.observations().size()).sum();
+        final List<Entity> allEntities = graph.entities();
+        int totalObservations = 0;
+        for (Entity e : allEntities) {
+            totalObservations += e.observations().size();
+        }
         content.append("- **Total Observations:** ").append(totalObservations).append("\n\n");
 
         // Entity type breakdown
-        final Map<String, Long> entityTypeCounts =
-                graph.entities().stream().collect(Collectors.groupingBy(Entity::entityType, Collectors.counting()));
+        final List<Entity> entities = graph.entities();
+        final Map<String, Long> entityTypeCounts = new HashMap<>();
+        for (final Entity entity : entities) {
+            final String entityType = entity.entityType();
+            entityTypeCounts.merge(entityType, 1L, Long::sum);
+        }
 
         content.append("## Entity Types\n\n");
         if (entityTypeCounts.isEmpty()) {
@@ -153,8 +171,12 @@ public final class McpMemoryResources {
         content.append("\n");
 
         // Relation type breakdown
-        final Map<String, Long> relationTypeCounts = graph.relations().stream()
-                .collect(Collectors.groupingBy(Relation::relationType, Collectors.counting()));
+        final List<Relation> relations = graph.relations();
+        final Map<String, Long> relationTypeCounts = new HashMap<>();
+        for (final Relation relation : relations) {
+            final String relationType = relation.relationType();
+            relationTypeCounts.merge(relationType, 1L, Long::sum);
+        }
 
         content.append("## Relation Types\n\n");
         if (relationTypeCounts.isEmpty()) {
@@ -197,28 +219,53 @@ public final class McpMemoryResources {
         content.append("## Data Integrity\n\n");
 
         // Check for orphaned relations
-        final List<String> entityNames =
-                graph.entities().stream().map(Entity::name).collect(Collectors.toList());
+        final List<Entity> allEntities = graph.entities();
+        final Set<String> entityNames = new HashSet<>();
+        for (final Entity entity : allEntities) {
+            entityNames.add(entity.name());
+        }
 
-        final long orphanedRelations = graph.relations().stream()
-                .filter(r -> !entityNames.contains(r.from()) || !entityNames.contains(r.to()))
-                .count();
+        final List<Relation> allRelations = graph.relations();
+        long orphanedRelations = 0;
+        for (final Relation relation : allRelations) {
+            final boolean fromExists = entityNames.contains(relation.from());
+            final boolean toExists = entityNames.contains(relation.to());
+            if (!fromExists || !toExists) {
+                orphanedRelations++;
+            }
+        }
 
         content.append("- **Orphaned Relations:** ").append(orphanedRelations).append("\n");
 
         // Check for entities with no observations
-        final long emptyEntities = graph.entities().stream()
-                .filter(e -> e.observations().isEmpty())
-                .count();
+        long emptyEntities = 0;
+        for (Entity e : graph.entities()) {
+            if (e.observations().isEmpty()) {
+                emptyEntities++;
+            }
+        }
         content.append("- **Entities with No Observations:** ")
                 .append(emptyEntities)
                 .append("\n");
 
         // Check for isolated entities (no relations)
-        final long isolatedEntities = graph.entities().stream()
-                .filter(e ->
-                        graph.relations().stream().noneMatch(r -> r.from().equals(e.name()) || r.to().equals(e.name())))
-                .count();
+        final List<Entity> entities = graph.entities();
+        final List<Relation> relations = graph.relations();
+
+        // Create sets of entity names that appear in relations for efficient lookup
+        final Set<String> entitiesInRelations = new HashSet<>();
+        for (final Relation relation : relations) {
+            entitiesInRelations.add(relation.from());
+            entitiesInRelations.add(relation.to());
+        }
+
+        long isolatedEntities = 0;
+        for (final Entity entity : entities) {
+            final boolean isConnected = entitiesInRelations.contains(entity.name());
+            if (!isConnected) {
+                isolatedEntities++;
+            }
+        }
         content.append("- **Isolated Entities:** ").append(isolatedEntities).append("\n");
 
         content.append("\n## Health Status\n\n");
