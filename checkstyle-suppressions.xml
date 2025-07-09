@@ -15,10 +15,6 @@
     <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="RegexpSinglelineJava"/>
     <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="VisibilityModifier"/>
 
-    <!-- Complexity checks only for test files -->
-    <suppress files="[/\\]src[/\\]main[/\\]java[/\\]" checks="CyclomaticComplexity"/>
-    <suppress files="[/\\]src[/\\]main[/\\]java[/\\]" checks="NPathComplexity"/>
-
     <!-- Integration test naming patterns -->
     <suppress files=".*IT\.java" checks="AbbreviationAsWordInName"/>
     <suppress files=".*IntegrationTest\.java" checks="AbbreviationAsWordInName"/>
