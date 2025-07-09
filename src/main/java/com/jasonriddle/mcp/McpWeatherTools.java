@@ -36,13 +36,8 @@ public final class McpWeatherTools {
             return Map.of(
                     "location", weather.location(),
                     "temperature", weather.temperature(),
-                    "feels_like", weather.feelsLike(),
-                    "humidity", weather.humidity(),
                     "condition", weather.condition(),
                     "description", weather.description(),
-                    "wind_speed", weather.windSpeed(),
-                    "wind_direction", weather.windDirection(),
-                    "visibility", weather.visibility(),
                     "timestamp", weather.timestamp().toString());
         } catch (final WeatherService.WeatherServiceException e) {
             return Map.of("error", "Unable to fetch current weather: " + e.getMessage());
@@ -68,14 +63,10 @@ public final class McpWeatherTools {
             for (final WeatherForecast forecast : forecasts) {
                 final Map<String, Object> forecastMap = Map.of(
                         "date", forecast.date(),
-                        "day_name", forecast.dayName(),
                         "high_temp", forecast.highTemp(),
                         "low_temp", forecast.lowTemp(),
                         "condition", forecast.condition(),
-                        "description", forecast.description(),
-                        "humidity", forecast.humidity(),
-                        "wind_speed", forecast.windSpeed(),
-                        "precipitation", forecast.precipitation());
+                        "description", forecast.description());
                 result.add(forecastMap);
             }
             return result;

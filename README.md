@@ -328,18 +328,13 @@ The server provides MCP tools for accessing real-time weather information and fo
 {
   "location": "New York",
   "temperature": 72.5,
-  "feels_like": 75.2,
-  "humidity": 65,
   "condition": "Clear",
   "description": "clear sky",
-  "wind_speed": 5.5,
-  "wind_direction": 180,
-  "visibility": 10.0,
   "timestamp": "2024-03-15T14:30:00Z"
 }
 ```
 
-*Supports city names, coordinates (lat,lon), and various location formats. All temperatures in Fahrenheit, wind speeds in mph.*
+*Supports city names, coordinates (lat,lon), and various location formats. All temperatures in Fahrenheit.*
 
 #### Weather Forecasts
 
@@ -356,30 +351,22 @@ The server provides MCP tools for accessing real-time weather information and fo
 [
   {
     "date": "2024-03-15",
-    "day_name": "Friday",
     "high_temp": 68.0,
     "low_temp": 52.0,
     "condition": "Partly Cloudy",
-    "description": "partly cloudy",
-    "humidity": 70,
-    "wind_speed": 12.5,
-    "precipitation": 0.0
+    "description": "partly cloudy"
   },
   {
     "date": "2024-03-16",
-    "day_name": "Saturday",
     "high_temp": 65.0,
     "low_temp": 48.0,
     "condition": "Rain",
-    "description": "light rain",
-    "humidity": 85,
-    "wind_speed": 8.2,
-    "precipitation": 0.15
+    "description": "light rain"
   }
 ]
 ```
 
-*Forecast supports 1-5 days ahead. Precipitation values in inches.*
+*Forecast supports 1-5 days ahead.*
 
 #### Weather Alerts
 

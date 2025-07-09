@@ -50,13 +50,8 @@ final class McpWeatherToolsTest {
         assertNotNull(result);
         assertEquals("New York", result.get("location"));
         assertEquals(72.5, result.get("temperature"));
-        assertEquals(75.2, result.get("feels_like"));
-        assertEquals(65, result.get("humidity"));
         assertEquals("Clear", result.get("condition"));
         assertEquals("clear sky", result.get("description"));
-        assertEquals(5.5, result.get("wind_speed"));
-        assertEquals(180, result.get("wind_direction"));
-        assertEquals(10.0, result.get("visibility"));
         assertTrue(result.containsKey("timestamp"));
 
         verify(weatherService).getCurrentWeather("New York");
@@ -96,25 +91,17 @@ final class McpWeatherToolsTest {
 
         final Map<String, Object> first = result.get(0);
         assertEquals("2024-01-15", first.get("date"));
-        assertEquals("Monday", first.get("day_name"));
         assertEquals(75.0, first.get("high_temp"));
         assertEquals(65.0, first.get("low_temp"));
         assertEquals("Clouds", first.get("condition"));
         assertEquals("scattered clouds", first.get("description"));
-        assertEquals(70, first.get("humidity"));
-        assertEquals(7.2, first.get("wind_speed"));
-        assertEquals(0.0, first.get("precipitation"));
 
         final Map<String, Object> second = result.get(1);
         assertEquals("2024-01-16", second.get("date"));
-        assertEquals("Tuesday", second.get("day_name"));
         assertEquals(78.0, second.get("high_temp"));
         assertEquals(68.0, second.get("low_temp"));
         assertEquals("Rain", second.get("condition"));
         assertEquals("light rain", second.get("description"));
-        assertEquals(75, second.get("humidity"));
-        assertEquals(6.8, second.get("wind_speed"));
-        assertEquals(0.25, second.get("precipitation"));
 
         verify(weatherService).getForecast("New York", 2);
     }
