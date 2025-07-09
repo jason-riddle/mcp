@@ -211,8 +211,6 @@ jobs:
             TodoWrite
             Task
             Bash
-          additional_permissions: |
-            actions: read
           claude_env: |
             JAVA_HOME: /opt/java/openjdk
             MAVEN_OPTS: -Xmx2g
