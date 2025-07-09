@@ -32,7 +32,6 @@
 
     <!-- 4. Formatting Tool Conflicts -->
     <!-- Handle conflicts between Checkstyle and Spotless/Palantir Java Format -->
-    <suppress files=".*/response/.*\.java|.*Response\.java" checks="WhitespaceAround"/>
 
     <!-- 5. Project-Specific Template Classes -->
     <!-- Allow longer lines for method chaining in resource/prompt classes -->
