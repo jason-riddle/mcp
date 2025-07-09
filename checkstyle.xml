@@ -341,13 +341,13 @@
 
         <!-- Code Complexity Metrics -->
         <module name="CyclomaticComplexity">
-            <property name="max" value="12"/>
+            <property name="max" value="8"/>
             <property name="switchBlockAsSingleDecisionPoint" value="true"/>
             <message key="cyclomaticComplexity" value="Method complexity is {0,number,integer} (max allowed is {1,number,integer}). Consider breaking down this method."/>
         </module>
 
         <module name="NPathComplexity">
-            <property name="max" value="150"/>
+            <property name="max" value="100"/>
             <message key="npathComplexity" value="Method NPATH complexity is {0,number,integer} (max allowed is {1,number,integer}). Consider simplifying this method."/>
         </module>
 

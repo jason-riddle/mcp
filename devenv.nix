@@ -94,6 +94,16 @@
       pass_filenames = false;
     };
 
+    # PMD cognitive complexity validation
+    # pmd-cognitive-complexity = {
+    #   enable = true;
+    #   name = "pmd-cognitive-complexity";
+    #   entry = "./mvnw pmd:check";
+    #   language = "system";
+    #   files = "\\.java$";
+    #   pass_filenames = false;
+    # };
+
     # Javadoc validation
     javadoc-check = {
       enable = true;

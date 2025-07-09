@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<ruleset name="Cognitive Complexity Rules"
+         xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+
+    <description>
+        PMD ruleset for cognitive complexity enforcement in jasons-mcp-server.
+        Based on SonarSource cognitive complexity methodology.
+    </description>
+
+    <!-- Cognitive Complexity Rule -->
+    <rule ref="category/java/design.xml/CognitiveComplexity">
+        <properties>
+            <property name="reportLevel" value="15" />
+        </properties>
+    </rule>
+
+</ruleset>
