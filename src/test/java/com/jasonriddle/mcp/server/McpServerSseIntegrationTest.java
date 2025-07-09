@@ -112,4 +112,16 @@ final class McpServerSseIntegrationTest extends McpIntegrationTestBase {
     void shouldDiscoverResources() throws Exception {
         testResourceDiscovery();
     }
+
+    @Test
+    @Order(6)
+    void shouldExecuteGetCurrentTimeTool() throws Exception {
+        testGetCurrentTime();
+    }
+
+    @Test
+    @Order(7)
+    void shouldExecuteConvertTimeTool() throws Exception {
+        testConvertTime();
+    }
 }

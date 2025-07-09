@@ -294,6 +294,18 @@ final class McpServerStdioIntegrationTest extends McpIntegrationTestBase {
         assertFalse(foundDeletedInSearch, "CrudTestEntity should not be found in search after deletion");
     }
 
+    @Test
+    @Order(8)
+    void shouldExecuteGetCurrentTimeTool() throws Exception {
+        testGetCurrentTime();
+    }
+
+    @Test
+    @Order(9)
+    void shouldExecuteConvertTimeTool() throws Exception {
+        testConvertTime();
+    }
+
     /**
      * Determines the path to the packaged Quarkus JAR for subprocess execution.
      * This method looks for the standard Quarkus build output locations.

@@ -237,6 +237,77 @@ abstract class McpIntegrationTestBase {
     }
 
     /**
+     * Tests the get_current_time tool functionality.
+     */
+    protected void testGetCurrentTime() throws Exception {
+        String argsJson = objectMapper.writeValueAsString(Map.of("timezone", "America/New_York"));
+
+        String result = mcpClient.executeTool(ToolExecutionRequest.builder()
+                .name("get_current_time")
+                .arguments(argsJson)
+                .build());
+
+        assertNotNull(result);
+        assertTrue(result.length() > 0);
+
+        JsonNode resultNode = objectMapper.readTree(result);
+        assertNotNull(resultNode);
+        assertTrue(resultNode.has("timezone"));
+        assertTrue(resultNode.has("datetime"));
+        assertTrue(resultNode.has("is_dst"));
+
+        // Verify expected values
+        assertTrue(resultNode.get("timezone").asText().equals("America/New_York"));
+        assertTrue(resultNode
+                .get("datetime")
+                .asText()
+                .matches("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}[+-]\\d{2}:\\d{2}"));
+        assertTrue(resultNode.get("is_dst").isBoolean());
+    }
+
+    /**
+     * Tests the convert_time tool functionality.
+     */
+    protected void testConvertTime() throws Exception {
+        String argsJson = objectMapper.writeValueAsString(Map.of(
+                "sourceTimezone", "America/New_York",
+                "time", "14:30",
+                "targetTimezone", "Europe/London"));
+
+        String result = mcpClient.executeTool(ToolExecutionRequest.builder()
+                .name("convert_time")
+                .arguments(argsJson)
+                .build());
+
+        assertNotNull(result);
+        assertTrue(result.length() > 0);
+
+        JsonNode resultNode = objectMapper.readTree(result);
+        assertNotNull(resultNode);
+        assertTrue(resultNode.has("source"));
+        assertTrue(resultNode.has("target"));
+        assertTrue(resultNode.has("time_difference"));
+
+        // Verify source structure
+        JsonNode source = resultNode.get("source");
+        assertTrue(source.has("timezone"));
+        assertTrue(source.has("datetime"));
+        assertTrue(source.has("is_dst"));
+        assertTrue(source.get("timezone").asText().equals("America/New_York"));
+
+        // Verify target structure
+        JsonNode target = resultNode.get("target");
+        assertTrue(target.has("timezone"));
+        assertTrue(target.has("datetime"));
+        assertTrue(target.has("is_dst"));
+        assertTrue(target.get("timezone").asText().equals("Europe/London"));
+
+        // Verify time difference format
+        String timeDiff = resultNode.get("time_difference").asText();
+        assertTrue(timeDiff.matches("[+-]\\d+(\\.\\d+)?h"));
+    }
+
+    /**
      * Cleans up the test memory file to ensure test isolation.
      */
     protected void cleanupTestMemoryFile() {
