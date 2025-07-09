@@ -36,7 +36,7 @@
         <!-- Quarkus Platform -->
         <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
-        <quarkus.platform.version>3.24.2</quarkus.platform.version>
+        <quarkus.platform.version>3.24.3</quarkus.platform.version>
 
         <!-- Plugin Versions -->
         <compiler-plugin.version>3.14.0</compiler-plugin.version>
@@ -287,7 +287,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
-                <version>3.25.0</version>
+                <version>3.27.0</version>
                 <configuration>
                     <rulesets>
                         <ruleset>cognitive-complexity-ruleset.xml</ruleset>
