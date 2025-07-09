@@ -42,6 +42,10 @@
         <property name="format" value="^\n\n$"/>
         <property name="message" value="Two consecutive blank lines are not permitted."/>
     </module>
+    <module name="RegexpSingleline">
+        <property name="format" value="\uFEFF"/>
+        <property name="message" value="UTF-8 BOM detected - files should not contain Byte Order Mark"/>
+    </module>
 
 
     <!-- Line Length Constraints -->
@@ -309,6 +313,18 @@
             <property name="ignoreComments" value="true"/>
         </module>
 
+        <!-- Modern Java Features Guidelines -->
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="var\s+\w+\s*=\s*new\s+\w+&lt;&gt;\(\)"/>
+            <property name="message" value="Avoid var with diamond operator - either use explicit type or var with clear initialization"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="var\s+\w+\s*=\s*[^;]{50,}"/>
+            <property name="message" value="Avoid var with complex right-hand side - extract to intermediate variable for clarity"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+
         <!-- 4. Code Style -->
 
         <!-- Whitespace -->
@@ -361,6 +377,8 @@
         <!-- Javadoc Requirements -->
         <module name="JavadocMethod">
             <property name="tokens" value="METHOD_DEF"/>
+            <property name="allowMissingParamTags" value="false"/>
+            <property name="allowMissingReturnTag" value="false"/>
         </module>
         <module name="JavadocType">
             <property name="tokens" value="CLASS_DEF, INTERFACE_DEF, ENUM_DEF"/>
@@ -373,6 +391,8 @@
         </module>
         <module name="MissingJavadocMethod">
             <property name="tokens" value="METHOD_DEF"/>
+            <property name="allowMissingPropertyJavadoc" value="true"/>
+            <property name="scope" value="public"/>
         </module>
         <module name="MissingJavadocType">
             <property name="tokens" value="CLASS_DEF, INTERFACE_DEF, ENUM_DEF"/>
