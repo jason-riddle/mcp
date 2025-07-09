@@ -7,7 +7,7 @@
     <artifactId>jasons-mcp-server</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>Jason's MCP Server</name>
-    <description>A Model Context Protocol (MCP) server with memory graph capabilities</description>
+    <description>A Model Context Protocol (MCP) server with memory graph and time/timezone capabilities</description>
 
     <!-- SCM Information -->
     <scm>

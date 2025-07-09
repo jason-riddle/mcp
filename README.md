@@ -14,7 +14,7 @@ A Model Context Protocol (MCP) server implementation with persistent memory grap
 
 ## Overview
 
-The MCP Memory Server implements the Model Context Protocol to provide persistent memory capabilities for AI agents and applications. It maintains a knowledge graph of entities, relations, and observations that can be queried and modified through standardized MCP tools and resources.
+The MCP Server implements the Model Context Protocol to provide persistent memory capabilities and time/timezone utilities for AI agents and applications. It maintains a knowledge graph of entities, relations, and observations that can be queried and modified through standardized MCP tools and resources. Additionally, it provides time and timezone conversion tools for working with different time zones.
 
 ## Quick Start
 
@@ -147,6 +147,24 @@ The server provides MCP tools for managing a persistent knowledge graph:
   - Description: Retrieve specific nodes by name
   - Parameters:
     - `names` (array): Array of entity names to retrieve
+  - Read-only: **true**
+
+### Time Tools
+
+The server provides MCP tools for time and timezone operations:
+
+- **get_current_time**
+  - Description: Get current time in a specific timezone
+  - Parameters:
+    - `timezone` (string): IANA timezone name (e.g., "America/New_York", "Europe/London")
+  - Read-only: **true**
+
+- **convert_time**
+  - Description: Convert time between timezones
+  - Parameters:
+    - `sourceTimezone` (string): Source IANA timezone name
+    - `time` (string): Time to convert in 24-hour format (HH:MM)
+    - `targetTimezone` (string): Target IANA timezone name
   - Read-only: **true**
 
 ### Memory Resources

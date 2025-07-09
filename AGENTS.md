@@ -74,6 +74,7 @@ make test-integration                 # Run integration tests
 # ./mvnw verify -DskipITs=false
 
 ./mvnw test -Dtest=MemoryServiceTest  # Run specific test class
+./mvnw test -Dtest=TimeServiceTest   # Run time service tests
 ```
 
 ## Code Quality
@@ -212,13 +213,18 @@ com.jasonriddle.mcp/
 ├── McpMemoryPrompts.java      # MCP prompts providing memory guidance
 ├── McpMemoryResources.java    # MCP resources (memory://) for graph access
 ├── McpMemoryTools.java        # MCP tools for graph operations
+├── McpTimeTools.java          # MCP tools for time and timezone operations
 ├── package-info.java          # Package documentation
-└── memory/                    # Memory graph implementation
-    ├── Entity.java            # Entity record representing graph nodes
-    ├── MemoryGraph.java       # Complete graph structure record
-    ├── MemoryRecord.java      # Base interface for JSONL records
-    ├── MemoryService.java     # Core service for graph persistence and operations
-    ├── Relation.java          # Relation record representing graph edges
+├── memory/                    # Memory graph implementation
+│   ├── Entity.java            # Entity record representing graph nodes
+│   ├── MemoryGraph.java       # Complete graph structure record
+│   ├── MemoryRecord.java      # Base interface for JSONL records
+│   ├── MemoryService.java     # Core service for graph persistence and operations
+│   ├── Relation.java          # Relation record representing graph edges
+│   └── package-info.java      # Package documentation
+└── time/                      # Time and timezone services
+    ├── TimeConversionResult.java  # Result record for time conversions
+    ├── TimeService.java       # Core service for time operations
     └── package-info.java      # Package documentation
 ```
 
@@ -229,6 +235,7 @@ com.jasonriddle.mcp/
 ├── McpMemoryPromptsTest.java                       # Tests for memory prompts
 ├── McpMemoryResourcesTest.java                     # Tests for memory resources
 ├── McpMemoryToolsTest.java                         # Tests for memory tools
+├── McpTimeToolsTest.java                           # Tests for time tools
 ├── package-info.java                               # Package documentation
 ├── config/                                         # Configuration tests
 │   ├── ConfigurationValidationTest.java           # Tests for configuration validation
@@ -236,11 +243,14 @@ com.jasonriddle.mcp/
 ├── memory/                                         # Memory implementation tests
 │   ├── MemoryServiceTest.java                     # Tests for memory service
 │   └── package-info.java                          # Package documentation
-└── server/                                         # Server integration tests
-    ├── McpIntegrationTestBase.java                 # Base class for integration tests
-    ├── McpServerSseIntegrationTest.java            # Integration tests for SSE server
-    ├── McpServerStdioIntegrationTest.java          # Integration tests for STDIO server
-    └── package-info.java                           # Package documentation
+├── server/                                         # Server integration tests
+│   ├── McpIntegrationTestBase.java                 # Base class for integration tests
+│   ├── McpServerSseIntegrationTest.java            # Integration tests for SSE server
+│   ├── McpServerStdioIntegrationTest.java          # Integration tests for STDIO server
+│   └── package-info.java                          # Package documentation
+└── time/                                           # Time service tests
+    ├── TimeServiceTest.java                       # Tests for time service
+    └── package-info.java                          # Package documentation
 ```
 
 **Note**: Authentication integration tests were removed because authentication is not functional for MCP STDIO endpoints.
@@ -248,18 +258,20 @@ com.jasonriddle.mcp/
 ### Package Documentation
 
 Each package contains a `package-info.java` file with purpose and responsibilities:
-- **Root package** (`com.jasonriddle.mcp`): Model Context Protocol server implementation with memory graph capabilities
+- **Root package** (`com.jasonriddle.mcp`): Model Context Protocol server implementation with memory graph and time capabilities
 - **Memory package** (`com.jasonriddle.mcp.memory`): Memory graph implementation for the MCP server
+- **Time package** (`com.jasonriddle.mcp.time`): Time and timezone conversion services for the MCP server
 - **Test packages**: Corresponding test suites for implementation verification
   - **Config test package** (`com.jasonriddle.mcp.config`): Configuration validation tests
   - **Memory test package** (`com.jasonriddle.mcp.memory`): Memory service tests
+  - **Time test package** (`com.jasonriddle.mcp.time`): Time service tests
   - **Server test package** (`com.jasonriddle.mcp.server`): Integration tests for MCP server implementations
 
 ### Design Principles
 
 - **Feature-based organization**: Packages organized around functional areas rather than technical layers
 - **Minimal dependencies**: Each package has clear, minimal dependencies on other packages
-- **Clear separation**: MCP-specific classes in root, domain logic in memory package
+- **Clear separation**: MCP-specific classes in root, domain logic in memory and time packages
 - **Consistent naming**: Package names reflect their primary responsibility
 - **Single responsibility**: Each package has one clear purpose and set of related classes
 
