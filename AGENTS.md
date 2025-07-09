@@ -261,7 +261,7 @@ This project follows a feature-based package organization.
 ### Main Package Structure
 
 ```text
-com.jasonriddle.mcp/
+src/main/java/com.jasonriddle.mcp/
 ├── McpMemoryPrompts.java      # MCP prompts providing memory guidance
 ├── McpMemoryResources.java    # MCP resources (memory://) for graph access
 ├── McpMemoryTools.java        # MCP tools for graph operations
@@ -283,7 +283,7 @@ com.jasonriddle.mcp/
 ### Test Package Structure
 
 ```text
-com.jasonriddle.mcp/
+src/test/java/com.jasonriddle.mcp/
 ├── McpMemoryPromptsTest.java                       # Tests for memory prompts
 ├── McpMemoryResourcesTest.java                     # Tests for memory resources
 ├── McpMemoryToolsTest.java                         # Tests for memory tools
