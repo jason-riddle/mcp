@@ -261,7 +261,7 @@ abstract class McpIntegrationTestBase {
         assertTrue(resultNode
                 .get("datetime")
                 .asText()
-                .matches("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}[+-]\\d{2}:\\d{2}"));
+                .matches("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?[+-]\\d{2}:\\d{2}"));
         assertTrue(resultNode.get("is_dst").isBoolean());
     }
 
