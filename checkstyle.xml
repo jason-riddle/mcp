@@ -292,6 +292,18 @@
             <property name="ignoreComments" value="true"/>
         </module>
 
+        <!-- Ban meaningless test assertions -->
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="assertTrue\s*\(\s*true\s*\)"/>
+            <property name="message" value="assertTrue(true) is meaningless - write a meaningful assertion instead"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="assertFalse\s*\(\s*false\s*\)"/>
+            <property name="message" value="assertFalse(false) is meaningless - write a meaningful assertion instead"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+
         <!-- 4. Code Style -->
 
         <!-- Whitespace -->

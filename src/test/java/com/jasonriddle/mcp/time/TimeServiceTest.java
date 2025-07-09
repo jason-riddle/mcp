@@ -173,9 +173,9 @@ class TimeServiceTest {
         final boolean nyDst = timeService.isDaylightSavingTime(nyTime);
         final boolean londonDst = timeService.isDaylightSavingTime(londonTime);
 
-        // Both should be valid boolean values (always true)
-        assertTrue(true);
-        assertTrue(true);
+        // Both should be valid boolean values (not null)
+        assertNotNull(nyDst);
+        assertNotNull(londonDst);
     }
 
     @Test
@@ -247,8 +247,8 @@ class TimeServiceTest {
         final boolean currentDst = timeService.isDaylightSavingTime(currentTime);
         final boolean conversionDst = timeService.isDaylightSavingTime(conversion.sourceTime());
 
-        // Both should be valid boolean values (always true)
-        assertTrue(true);
-        assertTrue(true);
+        // Both should be valid boolean values (not null)
+        assertNotNull(currentDst);
+        assertNotNull(conversionDst);
     }
 }
