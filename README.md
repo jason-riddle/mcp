@@ -86,68 +86,150 @@ The server runs in STDIO mode, communicating via stdin/stdout for MCP protocol m
 
 ### Memory Tools
 
-The server provides MCP tools for managing a persistent knowledge graph:
+The server provides MCP tools for managing a persistent knowledge graph. This section walks you through the typical workflow from discovery to building and maintaining your knowledge base.
 
-#### Entity Management
+#### Getting Started - Discovery & Exploration
 
-- **memory_create_entities**
-  - Description: Create multiple new entities in the knowledge graph
-  - Parameters:
-    - `entities` (array): Array of entities with name, entityType, and observations
-  - Read-only: **false**
+Before creating new entities, explore what already exists in your memory graph:
 
-- **memory_delete_entities**
-  - Description: Remove entities and their relations from the knowledge graph
-  - Parameters:
-    - `entityNames` (array): Array of entity names to delete
-  - Read-only: **false**
+**memory_search_nodes** - Search for existing entities and content
+```json
+{
+  "query": "Jason"
+}
+```
+*Use this to find entities by name, type, or content. Search for "person", "preferences", or specific topics.*
 
-#### Relationship Management
+**memory_open_nodes** - Get complete details for specific entities
+```json
+{
+  "names": ["Jason", "Technical_Preferences"]
+}
+```
+*Retrieve full entity information including all observations and relationships.*
 
-- **memory_create_relations**
-  - Description: Create multiple new relations between entities
-  - Parameters:
-    - `relations` (array): Array of relations with from, to, and relationType
-  - Read-only: **false**
+**memory_read_graph** - View the entire knowledge graph
+```json
+{}
+```
+*Get a complete picture of all entities, relations, and observations. Use sparingly for large graphs.*
 
-- **memory_delete_relations**
-  - Description: Remove specific relations from the knowledge graph
-  - Parameters:
-    - `relations` (array): Array of relations with from, to, and relationType
-  - Read-only: **false**
+#### Building Knowledge - Entities & Relationships
 
-#### Observation Management
+Once you understand your existing knowledge, start building:
 
-- **memory_add_observations**
-  - Description: Add new observations to existing entities
-  - Parameters:
-    - `observations` (array): Array of objects with entityName and contents
-  - Read-only: **false**
+**memory_create_entities** - Create new knowledge nodes
+```json
+{
+  "entities": [
+    {
+      "name": "Jason",
+      "entityType": "person",
+      "observations": ["Software developer", "Prefers dark themes", "Uses vim keybindings"]
+    },
+    {
+      "name": "Technical_Preferences",
+      "entityType": "preferences",
+      "observations": ["Dark mode enabled", "Vim keybindings preferred", "Monospace fonts"]
+    }
+  ]
+}
+```
+*Common entity types: `person`, `preferences`, `project`, `system`, `tool`*
 
-- **memory_delete_observations**
-  - Description: Remove specific observations from entities
-  - Parameters:
-    - `deletions` (array): Array of objects with entityName and observations to delete
-  - Read-only: **false**
+**memory_create_relations** - Link entities together
+```json
+{
+  "relations": [
+    {
+      "from": "Jason",
+      "to": "Technical_Preferences",
+      "relationType": "has_preferences"
+    },
+    {
+      "from": "Jason",
+      "to": "VSCode",
+      "relationType": "uses_tool"
+    }
+  ]
+}
+```
+*Common relation types: `has_preferences`, `works_on`, `uses_tool`, `manages_project`, `works_at`*
 
-#### Graph Operations
+#### Maintaining Data - Observations & Updates
 
-- **memory_read_graph**
-  - Description: Read the entire knowledge graph
-  - Parameters: None
-  - Read-only: **true**
+Keep your knowledge current by adding details and removing outdated information:
 
-- **memory_search_nodes**
-  - Description: Search for nodes in the knowledge graph based on a query
-  - Parameters:
-    - `query` (string): The search query to match against entity names, types, and observation content
-  - Read-only: **true**
+**memory_add_observations** - Add new facts to existing entities
+```json
+{
+  "observations": [
+    {
+      "entityName": "Jason",
+      "contents": ["Currently working on authentication module", "Learning Rust programming"]
+    },
+    {
+      "entityName": "Technical_Preferences",
+      "contents": ["Recently switched to Neovim", "Prefers TypeScript over JavaScript"]
+    }
+  ]
+}
+```
+*Add one fact per observation. Be specific and actionable.*
 
-- **memory_open_nodes**
-  - Description: Retrieve specific nodes by name
-  - Parameters:
-    - `names` (array): Array of entity names to retrieve
-  - Read-only: **true**
+#### Cleanup & Maintenance
+
+**memory_delete_entities** - Remove outdated entities
+```json
+{
+  "entityNames": ["Old_Project", "Deprecated_Tool"]
+}
+```
+*This also removes all relations involving these entities.*
+
+**memory_delete_relations** - Remove specific connections
+```json
+{
+  "relations": [
+    {
+      "from": "Jason",
+      "to": "Old_Company",
+      "relationType": "works_at"
+    }
+  ]
+}
+```
+
+**memory_delete_observations** - Remove outdated facts
+```json
+{
+  "deletions": [
+    {
+      "entityName": "Jason",
+      "observations": ["Learning Python", "New to programming"]
+    }
+  ]
+}
+```
+
+#### Common Patterns & Best Practices
+
+**Entity Naming Conventions:**
+- Use underscores for multi-word names: `Technical_Preferences`, `Project_Alpha`
+- Be descriptive: `Personal_Calendar` vs `Work_Calendar`
+- Stay consistent with existing patterns
+
+**Relationship Patterns:**
+- Use active voice: `Jason has_preferences Technical_Preferences`
+- Be specific: `currently_uses` vs `previously_used`
+- Include temporal context when relevant
+
+**Typical Workflow:**
+1. Search for existing entities (`memory_search_nodes`)
+2. Create new entities if needed (`memory_create_entities`)
+3. Link entities with relationships (`memory_create_relations`)
+4. Add details over time (`memory_add_observations`)
+5. Clean up outdated information (`memory_delete_*`)
 
 ### Time Tools
 
