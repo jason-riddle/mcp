@@ -9,6 +9,4 @@ import java.time.ZonedDateTime;
  * @param targetTime converted target time with timezone.
  * @param timeDifference formatted time difference string (e.g., "+5.0h", "-3.5h").
  */
-public record TimeConversionResult(
-        ZonedDateTime sourceTime, ZonedDateTime targetTime, String timeDifference) {
-}
+public record TimeConversionResult(ZonedDateTime sourceTime, ZonedDateTime targetTime, String timeDifference) {}
