@@ -17,8 +17,16 @@ public record MemoryGraph(List<Entity> entities, List<Relation> relations) {
      * @param relations list of all relations in the graph.
      */
     public MemoryGraph {
-        entities = entities != null ? List.copyOf(entities) : List.of();
-        relations = relations != null ? List.copyOf(relations) : List.of();
+        if (entities != null) {
+            entities = List.copyOf(entities);
+        } else {
+            entities = List.of();
+        }
+        if (relations != null) {
+            relations = List.copyOf(relations);
+        } else {
+            relations = List.of();
+        }
     }
 
     /**

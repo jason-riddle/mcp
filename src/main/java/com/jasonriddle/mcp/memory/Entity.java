@@ -18,18 +18,7 @@ public record Entity(
         @JsonProperty("observations") List<String> observations) {
 
     /**
-     * Creates an Entity with the given parameters.
-     *
-     * @param name unique identifier for the entity.
-     * @param entityType classification of the entity.
-     * @param observations list of atomic facts about the entity.
-     */
-    public Entity(final String name, final String entityType, final List<String> observations) {
-        this("entity", name, entityType, observations != null ? List.copyOf(observations) : List.of());
-    }
-
-    /**
-     * Creates an Entity with all parameters.
+     * Compact constructor for validation and processing.
      *
      * @param type the type of record.
      * @param name unique identifier for the entity.
@@ -40,6 +29,21 @@ public record Entity(
         if (type == null || type.isEmpty()) {
             type = "entity";
         }
-        observations = observations != null ? List.copyOf(observations) : List.of();
+        if (observations == null) {
+            observations = List.of();
+        } else {
+            observations = List.copyOf(observations);
+        }
+    }
+
+    /**
+     * Creates an Entity with the given parameters.
+     *
+     * @param name unique identifier for the entity.
+     * @param entityType classification of the entity.
+     * @param observations list of atomic facts about the entity.
+     */
+    public Entity(final String name, final String entityType, final List<String> observations) {
+        this("entity", name, entityType, observations);
     }
 }

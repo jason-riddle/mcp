@@ -40,7 +40,12 @@ public final class McpMemoryTools {
             final List<String> observations = (List<String>) entityData.get("observations");
 
             if (name != null && entityType != null) {
-                final Entity entity = new Entity(name, entityType, observations != null ? observations : List.of());
+                final Entity entity;
+                if (observations != null) {
+                    entity = new Entity(name, entityType, observations);
+                } else {
+                    entity = new Entity(name, entityType, List.of());
+                }
                 entitiesToCreate.add(entity);
             }
         }

@@ -221,6 +221,11 @@
             <property name="message" value="Contradictory expressions (x &amp;&amp; !x) are always false and should be removed"/>
             <property name="ignoreComments" value="true"/>
         </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\w+\s*\?\s*[^:]+\s*:\s*[^;]+"/>
+            <property name="message" value="Ternary operators are banned - use if-else statements for better readability"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
 
         <!-- Ban Optional chaining -->
         <module name="RegexpSinglelineJava">
