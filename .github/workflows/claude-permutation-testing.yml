@@ -76,8 +76,8 @@ jobs:
         uses: anthropics/claude-code-base-action@beta
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          timeout_minutes: 4
-          max_turns: "5"
+          timeout_minutes: 15
+          max_turns: "18"
           append_system_prompt: |
             You are an expert in permutation testing and software quality assurance for Java/Quarkus applications.
             Your role is to analyze code changes and determine the most effective permutation tests to run.
