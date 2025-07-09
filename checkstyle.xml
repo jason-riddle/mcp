@@ -160,6 +160,11 @@
             <property name="message" value="Extract object instantiation to separate variable before method call for better debugging"/>
             <property name="ignoreComments" value="true"/>
         </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="Map\.of\s*\([^)]*Map\.of\s*\("/>
+            <property name="message" value="Avoid nested Map.of calls - extract inner maps to separate variables for better readability"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
 
         <!-- 4. Code Style -->
 
