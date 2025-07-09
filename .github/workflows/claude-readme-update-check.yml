@@ -83,7 +83,7 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           timeout_minutes: 20
-          max_turns: "5"
+          max_turns: "7"
           prompt: |
             You are a documentation analyst. Follow these steps:
 
