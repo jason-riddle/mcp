@@ -185,9 +185,11 @@ public class MemoryService {
             for (Relation newRelation : relations) {
                 boolean exists = false;
                 for (Relation r : existingRelations) {
-                    if (r.from().equals(newRelation.from())
-                            && r.to().equals(newRelation.to())
-                            && r.relationType().equals(newRelation.relationType())) {
+                    final boolean fromMatches = r.from().equals(newRelation.from());
+                    final boolean toMatches = r.to().equals(newRelation.to());
+                    final boolean typeMatches = r.relationType().equals(newRelation.relationType());
+                    final boolean allFieldsMatch = fromMatches && toMatches;
+                    if (allFieldsMatch && typeMatches) {
                         exists = true;
                         break;
                     }

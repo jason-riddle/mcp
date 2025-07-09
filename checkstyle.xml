@@ -42,6 +42,11 @@
         <property name="format" value="^\n\n$"/>
         <property name="message" value="Two consecutive blank lines are not permitted."/>
     </module>
+    <module name="RegexpMultiline">
+        <property name="fileExtensions" value="java"/>
+        <property name="format" value="if\s*\([^{]*&amp;&amp;[^{]*&amp;&amp;[^{]*\)\s*\{"/>
+        <property name="message" value="Complex if statements with multiple &amp;&amp; operators are banned - extract conditions to separate boolean variables for better readability"/>
+    </module>
     <module name="RegexpSingleline">
         <property name="format" value="\uFEFF"/>
         <property name="message" value="UTF-8 BOM detected - files should not contain Byte Order Mark"/>
