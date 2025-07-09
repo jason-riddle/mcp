@@ -43,35 +43,41 @@ public final class TimeService {
      */
     public TimeConversionResult convertTime(
             final String sourceTimezone, final String timeString, final String targetTimezone) {
+
+        final ZoneId sourceZone = parseTimezone(sourceTimezone);
+        final ZoneId targetZone = parseTimezone(targetTimezone);
+        final LocalTime parsedTime = parseTimeString(timeString);
+
+        final LocalDate currentDate = LocalDate.now();
+        final ZonedDateTime sourceTime = ZonedDateTime.of(currentDate, parsedTime, sourceZone);
+        final ZonedDateTime targetTime = sourceTime.withZoneSameInstant(targetZone);
+
+        final String timeDifference = calculateTimeDifference(sourceTime, targetTime);
+
+        return new TimeConversionResult(sourceTime, targetTime, timeDifference);
+    }
+
+    private ZoneId parseTimezone(final String timezoneName) {
         try {
-            final ZoneId sourceZone = ZoneId.of(sourceTimezone);
-            final ZoneId targetZone = ZoneId.of(targetTimezone);
+            return ZoneId.of(timezoneName);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid timezone: " + timezoneName, e);
+        }
+    }
 
-            // Parse the time string
-            final LocalTime parsedTime = LocalTime.parse(timeString, TIME_FORMATTER);
-
-            // Use current date for conversion
-            final LocalDate currentDate = LocalDate.now();
-            final ZonedDateTime sourceTime = ZonedDateTime.of(currentDate, parsedTime, sourceZone);
-
-            // Convert to target timezone
-            final ZonedDateTime targetTime = sourceTime.withZoneSameInstant(targetZone);
-
-            // Calculate time difference
-            final long sourceOffsetSeconds = sourceTime.getOffset().getTotalSeconds();
-            final long targetOffsetSeconds = targetTime.getOffset().getTotalSeconds();
-            final double hoursDifference = (targetOffsetSeconds - sourceOffsetSeconds) / 3600.0;
-
-            // Format time difference
-            final String timeDifference = formatTimeDifference(hoursDifference);
-
-            return new TimeConversionResult(sourceTime, targetTime, timeDifference);
-
+    private LocalTime parseTimeString(final String timeString) {
+        try {
+            return LocalTime.parse(timeString, TIME_FORMATTER);
         } catch (DateTimeParseException e) {
             throw new IllegalArgumentException("Invalid time format. Expected HH:MM in 24-hour format", e);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid timezone: " + e.getMessage(), e);
         }
+    }
+
+    private String calculateTimeDifference(final ZonedDateTime sourceTime, final ZonedDateTime targetTime) {
+        final long sourceOffsetSeconds = sourceTime.getOffset().getTotalSeconds();
+        final long targetOffsetSeconds = targetTime.getOffset().getTotalSeconds();
+        final double hoursDifference = (targetOffsetSeconds - sourceOffsetSeconds) / 3600.0;
+        return formatTimeDifference(hoursDifference);
     }
 
     /**

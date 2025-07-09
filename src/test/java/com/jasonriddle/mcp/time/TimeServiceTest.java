@@ -54,7 +54,9 @@ class TimeServiceTest {
 
     @Test
     void testGetCurrentTimeWithInvalidTimezone() {
-        assertThrows(IllegalArgumentException.class, () -> timeService.getCurrentTime("Invalid/Timezone"));
+        final IllegalArgumentException exception =
+                assertThrows(IllegalArgumentException.class, () -> timeService.getCurrentTime("Invalid/Timezone"));
+        assertTrue(exception.getMessage().contains("Invalid timezone: Invalid/Timezone"));
     }
 
     @Test
@@ -104,32 +106,41 @@ class TimeServiceTest {
 
     @Test
     void testConvertTimeWithInvalidSourceTimezone() {
-        assertThrows(
+        final IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
                 () -> timeService.convertTime("Invalid/Timezone", "14:30", "Europe/London"));
+        assertTrue(exception.getMessage().contains("Invalid timezone: Invalid/Timezone"));
     }
 
     @Test
     void testConvertTimeWithInvalidTargetTimezone() {
-        assertThrows(
+        final IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
                 () -> timeService.convertTime("America/New_York", "14:30", "Invalid/Timezone"));
+        assertTrue(exception.getMessage().contains("Invalid timezone: Invalid/Timezone"));
     }
 
     @Test
     void testConvertTimeWithInvalidTimeFormat() {
-        assertThrows(
+        final IllegalArgumentException exception1 = assertThrows(
                 IllegalArgumentException.class,
                 () -> timeService.convertTime("America/New_York", "25:00", "Europe/London"));
-        assertThrows(
+        assertTrue(exception1.getMessage().contains("Invalid time format. Expected HH:MM in 24-hour format"));
+
+        final IllegalArgumentException exception2 = assertThrows(
                 IllegalArgumentException.class,
                 () -> timeService.convertTime("America/New_York", "14:60", "Europe/London"));
-        assertThrows(
+        assertTrue(exception2.getMessage().contains("Invalid time format. Expected HH:MM in 24-hour format"));
+
+        final IllegalArgumentException exception3 = assertThrows(
                 IllegalArgumentException.class,
                 () -> timeService.convertTime("America/New_York", "2:30 PM", "Europe/London"));
-        assertThrows(
+        assertTrue(exception3.getMessage().contains("Invalid time format. Expected HH:MM in 24-hour format"));
+
+        final IllegalArgumentException exception4 = assertThrows(
                 IllegalArgumentException.class,
                 () -> timeService.convertTime("America/New_York", "invalid", "Europe/London"));
+        assertTrue(exception4.getMessage().contains("Invalid time format. Expected HH:MM in 24-hour format"));
     }
 
     @Test
