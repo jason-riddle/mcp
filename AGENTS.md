@@ -479,10 +479,10 @@ There are two Claude Code actions available, each designed for different use cas
 
 #### `anthropics/claude-code-action@beta`
 - **Purpose**: Interactive comment-based workflows
-- **Supported Events**: `issue_comment`, `pull_request_review_comment` only
-- **Use Case**: Manual triggering via comments (e.g., "@claude fix this")
-- **Features**: Trigger phrases, GitHub integration, sticky comments
-- **Limitations**: Cannot be triggered by push events, PR opens, or other automated events
+- **Supported Events**: `issue_comment`, `pull_request_review_comment`, `issues`, `pull_request`, `pull_request_review`
+- **Use Case**: Manual triggering via comments (e.g., "@claude fix this") or automated triggers on PR/issue events
+- **Features**: Trigger phrases, GitHub integration, sticky comments, assignee/label triggers
+- **Limitations**: Requires GitHub app installation, limited to GitHub-specific workflows
 
 #### `anthropics/claude-code-base-action@beta`
 - **Purpose**: Flexible automation for any GitHub event
@@ -509,7 +509,11 @@ There are two Claude Code actions available, each designed for different use cas
 | `mcp_config` | ❌ | ✅ | MCP server configuration |
 | `claude_env` | ❌ | ✅ | Custom environment variables |
 
-### Current Workflow: Permutation Testing
+### Example Workflows
+
+The project uses Claude Code actions for various automated workflows:
+
+#### 1. Automated Permutation Testing
 
 The project uses `claude-code-base-action` for automated permutation testing analysis:
 
@@ -549,6 +553,115 @@ jobs:
             Bash(./mvnw test -Dtest=MemoryGraphPermutationTest*)
             Bash(./mvnw test -Dtest=*PermutationTest*)
             Bash(git diff*),Bash(git log*),Bash(git show*)
+```
+
+#### 2. Automated PR Code Review
+
+Uses `claude-code-action` for interactive code review triggered by PR events:
+
+```yaml
+name: Claude Auto Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  auto-review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Automatic PR Review
+        uses: anthropics/claude-code-action@beta
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          timeout_minutes: "60"
+          direct_prompt: |
+            Please review this pull request and provide comprehensive feedback.
+
+            Focus on:
+            - Code quality and best practices
+            - Potential bugs or issues
+            - Performance considerations
+            - Security implications
+            - Test coverage
+            - Documentation updates if needed
+
+            Provide constructive feedback with specific suggestions for improvement.
+            Use inline comments to highlight specific areas of concern.
+```
+
+#### 3. Automated Issue Triage
+
+Uses `claude-code-base-action` for automated issue labeling and triage:
+
+```yaml
+name: Claude Issue Triage
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  triage-issue:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup GitHub MCP Server
+        run: |
+          mkdir -p /tmp/mcp-config
+          cat > /tmp/mcp-config/mcp-servers.json << 'EOF'
+          {
+            "mcpServers": {
+              "github": {
+                "command": "docker",
+                "args": [
+                  "run",
+                  "-i",
+                  "--rm",
+                  "-e",
+                  "GITHUB_PERSONAL_ACCESS_TOKEN",
+                  "ghcr.io/github/github-mcp-server:sha-7aced2b"
+                ],
+                "env": {
+                  "GITHUB_PERSONAL_ACCESS_TOKEN": "${{ secrets.GITHUB_TOKEN }}"
+                }
+              }
+            }
+          }
+          EOF
+
+      - name: Run Claude Code for Issue Triage
+        uses: anthropics/claude-code-base-action@beta
+        with:
+          prompt: |
+            You're an issue triage assistant. Analyze the issue and apply appropriate labels.
+
+            1. First, get available labels: `gh label list`
+            2. Get issue details: use mcp__github__get_issue
+            3. Analyze content and apply relevant labels
+            4. Do not post comments, only apply labels
+          allowed_tools: "Bash(gh label list),mcp__github__get_issue,mcp__github__get_issue_comments,mcp__github__update_issue,mcp__github__search_issues,mcp__github__list_issues"
+          mcp_config: /tmp/mcp-config/mcp-servers.json
+          timeout_minutes: "5"
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
 ```
 
 ### Migration Guide
