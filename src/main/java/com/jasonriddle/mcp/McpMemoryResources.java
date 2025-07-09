@@ -106,7 +106,10 @@ public final class McpMemoryResources {
         }
     }
 
-    private void appendCommonPatternsSection(final StringBuilder content, final Map<String, Long> entityTypeCounts, final Map<String, Long> relationTypeCounts) {
+    private void appendCommonPatternsSection(
+            final StringBuilder content,
+            final Map<String, Long> entityTypeCounts,
+            final Map<String, Long> relationTypeCounts) {
         content.append("## Common Patterns\n\n");
         if (!entityTypeCounts.isEmpty() && !relationTypeCounts.isEmpty()) {
             appendEntityNamingExamples(content, entityTypeCounts);
@@ -170,7 +173,9 @@ public final class McpMemoryResources {
     private void appendOverviewSection(final StringBuilder content, final MemoryGraph graph) {
         content.append("## Overview\n\n");
         content.append("- **Total Entities:** ").append(graph.entities().size()).append("\n");
-        content.append("- **Total Relations:** ").append(graph.relations().size()).append("\n");
+        content.append("- **Total Relations:** ")
+                .append(graph.relations().size())
+                .append("\n");
 
         final int totalObservations = calculateTotalObservations(graph.entities());
         content.append("- **Total Observations:** ").append(totalObservations).append("\n\n");
@@ -249,7 +254,9 @@ public final class McpMemoryResources {
         content.append("- **Orphaned Relations:** ").append(orphanedRelations).append("\n");
 
         final long emptyEntities = countEmptyEntities(graph.entities());
-        content.append("- **Entities with No Observations:** ").append(emptyEntities).append("\n");
+        content.append("- **Entities with No Observations:** ")
+                .append(emptyEntities)
+                .append("\n");
 
         final long isolatedEntities = countIsolatedEntities(graph);
         content.append("- **Isolated Entities:** ").append(isolatedEntities).append("\n");
