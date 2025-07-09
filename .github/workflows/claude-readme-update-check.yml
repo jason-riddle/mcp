@@ -1,0 +1,182 @@
+---
+name: Claude README Update Check
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**/*.java'
+      - 'pom.xml'
+      - 'Makefile'
+      - 'Procfile'
+      - 'system.properties'
+      - 'app.json'
+      - 'application*.properties'
+      - '!src/**/package-info.java'
+      - '!src/**/*Test.java'
+
+permissions: {}
+
+jobs:
+  security-check:
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.security.outputs.should_run }}
+    steps:
+      - name: Security Check
+        id: security
+        run: |
+          echo "Actor: ${{ github.actor }}"
+          echo "Repository: ${{ github.repository }}"
+          echo "Event: ${{ github.event_name }}"
+
+          # Only allow specific actor
+          if [[ "${{ github.actor }}" != "jason-riddle" ]]; then
+            echo "should_run=false" >> $GITHUB_OUTPUT
+            echo "❌ Actor not authorized"
+            exit 0
+          fi
+
+          # For PR events, ensure it's from same repository
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            if [[ "${{ github.event.pull_request.head.repo.full_name }}" != "${{ github.repository }}" ]]; then
+              echo "should_run=false" >> $GITHUB_OUTPUT
+              echo "❌ PR from fork not allowed"
+              exit 0
+            fi
+          fi
+
+          # For push events, ensure it's to main branch
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            if [[ "${{ github.ref }}" != "refs/heads/main" ]]; then
+              echo "should_run=false" >> $GITHUB_OUTPUT
+              echo "❌ Push not to main branch"
+              exit 0
+            fi
+          fi
+
+          echo "should_run=true" >> $GITHUB_OUTPUT
+          echo "✅ Security check passed"
+
+  claude-readme-check:
+    runs-on: ubuntu-latest
+    needs: security-check
+    if: needs.security-check.outputs.should_run == 'true'
+    timeout-minutes: 25
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Debug Git Changes
+        run: |
+          echo "Recent commits:"
+          git log --oneline -6
+          echo "Changed files (last 6 commits):"
+          git diff --name-only HEAD~6
+
+      - name: Claude README Update Analysis
+        id: claude-readme-analysis
+        uses: anthropics/claude-code-base-action@beta
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          timeout_minutes: 20
+          max_turns: "5"
+          prompt: |
+            You are a documentation analyst. Follow these steps:
+
+            1. Check what files changed: `git diff --name-only HEAD~6`
+            2. Read the current README.md file
+            3. Analyze if the changes require README updates for:
+               - New features or functionality
+               - Configuration changes
+               - Build process changes
+               - API changes
+               - Dependencies updates
+            4. If README needs updates, create a detailed analysis explaining:
+               - What changed in the code
+               - What sections of README need updating
+               - Specific recommendations for updates
+            5. If no README updates needed, output: "No README updates needed"
+
+            Keep it focused on documentation impact analysis.
+          allowed_tools: |
+            Read
+            Glob
+            Grep
+            Bash(git*)
+            LS
+
+      - name: Capture README Analysis Report
+        if: always()
+        run: |
+          # Create reports directory
+          mkdir -p reports
+
+          # Generate report metadata
+          echo "# Claude README Update Analysis Report" > reports/readme-analysis-report.md
+          echo "**Run ID:** ${{ github.run_id }}" >> reports/readme-analysis-report.md
+          echo "**Run Number:** ${{ github.run_number }}" >> reports/readme-analysis-report.md
+          echo "**Commit:** ${{ github.sha }}" >> reports/readme-analysis-report.md
+          echo "**Date:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> reports/readme-analysis-report.md
+          echo "**Actor:** ${{ github.actor }}" >> reports/readme-analysis-report.md
+          echo "**Event:** ${{ github.event_name }}" >> reports/readme-analysis-report.md
+          echo "" >> reports/readme-analysis-report.md
+
+          # Add git information
+          echo "## Git Information" >> reports/readme-analysis-report.md
+          echo "### Recent Commits" >> reports/readme-analysis-report.md
+          echo '```' >> reports/readme-analysis-report.md
+          git log --oneline -6 >> reports/readme-analysis-report.md
+          echo '```' >> reports/readme-analysis-report.md
+          echo "" >> reports/readme-analysis-report.md
+
+          echo "### Changed Files (Last 6 Commits)" >> reports/readme-analysis-report.md
+          echo '```' >> reports/readme-analysis-report.md
+          git diff --name-only HEAD~6 >> reports/readme-analysis-report.md
+          echo '```' >> reports/readme-analysis-report.md
+          echo "" >> reports/readme-analysis-report.md
+
+          # Add Claude analysis status
+          echo "## Claude README Analysis Status" >> reports/readme-analysis-report.md
+          if [ "${{ steps.claude-readme-analysis.outcome }}" == "success" ]; then
+            echo "✅ **Status:** SUCCESS" >> reports/readme-analysis-report.md
+            echo "Claude completed README update analysis successfully." >> reports/readme-analysis-report.md
+          elif [ "${{ steps.claude-readme-analysis.outcome }}" == "failure" ]; then
+            echo "❌ **Status:** FAILURE" >> reports/readme-analysis-report.md
+            echo "Claude README analysis failed or encountered an error." >> reports/readme-analysis-report.md
+          elif [ "${{ steps.claude-readme-analysis.outcome }}" == "cancelled" ]; then
+            echo "🚫 **Status:** CANCELLED" >> reports/readme-analysis-report.md
+            echo "Claude README analysis was cancelled before completion." >> reports/readme-analysis-report.md
+          else
+            echo "⚠️ **Status:** SKIPPED/UNKNOWN" >> reports/readme-analysis-report.md
+            echo "Claude README analysis was skipped or has unknown status." >> reports/readme-analysis-report.md
+          fi
+          echo "" >> reports/readme-analysis-report.md
+
+          # Add workflow information
+          echo "## Workflow Configuration" >> reports/readme-analysis-report.md
+          echo "- **Timeout:** 20 minutes" >> reports/readme-analysis-report.md
+          echo "- **Max Turns:** 5" >> reports/readme-analysis-report.md
+          echo "- **Purpose:** Documentation impact analysis" >> reports/readme-analysis-report.md
+          echo "" >> reports/readme-analysis-report.md
+
+          # Add link to full logs
+          echo "## Full Logs" >> reports/readme-analysis-report.md
+          echo "For complete Claude README analysis logs, see:" >> reports/readme-analysis-report.md
+          echo "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> reports/readme-analysis-report.md
+
+          # Create a summary file for quick reference
+          SUMMARY="Run ${{ github.run_number }} - ${{ steps.claude-readme-analysis.outcome }} - $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
+          echo "$SUMMARY" > reports/summary.txt
+
+      - name: Archive README Analysis Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: claude-readme-analysis-report-${{ github.run_number }}
+          path: reports/
+          retention-days: 30
+          if-no-files-found: error
