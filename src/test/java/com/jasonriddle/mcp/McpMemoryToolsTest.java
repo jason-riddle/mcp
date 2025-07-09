@@ -349,10 +349,16 @@ final class McpMemoryToolsTest {
         assertEquals("Jason", openResult.entities().get(0).name());
 
         // Verify Technical_Preferences has 3 observations now
-        final Entity techPrefs = fullGraph.entities().stream()
-                .filter(e -> "Technical_Preferences".equals(e.name()))
-                .findFirst()
-                .orElseThrow();
+        Entity techPrefs = null;
+        for (Entity e : fullGraph.entities()) {
+            if ("Technical_Preferences".equals(e.name())) {
+                techPrefs = e;
+                break;
+            }
+        }
+        if (techPrefs == null) {
+            throw new RuntimeException("Technical_Preferences entity not found");
+        }
         assertEquals(3, techPrefs.observations().size());
     }
 }

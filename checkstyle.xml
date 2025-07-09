@@ -43,6 +43,7 @@
         <property name="message" value="Two consecutive blank lines are not permitted."/>
     </module>
 
+
     <!-- Line Length Constraints -->
     <module name="LineLength">
         <property name="max" value="120"/>
@@ -81,12 +82,12 @@
         <!-- Import Management -->
         <module name="AvoidStarImport"/>
         <module name="AvoidStaticImport">
-            <property name="excludes" value="com.google.common.base.Preconditions.*, java.util.Collections.*, java.util.stream.Collectors.*, org.assertj.core.api.Assertions.*, org.mockito.Mockito.*"/>
+            <property name="excludes" value="com.google.common.base.Preconditions.*, java.util.Collections.*, org.assertj.core.api.Assertions.*, org.mockito.Mockito.*"/>
         </module>
         <module name="IllegalImport">
             <property name="illegalPkgs" value="junit.framework, sun"/>
-            <property name="illegalClasses" value="com.google.common.base.Optional, com.google.common.base.Supplier"/>
-            <message key="import.illegal" value="Forbidden imports: JUnit 3 (use org.junit.*), Oracle internals (sun.*), legacy Guava (use Java 8 equivalents)"/>
+            <property name="illegalClasses" value="com.google.common.base.Optional, com.google.common.base.Supplier, java.util.stream.Collectors"/>
+            <message key="import.illegal" value="Forbidden imports: JUnit 3 (use org.junit.*), Oracle internals (sun.*), legacy Guava (use Java 8 equivalents), Collectors (use simple loops instead)"/>
         </module>
         <module name="RedundantImport"/>
         <module name="UnusedImports">
@@ -163,6 +164,46 @@
         <module name="RegexpSinglelineJava">
             <property name="format" value="Map\.of\s*\([^)]*Map\.of\s*\("/>
             <property name="message" value="Avoid nested Map.of calls - extract inner maps to separate variables for better readability"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\w+\(\)\..*\(\)\..*\(\)\..*\(\)"/>
+            <property name="message" value="Avoid excessive method chaining (4+ chained calls) - extract intermediate variables for better readability"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\w+\([^)]*\|\|[^)]*\)"/>
+            <property name="message" value="Avoid logical OR (||) inside method calls - extract to boolean variables for better readability"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\.stream\(\)"/>
+            <property name="message" value="stream() is banned - use simple loops instead for better readability and maintainability"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\.map\("/>
+            <property name="message" value="map() is banned - use simple loops instead for better readability"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\.collect\("/>
+            <property name="message" value="collect() is banned - use simple loops instead for better readability"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="Collectors\."/>
+            <property name="message" value="Collectors usage is banned - use simple loops instead for better readability and performance"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\.filter\("/>
+            <property name="message" value="filter() is banned - use simple if statements in loops for better readability"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="->\s*!"/>
+            <property name="message" value="Avoid negation at the start of lambda expressions - extract to a named boolean variable for clarity"/>
             <property name="ignoreComments" value="true"/>
         </module>
 

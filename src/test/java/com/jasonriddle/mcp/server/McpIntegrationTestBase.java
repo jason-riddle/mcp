@@ -168,8 +168,13 @@ abstract class McpIntegrationTestBase {
             assertNotNull(prompts, "Prompts list should not be null");
             assertFalse(prompts.isEmpty(), "Should have at least one prompt registered");
 
-            boolean foundMemoryPrompt =
-                    prompts.stream().anyMatch(prompt -> "memory_best_practices".equals(prompt.name()));
+            boolean foundMemoryPrompt = false;
+            for (var prompt : prompts) {
+                if ("memory_best_practices".equals(prompt.name())) {
+                    foundMemoryPrompt = true;
+                    break;
+                }
+            }
 
             assertTrue(foundMemoryPrompt, "Should find memory_best_practices prompt");
 
@@ -193,10 +198,20 @@ abstract class McpIntegrationTestBase {
             assertNotNull(resources, "Resources list should not be null");
             assertFalse(resources.isEmpty(), "Should have at least one resource registered");
 
-            boolean foundTypesResource =
-                    resources.stream().anyMatch(resource -> "memory://types".equals(resource.uri()));
-            boolean foundStatusResource =
-                    resources.stream().anyMatch(resource -> "memory://status".equals(resource.uri()));
+            boolean foundTypesResource = false;
+            for (var resource : resources) {
+                if ("memory://types".equals(resource.uri())) {
+                    foundTypesResource = true;
+                    break;
+                }
+            }
+            boolean foundStatusResource = false;
+            for (var resource : resources) {
+                if ("memory://status".equals(resource.uri())) {
+                    foundStatusResource = true;
+                    break;
+                }
+            }
 
             assertTrue(foundTypesResource, "Should find memory://types resource");
             assertTrue(foundStatusResource, "Should find memory://status resource");

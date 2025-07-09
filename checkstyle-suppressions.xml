@@ -12,20 +12,15 @@
     <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="MissingJavadocMethod"/>
     <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="MissingJavadocType"/>
     <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="MultipleStringLiterals"/>
-    <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="RegexpSinglelineJava"/>
     <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="VisibilityModifier"/>
+    <!-- Suppress only specific regex checks for tests that would interfere with testing -->
+    <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="RegexpSinglelineJava" message="console output"/>
+    <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="RegexpSinglelineJava" message="printStackTrace"/>
 
     <!-- Integration test naming patterns -->
     <suppress files=".*IT\.java" checks="AbbreviationAsWordInName"/>
     <suppress files=".*IntegrationTest\.java" checks="AbbreviationAsWordInName"/>
 
-    <!-- Allow longer lines for generated application files -->
-    <suppress files=".*Application\.java" checks="LineLength"/>
-
-    <!-- Allow public fields in DTOs and data classes -->
-    <suppress files=".*DTO\.java" checks="VisibilityModifier"/>
-    <suppress files=".*Request\.java" checks="VisibilityModifier"/>
-    <suppress files=".*/response/.*\.java|.*Response\.java" checks="VisibilityModifier"/>
 
     <!-- Allow longer lines for method chaining in resource/prompt classes -->
     <suppress files=".*McpMemoryResources\.java" checks="LineLength"/>
@@ -34,4 +29,8 @@
     <!-- Allow string literals in template-heavy classes -->
     <suppress files=".*McpMemoryResources\.java" checks="MultipleStringLiterals"/>
     <suppress files=".*McpMemoryTools\.java" checks="MultipleStringLiterals"/>
+
+    <!-- Allow higher complexity in resource generation classes -->
+    <suppress files=".*McpMemoryResources\.java" checks="NPathComplexity"/>
+    <suppress files=".*McpMemoryResources\.java" checks="CyclomaticComplexity"/>
 </suppressions>

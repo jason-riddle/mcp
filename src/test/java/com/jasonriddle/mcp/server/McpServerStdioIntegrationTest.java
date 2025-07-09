@@ -323,11 +323,15 @@ final class McpServerStdioIntegrationTest extends McpIntegrationTestBase {
                 Path targetDir = Paths.get("target");
                 if (Files.exists(targetDir)) {
                     try (var files = Files.list(targetDir)) {
-                        var matchingFile = files.filter(
-                                        p -> p.getFileName().toString().contains("runner.jar"))
-                                .findFirst();
-                        if (matchingFile.isPresent()) {
-                            return matchingFile.get().toAbsolutePath().toString();
+                        Path matchingFile = null;
+                        for (Path p : (Iterable<Path>) files::iterator) {
+                            if (p.getFileName().toString().contains("runner.jar")) {
+                                matchingFile = p;
+                                break;
+                            }
+                        }
+                        if (matchingFile != null) {
+                            return matchingFile.toAbsolutePath().toString();
                         }
                     }
                 }

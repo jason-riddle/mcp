@@ -42,7 +42,8 @@ final class McpMemoryResourcesTest {
                 new Entity("Technical_Preferences", "preferences", List.of("Dark mode", "Vim keybindings"));
 
         final List<Entity> entities = List.of(person, preferences);
-        final List<Relation> relations = List.of(new Relation("Jason", "Technical_Preferences", "has_preferences"));
+        final Relation relation = new Relation("Jason", "Technical_Preferences", "has_preferences");
+        final List<Relation> relations = List.of(relation);
 
         // Setup test data in memory service
         memoryService.createEntities(entities);
@@ -104,7 +105,8 @@ final class McpMemoryResourcesTest {
     @Test
     void memoryStatusResourceShouldDetectDataIntegrityIssues() {
         // Create graph with orphaned relation by adding a bad relation
-        memoryService.createRelations(List.of(new Relation("Jason", "NonExistentCompany", "works_at")));
+        final Relation orphanedRelation = new Relation("Jason", "NonExistentCompany", "works_at");
+        memoryService.createRelations(List.of(orphanedRelation));
 
         final TextResourceContents result = mcpMemoryResources.memoryStatusResource();
 
