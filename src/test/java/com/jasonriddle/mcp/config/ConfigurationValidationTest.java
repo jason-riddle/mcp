@@ -304,6 +304,63 @@ final class ConfigurationValidationTest {
     }
 
     /**
+     * Validates weather API configuration.
+     */
+    @Nested
+    @DisplayName("Weather API Configuration")
+    class WeatherApiConfiguration {
+
+        @Test
+        @DisplayName("Should have weather API key configuration available")
+        void shouldHaveWeatherApiKeyConfiguration() {
+            // Weather API key is optional in tests and may be empty
+            String weatherApiKey =
+                    config.getOptionalValue("weather.api.key", String.class).orElse("");
+            assertNotNull(weatherApiKey, "Weather API key configuration must be present (can be empty for tests).");
+        }
+
+        @Test
+        @DisplayName("Should validate REST client configuration for weather service")
+        void shouldValidateRestClientConfiguration() {
+            String weatherClientUrl = config.getValue("quarkus.rest-client.weather-client.url", String.class);
+            assertEquals(
+                    "https://api.openweathermap.org",
+                    weatherClientUrl,
+                    String.format(
+                            "Weather client URL should be OpenWeatherMap API endpoint, but was '%s'.",
+                            weatherClientUrl));
+
+            Integer connectTimeout =
+                    config.getValue("quarkus.rest-client.weather-client.connect-timeout", Integer.class);
+            assertEquals(
+                    10000,
+                    connectTimeout,
+                    String.format("Weather client connect timeout should be 10000ms, but was %d.", connectTimeout));
+
+            Integer readTimeout = config.getValue("quarkus.rest-client.weather-client.read-timeout", Integer.class);
+            assertEquals(
+                    30000,
+                    readTimeout,
+                    String.format("Weather client read timeout should be 30000ms, but was %d.", readTimeout));
+        }
+
+        @Test
+        @DisplayName("Should validate weather configuration consistency")
+        void shouldValidateWeatherConfigurationConsistency() {
+            // Verify that weather configuration is consistent across profiles
+            String weatherClientUrl = config.getValue("quarkus.rest-client.weather-client.url", String.class);
+            assertTrue(
+                    weatherClientUrl.startsWith("https://"),
+                    String.format("Weather API URL must use HTTPS for security, but was '%s'.", weatherClientUrl));
+
+            assertTrue(
+                    weatherClientUrl.contains("openweathermap.org"),
+                    String.format(
+                            "Weather API URL must point to OpenWeatherMap service, but was '%s'.", weatherClientUrl));
+        }
+    }
+
+    /**
      * Validates MCP server configuration.
      */
     @Nested

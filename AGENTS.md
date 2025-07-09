@@ -75,6 +75,7 @@ make test-integration                 # Run integration tests
 
 ./mvnw test -Dtest=MemoryServiceTest  # Run specific test class
 ./mvnw test -Dtest=TimeServiceTest   # Run time service tests
+./mvnw test -Dtest=WeatherServiceTest # Run weather service tests
 ```
 
 ## Code Quality
@@ -266,6 +267,7 @@ src/main/java/com.jasonriddle.mcp/
 ├── McpMemoryResources.java    # MCP resources (memory://) for graph access
 ├── McpMemoryTools.java        # MCP tools for graph operations
 ├── McpTimeTools.java          # MCP tools for time and timezone operations
+├── McpWeatherTools.java       # MCP tools for weather operations
 ├── package-info.java          # Package documentation
 ├── memory/                    # Memory graph implementation
 │   ├── Entity.java            # Entity record representing graph nodes
@@ -274,9 +276,15 @@ src/main/java/com.jasonriddle.mcp/
 │   ├── MemoryService.java     # Core service for graph persistence and operations
 │   ├── Relation.java          # Relation record representing graph edges
 │   └── package-info.java      # Package documentation
-└── time/                      # Time and timezone services
-    ├── TimeConversionResult.java  # Result record for time conversions
-    ├── TimeService.java       # Core service for time operations
+├── time/                      # Time and timezone services
+│   ├── TimeConversionResult.java  # Result record for time conversions
+│   ├── TimeService.java       # Core service for time operations
+│   └── package-info.java      # Package documentation
+└── weather/                   # Weather services and data structures
+    ├── WeatherClient.java     # OpenWeatherMap REST client interface
+    ├── WeatherData.java       # Current weather data record
+    ├── WeatherForecast.java   # Weather forecast data record
+    ├── WeatherService.java    # Core service for weather operations
     └── package-info.java      # Package documentation
 ```
 
@@ -288,20 +296,32 @@ src/test/java/com.jasonriddle.mcp/
 ├── McpMemoryResourcesTest.java                     # Tests for memory resources
 ├── McpMemoryToolsTest.java                         # Tests for memory tools
 ├── McpTimeToolsTest.java                           # Tests for time tools
+├── McpWeatherToolsTest.java                        # Tests for weather tools
 ├── package-info.java                               # Package documentation
 ├── config/                                         # Configuration tests
+│   ├── ConfigurationTestConstants.java            # Test constants for configuration
 │   ├── ConfigurationValidationTest.java           # Tests for configuration validation
+│   ├── HerokuConfigurationValidationTest.java     # Tests for Heroku configuration
+│   ├── HerokuTestProfile.java                     # Heroku test profile
+│   ├── ProdConfigurationValidationTest.java       # Tests for production configuration
+│   ├── ProdTestProfile.java                       # Production test profile
 │   └── package-info.java                          # Package documentation
 ├── memory/                                         # Memory implementation tests
+│   ├── MemoryGraphPermutationTest.java            # JQwik permutation tests for memory graph
 │   ├── MemoryServiceTest.java                     # Tests for memory service
 │   └── package-info.java                          # Package documentation
+├── security/                                       # Security tests (disabled)
+│   └── ApiKeyAuthenticationDisabledIntegrationTest.java.disabled  # Disabled auth tests
 ├── server/                                         # Server integration tests
 │   ├── McpIntegrationTestBase.java                 # Base class for integration tests
 │   ├── McpServerSseIntegrationTest.java            # Integration tests for SSE server
 │   ├── McpServerStdioIntegrationTest.java          # Integration tests for STDIO server
 │   └── package-info.java                          # Package documentation
-└── time/                                           # Time service tests
-    ├── TimeServiceTest.java                       # Tests for time service
+├── time/                                           # Time service tests
+│   ├── TimeServiceTest.java                       # Tests for time service
+│   └── package-info.java                          # Package documentation
+└── weather/                                        # Weather service tests
+    ├── WeatherServiceTest.java                    # Tests for weather service
     └── package-info.java                          # Package documentation
 ```
 
@@ -310,14 +330,17 @@ src/test/java/com.jasonriddle.mcp/
 ### Package Documentation
 
 Each package contains a `package-info.java` file with purpose and responsibilities:
-- **Root package** (`com.jasonriddle.mcp`): Model Context Protocol server implementation with memory graph and time capabilities
+- **Root package** (`com.jasonriddle.mcp`): Model Context Protocol server implementation with memory graph, time, and weather capabilities
 - **Memory package** (`com.jasonriddle.mcp.memory`): Memory graph implementation for the MCP server
 - **Time package** (`com.jasonriddle.mcp.time`): Time and timezone conversion services for the MCP server
+- **Weather package** (`com.jasonriddle.mcp.weather`): Weather services and data structures for the MCP server
 - **Test packages**: Corresponding test suites for implementation verification
-  - **Config test package** (`com.jasonriddle.mcp.config`): Configuration validation tests
-  - **Memory test package** (`com.jasonriddle.mcp.memory`): Memory service tests
+  - **Config test package** (`com.jasonriddle.mcp.config`): Configuration validation tests for default, Heroku, and production profiles
+  - **Memory test package** (`com.jasonriddle.mcp.memory`): Memory service tests including JQwik permutation testing
+  - **Security test package** (`com.jasonriddle.mcp.security`): Security tests (currently disabled for STDIO endpoints)
+  - **Server test package** (`com.jasonriddle.mcp.server`): Integration tests for MCP server implementations (SSE and STDIO)
   - **Time test package** (`com.jasonriddle.mcp.time`): Time service tests
-  - **Server test package** (`com.jasonriddle.mcp.server`): Integration tests for MCP server implementations
+  - **Weather test package** (`com.jasonriddle.mcp.weather`): Weather service tests
 
 ### Design Principles
 
@@ -334,6 +357,9 @@ Configure via `application.properties`:
 ```properties
 # Memory file path (default: memory.jsonl)
 memory.file.path=memory.jsonl
+
+# Weather API configuration
+weather.api.key=${WEATHER_API_KEY:}
 
 # Server port (default: 8080)
 quarkus.http.port=8080

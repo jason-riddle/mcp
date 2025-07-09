@@ -310,6 +310,127 @@ The server provides MCP tools for time and timezone operations, useful for sched
 **Checking DST status for scheduling:**
 The `is_dst` field indicates whether Daylight Saving Time is active, helping with scheduling decisions during DST transitions.
 
+### Weather Tools
+
+The server provides MCP tools for accessing real-time weather information and forecasts through the OpenWeatherMap API. These tools are useful for planning, scheduling, and contextual information.
+
+#### Getting Current Weather
+
+**weather.current** - Get current weather conditions for any location
+```json
+{
+  "location": "New York"
+}
+```
+
+**Response:**
+```json
+{
+  "location": "New York",
+  "temperature": 72.5,
+  "feels_like": 75.2,
+  "humidity": 65,
+  "condition": "Clear",
+  "description": "clear sky",
+  "wind_speed": 5.5,
+  "wind_direction": 180,
+  "visibility": 10.0,
+  "timestamp": "2024-03-15T14:30:00Z"
+}
+```
+
+*Supports city names, coordinates (lat,lon), and various location formats. All temperatures in Fahrenheit, wind speeds in mph.*
+
+#### Weather Forecasts
+
+**weather.forecast** - Get multi-day weather forecast
+```json
+{
+  "location": "San Francisco",
+  "days": 3
+}
+```
+
+**Response:**
+```json
+[
+  {
+    "date": "2024-03-15",
+    "day_name": "Friday",
+    "high_temp": 68.0,
+    "low_temp": 52.0,
+    "condition": "Partly Cloudy",
+    "description": "partly cloudy",
+    "humidity": 70,
+    "wind_speed": 12.5,
+    "precipitation": 0.0
+  },
+  {
+    "date": "2024-03-16",
+    "day_name": "Saturday",
+    "high_temp": 65.0,
+    "low_temp": 48.0,
+    "condition": "Rain",
+    "description": "light rain",
+    "humidity": 85,
+    "wind_speed": 8.2,
+    "precipitation": 0.15
+  }
+]
+```
+
+*Forecast supports 1-5 days ahead. Precipitation values in inches.*
+
+#### Weather Alerts
+
+**weather.alerts** - Get weather warnings and advisories
+```json
+{
+  "location": "Miami"
+}
+```
+
+**Example responses:**
+- `"Heat Warning: Temperature is 98.0°F"`
+- `"Cold Warning: Temperature is 20.0°F"`
+- `"Wind Warning: Wind speed is 30.0 mph"`
+- `"No weather alerts for this location"`
+
+#### Setup Requirements
+
+Weather tools require an OpenWeatherMap API key:
+
+1. **Get API Key**: Sign up at [OpenWeatherMap](https://openweathermap.org/api) (free tier: 1,000 calls/day)
+2. **Set Environment Variable**: `export WEATHER_API_KEY=your_api_key_here`
+3. **Configure**: Add to `application.properties`:
+```properties
+weather.api.key=${WEATHER_API_KEY:}
+```
+
+#### Common Use Cases
+
+**Planning outdoor activities:**
+```json
+{
+  "location": "Portland",
+  "days": 2
+}
+```
+
+**Checking travel conditions:**
+```json
+{
+  "location": "40.7128,-74.0060"
+}
+```
+
+**Getting location-specific alerts:**
+```json
+{
+  "location": "Phoenix"
+}
+```
+
 ### Memory Resources
 
 Access memory data via URI resources for discovery and health monitoring. These complement the memory tools by providing overview information.
