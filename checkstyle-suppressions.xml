@@ -4,7 +4,6 @@
         "https://checkstyle.org/dtds/suppressions_1_2.dtd">
 
 <suppressions>
-    <!-- 1. Test Code Relaxations -->
     <!-- Suppress certain checks for test files (following Palantir patterns) -->
     <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="AvoidStaticImport"/>
     <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="JavadocMethod"/>
@@ -20,20 +19,14 @@
     <suppress files=".*IT\.java" checks="AbbreviationAsWordInName"/>
     <suppress files=".*IntegrationTest\.java" checks="AbbreviationAsWordInName"/>
 
-    <!-- 2. Framework & Generated Code -->
     <!-- Allow longer lines for generated application files -->
     <suppress files=".*Application\.java" checks="LineLength"/>
 
-    <!-- 3. Data Transfer Objects -->
     <!-- Allow public fields in DTOs and data classes -->
     <suppress files=".*DTO\.java" checks="VisibilityModifier"/>
     <suppress files=".*Request\.java" checks="VisibilityModifier"/>
     <suppress files=".*/response/.*\.java|.*Response\.java" checks="VisibilityModifier"/>
 
-    <!-- 4. Formatting Tool Conflicts -->
-    <!-- Handle conflicts between Checkstyle and Spotless/Palantir Java Format -->
-
-    <!-- 5. Project-Specific Template Classes -->
     <!-- Allow longer lines for method chaining in resource/prompt classes -->
     <suppress files=".*McpMemoryResources\.java" checks="LineLength"/>
     <suppress files=".*McpMemoryPrompts\.java" checks="LineLength"/>
