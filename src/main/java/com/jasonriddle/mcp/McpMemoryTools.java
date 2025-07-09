@@ -66,7 +66,11 @@ public final class McpMemoryTools {
             final String to = relationData.get("to");
             final String relationType = relationData.get("relationType");
 
-            if (from != null && to != null && relationType != null) {
+            final boolean hasFrom = from != null;
+            final boolean hasTo = to != null;
+            final boolean hasRelationType = relationType != null;
+            final boolean hasAllFields = hasFrom && hasTo;
+            if (hasAllFields && hasRelationType) {
                 final Relation relation = new Relation(from, to, relationType);
                 relationsToCreate.add(relation);
             }
@@ -168,7 +172,11 @@ public final class McpMemoryTools {
             final String to = relationData.get("to");
             final String relationType = relationData.get("relationType");
 
-            if (from != null && to != null && relationType != null) {
+            final boolean hasFrom = from != null;
+            final boolean hasTo = to != null;
+            final boolean hasRelationType = relationType != null;
+            final boolean hasAllFields = hasFrom && hasTo;
+            if (hasAllFields && hasRelationType) {
                 final Relation relation = new Relation(from, to, relationType);
                 relationsToDelete.add(relation);
             }

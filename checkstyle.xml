@@ -212,13 +212,83 @@
             <property name="ignoreComments" value="true"/>
         </module>
         <module name="RegexpSinglelineJava">
-            <property name="format" value="\w+\s*\|\|\s*!\s*\w+"/>
+            <property name="format" value="(\w+)\s*\|\|\s*!\s*\1\s*[;\)]"/>
             <property name="message" value="Tautological expressions (x || !x) are always true and should be removed"/>
             <property name="ignoreComments" value="true"/>
         </module>
         <module name="RegexpSinglelineJava">
-            <property name="format" value="\w+\s*&amp;&amp;\s*!\s*\w+"/>
+            <property name="format" value="(\w+)\s*&amp;&amp;\s*!\s*\1\s*[;\)]"/>
             <property name="message" value="Contradictory expressions (x &amp;&amp; !x) are always false and should be removed"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+
+        <!-- Ban Optional chaining -->
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\.map\(.*\.filter\(|\.filter\(.*\.map\("/>
+            <property name="message" value="Optional chaining is banned - use simple if statements instead"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\.flatMap\("/>
+            <property name="message" value="Optional.flatMap() is banned - use simple if statements instead"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\.orElseGet\(.*\.orElse\(|\.orElse\(.*\.orElseGet\("/>
+            <property name="message" value="Optional chaining with multiple fallbacks is banned - use simple if-else logic"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+
+        <!-- Ban CompletableFuture chaining -->
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\.thenApply\("/>
+            <property name="message" value="CompletableFuture.thenApply() chaining is banned - use simple async patterns"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\.thenCompose\("/>
+            <property name="message" value="CompletableFuture.thenCompose() chaining is banned - use simple async patterns"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\.thenCombine\("/>
+            <property name="message" value="CompletableFuture.thenCombine() chaining is banned - use simple async patterns"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\.whenComplete\("/>
+            <property name="message" value="CompletableFuture.whenComplete() chaining is banned - use simple async patterns"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+
+        <!-- Ban Module System complexity -->
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="module\s+\w+\s*\{"/>
+            <property name="message" value="Module system is banned - use simple classpath-based projects"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+
+        <!-- Ban Pattern Matching complexity -->
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="switch\s*\([^)]*\)\s*\{[^}]*case.*\s+when\s+"/>
+            <property name="message" value="Pattern matching with guards is banned - use simple switch or if-else"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="case.*\(.*\)\s*when\s+"/>
+            <property name="message" value="Pattern matching with when guards is banned - use simple switch or if-else"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+
+        <!-- Ban Sealed Classes -->
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="sealed\s+(class|interface)"/>
+            <property name="message" value="Sealed classes/interfaces are banned - use regular inheritance"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="permits\s+\w+"/>
+            <property name="message" value="Sealed class permits clause is banned - use regular inheritance"/>
             <property name="ignoreComments" value="true"/>
         </module>
 

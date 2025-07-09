@@ -219,9 +219,9 @@ public final class McpMemoryResources {
         content.append("## Data Integrity\n\n");
 
         // Check for orphaned relations
-        final List<Entity> allEntities = graph.entities();
+        final List<Entity> entitiesForOrphanCheck = graph.entities();
         final Set<String> entityNames = new HashSet<>();
-        for (final Entity entity : allEntities) {
+        for (final Entity entity : entitiesForOrphanCheck) {
             entityNames.add(entity.name());
         }
 
@@ -249,18 +249,17 @@ public final class McpMemoryResources {
                 .append("\n");
 
         // Check for isolated entities (no relations)
-        final List<Entity> entities = graph.entities();
-        final List<Relation> relations = graph.relations();
+        // Reuse existing entities and relations variables
 
         // Create sets of entity names that appear in relations for efficient lookup
         final Set<String> entitiesInRelations = new HashSet<>();
-        for (final Relation relation : relations) {
+        for (final Relation relation : allRelations) {
             entitiesInRelations.add(relation.from());
             entitiesInRelations.add(relation.to());
         }
 
         long isolatedEntities = 0;
-        for (final Entity entity : entities) {
+        for (final Entity entity : entitiesForOrphanCheck) {
             final boolean isConnected = entitiesInRelations.contains(entity.name());
             if (!isConnected) {
                 isolatedEntities++;
