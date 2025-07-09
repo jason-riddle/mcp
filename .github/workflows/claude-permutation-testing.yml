@@ -71,13 +71,20 @@ jobs:
           java-version: '17'
           cache: 'maven'
 
+      - name: Debug Git Changes
+        run: |
+          echo "Recent commits:"
+          git log --oneline -3
+          echo "Changed files:"
+          git diff --name-only HEAD~1
 
       - name: Claude Permutation Testing Analysis
+        id: claude-analysis
         uses: anthropics/claude-code-base-action@beta
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          timeout_minutes: 15
-          max_turns: "18"
+          timeout_minutes: 40
+          max_turns: "10"
           append_system_prompt: |
             You are an expert in permutation testing and software quality assurance for Java/Quarkus applications.
             Your role is to analyze code changes and determine the most effective permutation tests to run.
@@ -216,3 +223,75 @@ jobs:
             MAVEN_OPTS: -Xmx2g
             JQWIK_TRIES: 1000
             JQWIK_MAX_DISCARD_RATIO: 10
+
+      - name: Capture Claude Analysis Report
+        if: always()
+        run: |
+          # Create reports directory
+          mkdir -p reports
+
+          # Generate report metadata
+          echo "# Claude Permutation Testing Report" > reports/claude-analysis-report.md
+          echo "**Run ID:** ${{ github.run_id }}" >> reports/claude-analysis-report.md
+          echo "**Run Number:** ${{ github.run_number }}" >> reports/claude-analysis-report.md
+          echo "**Commit:** ${{ github.sha }}" >> reports/claude-analysis-report.md
+          echo "**Date:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> reports/claude-analysis-report.md
+          echo "**Actor:** ${{ github.actor }}" >> reports/claude-analysis-report.md
+          echo "**Event:** ${{ github.event_name }}" >> reports/claude-analysis-report.md
+          echo "" >> reports/claude-analysis-report.md
+
+          # Add git information
+          echo "## Git Information" >> reports/claude-analysis-report.md
+          echo "### Recent Commits" >> reports/claude-analysis-report.md
+          echo '```' >> reports/claude-analysis-report.md
+          git log --oneline -3 >> reports/claude-analysis-report.md
+          echo '```' >> reports/claude-analysis-report.md
+          echo "" >> reports/claude-analysis-report.md
+
+          echo "### Changed Files" >> reports/claude-analysis-report.md
+          echo '```' >> reports/claude-analysis-report.md
+          git diff --name-only HEAD~1 >> reports/claude-analysis-report.md
+          echo '```' >> reports/claude-analysis-report.md
+          echo "" >> reports/claude-analysis-report.md
+
+          # Add Claude analysis status
+          echo "## Claude Analysis Status" >> reports/claude-analysis-report.md
+          if [ "${{ steps.claude-analysis.outcome }}" == "success" ]; then
+            echo "✅ **Status:** SUCCESS" >> reports/claude-analysis-report.md
+            echo "Claude analysis completed successfully and executed permutation tests." >> reports/claude-analysis-report.md
+          elif [ "${{ steps.claude-analysis.outcome }}" == "failure" ]; then
+            echo "❌ **Status:** FAILURE" >> reports/claude-analysis-report.md
+            echo "Claude analysis failed or encountered an error." >> reports/claude-analysis-report.md
+          elif [ "${{ steps.claude-analysis.outcome }}" == "cancelled" ]; then
+            echo "🚫 **Status:** CANCELLED" >> reports/claude-analysis-report.md
+            echo "Claude analysis was cancelled before completion." >> reports/claude-analysis-report.md
+          else
+            echo "⚠️ **Status:** SKIPPED/UNKNOWN" >> reports/claude-analysis-report.md
+            echo "Claude analysis was skipped or has unknown status." >> reports/claude-analysis-report.md
+          fi
+          echo "" >> reports/claude-analysis-report.md
+
+          # Add workflow information
+          echo "## Workflow Configuration" >> reports/claude-analysis-report.md
+          echo "- **Timeout:** 40 minutes" >> reports/claude-analysis-report.md
+          echo "- **Max Turns:** 10" >> reports/claude-analysis-report.md
+          echo "- **JQwik Tries:** 1000" >> reports/claude-analysis-report.md
+          echo "- **JQwik Max Discard Ratio:** 10" >> reports/claude-analysis-report.md
+          echo "" >> reports/claude-analysis-report.md
+
+          # Add link to full logs
+          echo "## Full Logs" >> reports/claude-analysis-report.md
+          echo "For complete Claude analysis logs, see:" >> reports/claude-analysis-report.md
+          echo "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> reports/claude-analysis-report.md
+
+          # Create a summary file for quick reference
+          echo "Run ${{ github.run_number }} - ${{ steps.claude-analysis.outcome }} - $(date -u +"%Y-%m-%d %H:%M:%S UTC")" > reports/summary.txt
+
+      - name: Archive Claude Analysis Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: claude-permutation-analysis-report-${{ github.run_number }}
+          path: reports/
+          retention-days: 30
+          if-no-files-found: error
