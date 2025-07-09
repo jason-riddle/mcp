@@ -206,6 +206,21 @@
             <property name="message" value="Avoid negation at the start of lambda expressions - extract to a named boolean variable for clarity"/>
             <property name="ignoreComments" value="true"/>
         </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="if\s*\([^)]*&amp;&amp;[^)]*&amp;&amp;"/>
+            <property name="message" value="Complex if statements with multiple &amp;&amp; operators are banned - extract conditions to separate boolean variables for better readability"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\w+\s*\|\|\s*!\s*\w+"/>
+            <property name="message" value="Tautological expressions (x || !x) are always true and should be removed"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\w+\s*&amp;&amp;\s*!\s*\w+"/>
+            <property name="message" value="Contradictory expressions (x &amp;&amp; !x) are always false and should be removed"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
 
         <!-- 4. Code Style -->
 
