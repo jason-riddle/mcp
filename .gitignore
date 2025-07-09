@@ -22,6 +22,7 @@
 .env
 .gemini
 .idea
+.jqwik-database
 .mcp.json
 .pre-commit-config.yaml
 AIDER.md
@@ -48,5 +49,8 @@ staging
 target
 tmp
 
-
-.jqwik-database
+# VCR cassettes - commit these to version control for CI/CD replay
+# but ignore any with sensitive data patterns
+src/test/resources/cassettes/
+!src/test/resources/cassettes/*.yaml
+!src/test/resources/cassettes/*.json
