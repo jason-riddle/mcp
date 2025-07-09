@@ -15,6 +15,7 @@ import java.time.format.DateTimeParseException;
 public final class TimeService {
 
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
+    private static final long SECONDS_PER_HOUR = 3600L;
 
     /**
      * Get current time in specified timezone.
@@ -76,7 +77,7 @@ public final class TimeService {
     private String calculateTimeDifference(final ZonedDateTime sourceTime, final ZonedDateTime targetTime) {
         final long sourceOffsetSeconds = sourceTime.getOffset().getTotalSeconds();
         final long targetOffsetSeconds = targetTime.getOffset().getTotalSeconds();
-        final double hoursDifference = (targetOffsetSeconds - sourceOffsetSeconds) / 3600.0;
+        final double hoursDifference = (targetOffsetSeconds - sourceOffsetSeconds) / (double) SECONDS_PER_HOUR;
         return formatTimeDifference(hoursDifference);
     }
 

@@ -206,6 +206,16 @@
             <property name="ignoreComments" value="true"/>
         </module>
         <module name="RegexpSinglelineJava">
+            <property name="format" value="\.removeIf\("/>
+            <property name="message" value="removeIf() is banned - use simple loops with explicit removal logic for better readability"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\.forEach\("/>
+            <property name="message" value="forEach() is banned - use simple for-each loops for better readability"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
             <property name="format" value="->\s*!"/>
             <property name="message" value="Avoid negation at the start of lambda expressions - extract to a named boolean variable for clarity"/>
             <property name="ignoreComments" value="true"/>

@@ -357,9 +357,17 @@ public class MemoryService {
             List<Relation> deleted = new ArrayList<>();
 
             for (Relation toDelete : relations) {
-                remainingRelations.removeIf(r -> r.from().equals(toDelete.from())
-                        && r.to().equals(toDelete.to())
-                        && r.relationType().equals(toDelete.relationType()));
+                final List<Relation> toRemove = new ArrayList<>();
+                for (Relation r : remainingRelations) {
+                    final boolean fromMatches = r.from().equals(toDelete.from());
+                    final boolean toMatches = r.to().equals(toDelete.to());
+                    final boolean typeMatches = r.relationType().equals(toDelete.relationType());
+                    final boolean allMatch = fromMatches && toMatches;
+                    if (allMatch && typeMatches) {
+                        toRemove.add(r);
+                    }
+                }
+                remainingRelations.removeAll(toRemove);
                 deleted.add(toDelete);
             }
 
