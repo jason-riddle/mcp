@@ -2,6 +2,12 @@ package com.jasonriddle.mcp.server;
 
 // SSE integration tests for MCP server HTTP/SSE transport functionality
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import dev.langchain4j.agent.tool.ToolExecutionRequest;
 import dev.langchain4j.mcp.client.DefaultMcpClient;
 import dev.langchain4j.mcp.client.transport.McpTransport;
 import dev.langchain4j.mcp.client.transport.http.HttpMcpTransport;
@@ -10,11 +16,10 @@ import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.QuarkusTestProfile;
 import io.quarkus.test.junit.TestProfile;
 import java.net.URI;
+import java.time.Duration;
+import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 
 /**
  * Integration tests for MCP Server SSE/HTTP transport.
@@ -24,8 +29,10 @@ import org.junit.jupiter.api.TestMethodOrder;
  */
 @QuarkusTest
 @TestProfile(McpServerSseIntegrationTest.TestProfile.class)
-@TestMethodOrder(OrderAnnotation.class)
 final class McpServerSseIntegrationTest extends McpIntegrationTestBase {
+
+    private static final Duration CLIENT_TIMEOUT = Duration.ofSeconds(10);
+    private static final String SSE_TEST_MEMORY_FILE = "memory-sse-int-test.jsonl";
 
     @TestHTTPResource("/mcp/sse")
     URI sseEndpoint;
@@ -40,13 +47,9 @@ final class McpServerSseIntegrationTest extends McpIntegrationTestBase {
         @Override
         public Map<String, String> getConfigOverrides() {
             return Map.of(
-                    // Use separate memory file for integration tests
                     "memory.file.path", SSE_TEST_MEMORY_FILE,
-                    // Configure SSE endpoint for default server
                     "quarkus.mcp.server.sse.root-path", "/mcp",
-                    // Enable traffic logging for debugging (default server)
                     "quarkus.mcp.server.traffic-logging.enabled", "true",
-                    // Disable STDIO transport for SSE-only testing
                     "quarkus.mcp.server.stdio.enabled", "false",
                     "quarkus.mcp.server.stdio.initialization-enabled", "false");
         }
@@ -76,52 +79,122 @@ final class McpServerSseIntegrationTest extends McpIntegrationTestBase {
                 .transport(transport)
                 .build();
 
-        Thread.sleep(2000); // Give the client time to complete initialization
+        Thread.sleep(2000);
     }
 
     @Test
-    @Order(1)
     void shouldEstablishSseConnection() throws Exception {
-        testBasicConnection();
+        assertNotNull(mcpClient);
+
+        String result = mcpClient.executeTool(ToolExecutionRequest.builder()
+                .name("memory.read_graph")
+                .arguments("{}")
+                .build());
+
+        assertNotNull(result);
+        assertTrue(result.length() > 0);
+
+        JsonNode jsonNode = objectMapper.readTree(result);
+        assertNotNull(jsonNode);
+        assertTrue(jsonNode.has("entities"));
+        assertTrue(jsonNode.has("relations"));
     }
 
     @Test
-    @Order(2)
-    void shouldExecuteCreateEntitiesAndReadGraph() throws Exception {
-        testCreateEntitiesAndReadGraph("SSETestEntity");
+    void shouldCreateEntityAndReadGraph() throws Exception {
+        String createEntitiesJson = objectMapper.writeValueAsString(Map.of(
+                "entities",
+                List.of(Map.of(
+                        "name", "SSETestEntity",
+                        "entityType", "TestType",
+                        "observations", List.of("This is a test entity")))));
+
+        String createResult = mcpClient.executeTool(ToolExecutionRequest.builder()
+                .name("memory.create_entities")
+                .arguments(createEntitiesJson)
+                .build());
+
+        assertNotNull(createResult);
+        assertTrue(createResult.length() > 0);
+
+        String readResult = mcpClient.executeTool(ToolExecutionRequest.builder()
+                .name("memory.read_graph")
+                .arguments("{}")
+                .build());
+
+        assertNotNull(readResult);
+        JsonNode graphNode = objectMapper.readTree(readResult);
+        JsonNode entities = graphNode.get("entities");
+
+        boolean foundEntity = false;
+        for (JsonNode entity : entities) {
+            if ("SSETestEntity".equals(entity.get("name").asText())) {
+                foundEntity = true;
+                break;
+            }
+        }
+        assertTrue(foundEntity, "SSETestEntity should be found in memory graph");
     }
 
     @Test
-    @Order(3)
-    void shouldExecuteSearchNodesTool() throws Exception {
-        // First, create an entity to search for
-        testCreateEntitiesAndReadGraph("SearchTestEntity");
+    void shouldSearchNodes() throws Exception {
+        String searchArgsJson = objectMapper.writeValueAsString(Map.of("query", "test"));
 
-        // Now search for the entity we just created
-        testSearchNodes("SearchTest", "SearchTestEntity");
+        String searchResult = mcpClient.executeTool(ToolExecutionRequest.builder()
+                .name("memory.search_nodes")
+                .arguments(searchArgsJson)
+                .build());
+
+        assertNotNull(searchResult);
+        JsonNode searchNode = objectMapper.readTree(searchResult);
+        assertTrue(searchNode.has("entities"));
+        assertTrue(searchNode.has("relations"));
     }
 
     @Test
-    @Order(4)
     void shouldDiscoverPrompts() throws Exception {
-        testPromptDiscovery();
+        var prompts = mcpClient.listPrompts();
+        assertNotNull(prompts);
+        assertFalse(prompts.isEmpty());
+
+        boolean foundMemoryPrompt = false;
+        for (var prompt : prompts) {
+            if ("memory.best_practices".equals(prompt.name())) {
+                foundMemoryPrompt = true;
+                break;
+            }
+        }
+        assertTrue(foundMemoryPrompt, "Should find memory.best_practices prompt");
     }
 
     @Test
-    @Order(5)
     void shouldDiscoverResources() throws Exception {
-        testResourceDiscovery();
+        var resources = mcpClient.listResources();
+        assertNotNull(resources);
+        assertFalse(resources.isEmpty());
+
+        boolean foundTypesResource = false;
+        for (var resource : resources) {
+            if ("memory://types".equals(resource.uri())) {
+                foundTypesResource = true;
+                break;
+            }
+        }
+        assertTrue(foundTypesResource, "Should find memory://types resource");
     }
 
     @Test
-    @Order(6)
-    void shouldExecuteGetCurrentTimeTool() throws Exception {
-        testGetCurrentTime();
-    }
+    void shouldExecuteTimeTools() throws Exception {
+        String timeArgsJson = objectMapper.writeValueAsString(Map.of("timezone", "America/New_York"));
 
-    @Test
-    @Order(7)
-    void shouldExecuteConvertTimeTool() throws Exception {
-        testConvertTime();
+        String timeResult = mcpClient.executeTool(ToolExecutionRequest.builder()
+                .name("time.get_current_time")
+                .arguments(timeArgsJson)
+                .build());
+
+        assertNotNull(timeResult);
+        JsonNode timeNode = objectMapper.readTree(timeResult);
+        assertTrue(timeNode.has("timezone"));
+        assertTrue(timeNode.has("datetime"));
     }
 }

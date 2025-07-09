@@ -1,0 +1,241 @@
+---
+name: Claude Smart Permutation Testing
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**/*.java'
+      - '!src/**/package-info.java'
+      - '!src/**/*Test.java'
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  actions: read
+
+jobs:
+  security-check:
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.security.outputs.should_run }}
+    steps:
+      - name: Security Check
+        id: security
+        run: |
+          echo "Actor: ${{ github.actor }}"
+          echo "Repository: ${{ github.repository }}"
+          echo "Event: ${{ github.event_name }}"
+
+          # Only allow specific actor
+          if [[ "${{ github.actor }}" != "jason-riddle" ]]; then
+            echo "should_run=false" >> $GITHUB_OUTPUT
+            echo "❌ Actor not authorized"
+            exit 0
+          fi
+
+          # For PR events, ensure it's from same repository
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            if [[ "${{ github.event.pull_request.head.repo.full_name }}" != "${{ github.repository }}" ]]; then
+              echo "should_run=false" >> $GITHUB_OUTPUT
+              echo "❌ PR from fork not allowed"
+              exit 0
+            fi
+          fi
+
+          # For push events, ensure it's to main branch
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            if [[ "${{ github.ref }}" != "refs/heads/main" ]]; then
+              echo "should_run=false" >> $GITHUB_OUTPUT
+              echo "❌ Push not to main branch"
+              exit 0
+            fi
+          fi
+
+          echo "should_run=true" >> $GITHUB_OUTPUT
+          echo "✅ Security check passed"
+
+  claude-permutation-analysis:
+    runs-on: ubuntu-latest
+    needs: security-check
+    if: needs.security-check.outputs.should_run == 'true'
+    timeout-minutes: 5
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'maven'
+
+
+      - name: Claude Permutation Testing Analysis
+        uses: anthropics/claude-code-action@beta
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          timeout_minutes: 4
+          max_turns: "5"
+          trigger_phrase: "@claude-permutation"
+          custom_instructions: |
+            You are an expert in permutation testing and software quality assurance for Java/Quarkus applications.
+            Your role is to analyze code changes and determine the most effective permutation tests to run.
+
+            ## Project Context
+            This is a Java/Quarkus MCP (Model Context Protocol) server with:
+            - Memory graph functionality (entities, relations, observations)
+            - Time/timezone conversion services
+            - MCP protocol implementation
+            - JQwik property-based testing for permutation tests
+
+            ## Your Mission
+            1. **Analyze Changed Files**: Examine the files that changed in this commit
+            2. **Assess Impact**: Determine which components could be affected by the changes
+            3. **Select Tests**: Choose specific permutation tests to run based on the changes
+            4. **Execute Tests**: Run the selected tests immediately
+            5. **Report Results**: Provide a summary of test outcomes and recommendations
+
+            ## Available Permutation Tests
+            - `MemoryGraphPermutationTest` - Tests memory operations work correctly regardless of execution order
+              - `entitiesCanBeCreatedInAnyOrder` - Entity creation ordering
+              - `relationsCanBeCreatedInAnyOrder` - Relation creation ordering
+              - `observationsCanBeAddedInAnyOrder` - Observation addition ordering
+              - `mixedOperationsWorkInAnyOrder` - Mixed operation sequences
+
+            ## Analysis Framework
+            When analyzing changes, consider:
+
+            ### High-Impact Changes (Run Full Permutation Suite)
+            - Core memory service modifications (`MemoryService.java`)
+            - Entity/Relation/Observation model changes
+            - JSONL persistence layer changes
+            - Concurrency-related modifications
+
+            ### Medium-Impact Changes (Run Targeted Tests)
+            - MCP tool implementations that use memory
+            - Service layer changes that interact with memory
+            - Configuration changes affecting memory behavior
+
+            ### Low-Impact Changes (Run Minimal/No Tests)
+            - Pure documentation changes
+            - Time service modifications (unless they affect memory)
+            - Build configuration changes (unless they affect test execution)
+            - Formatting/style changes
+
+            ## Test Execution Commands
+            Provide specific Maven commands to run the recommended tests:
+
+            ```bash
+            # Full permutation test suite
+            ./mvnw test -Dtest=MemoryGraphPermutationTest
+
+            # Specific test methods
+            ./mvnw test -Dtest=MemoryGraphPermutationTest#entitiesCanBeCreatedInAnyOrder
+            ./mvnw test -Dtest=MemoryGraphPermutationTest#relationsCanBeCreatedInAnyOrder
+            ./mvnw test -Dtest=MemoryGraphPermutationTest#observationsCanBeAddedInAnyOrder
+            ./mvnw test -Dtest=MemoryGraphPermutationTest#mixedOperationsWorkInAnyOrder
+
+            # Run with specific JQwik configurations
+            ./mvnw test -Dtest=MemoryGraphPermutationTest -Djqwik.tries=2000
+            ./mvnw test -Dtest=MemoryGraphPermutationTest -Djqwik.maxDiscardRatio=10
+            ```
+
+            ## Output Format
+            Structure your response as:
+
+            ### 📋 Analysis Summary
+            - **Changed Files**: List key files that changed
+            - **Impact Assessment**: HIGH/MEDIUM/LOW with brief explanation
+            - **Risk Areas**: Specific concerns based on the changes
+
+            ### 🧪 Selected Permutation Tests
+            - **Test Suite**: Which tests to run (with rationale)
+            - **Execution Command**: Exact Maven command being executed
+
+            ### ⚡ Test Execution Results
+            - **Test Status**: PASS/FAIL for each test
+            - **Execution Time**: Actual test execution time
+            - **Key Findings**: Any issues or insights discovered
+
+            ### 📊 Summary and Recommendations
+            - **Overall Status**: Summary of test outcomes
+            - **Action Items**: Specific recommendations for the developer
+            - **Next Steps**: What to do if tests failed or passed
+
+            ## Example Analysis
+            For a change to `MemoryService.java` that modifies entity creation:
+
+            ```
+            ### 📋 Analysis Summary
+            - **Changed Files**: MemoryService.java (entity creation logic)
+            - **Impact Assessment**: HIGH - Core memory functionality affected
+            - **Risk Areas**: Entity deduplication, concurrent creation, state consistency
+
+            ### 🧪 Selected Permutation Tests
+            - **entitiesCanBeCreatedInAnyOrder**: Directly tests changed code
+            - **Command**: `./mvnw test -Dtest=MemoryGraphPermutationTest#entitiesCanBeCreatedInAnyOrder`
+
+            ### ⚡ Test Execution Results
+            - **Test Status**: PASS - All property tests passed
+            - **Execution Time**: 2.3 seconds
+            - **Key Findings**: No entity deduplication issues found
+
+            ### 📊 Summary and Recommendations
+            - **Overall Status**: Tests PASSED - Changes are safe
+            - **Action Items**: No action required
+            - **Next Steps**: Proceed with confidence
+            ```
+          direct_prompt: |
+            ## Smart Permutation Testing Analysis and Execution
+
+            I need you to analyze the changes in this commit and execute the appropriate permutation tests.
+
+            Please:
+            1. Examine the files that have changed in this commit
+            2. Analyze the current permutation test implementation in `MemoryGraphPermutationTest.java`
+            3. Select specific permutation tests to run based on the changes
+            4. Execute the selected tests immediately
+            5. Report the test results and provide recommendations
+
+            Focus on being smart about test selection - don't run unnecessary tests, but ensure adequate coverage for the changes made.
+
+            **Important**: This workflow runs automatically on main branch commits when Java files change.
+            Log all test execution for audit purposes.
+
+            If this is triggered by a comment, also consider the specific request in the comment.
+          allowed_tools: |
+            Edit
+            Read
+            Glob
+            Grep
+            LS
+            TodoWrite
+            Task
+            Bash(./mvnw test -Dtest=MemoryGraphPermutationTest*)
+            Bash(./mvnw test -Dtest=*PermutationTest*)
+            Bash(./mvnw test -Djqwik.*)
+            Bash(git diff*)
+            Bash(git log*)
+            Bash(git show*)
+            Bash(find . -name "*.java" -type f)
+            Bash(grep -r*)
+            Bash(ls*)
+            Bash(echo*)
+          additional_permissions: |
+            actions: read
+          claude_env: |
+            JAVA_HOME: /opt/java/openjdk
+            MAVEN_OPTS: -Xmx2g
+            JQWIK_TRIES: 1000
+            JQWIK_MAX_DISCARD_RATIO: 10

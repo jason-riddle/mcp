@@ -90,19 +90,71 @@ This project follows **Palantir Java Format** with enhanced Checkstyle rules bas
 
 #### Key Style Rules
 
+**Core Structure:**
 - **Final parameters:** All method and constructor parameters must be `final`
 - **Method length:** Maximum 150 lines per method
 - **Parameter count:** Maximum 8 parameters per method
+- **Line length:** Maximum 120 characters (ignoring imports, packages, URLs)
+- **Tab width:** 4 spaces
+- **Line endings:** Unix-style (LF) required
+- **File encoding:** UTF-8 with no BOM
+
+**Naming Conventions:**
 - **Magic numbers:** Only `-1, 0, 1, 2, 8, 10, 16, 100, 1000` allowed as literals
-- **Abbreviations:** Allow `XML, HTTP, JSON, API, URL, URI, UUID, DTO, MCP, SSE`
-- **No trailing whitespace:** Enforced with regex checks
-- **LF line endings:** Unix-style line endings required
+- **Abbreviations:** Allow `XML, HTTP, JSON, API, URL, URI, UUID, DTO, MCP, SSE, JUnit`
+- **Package names:** Must be all lowercase with dots separating words
+- **Classes:** PascalCase nouns
+- **Methods:** lowerCamelCase verbs
+- **Variables:** lowerCamelCase descriptive nouns
+- **Constants:** UPPER_SNAKE_CASE
+
+**Import Management:**
 - **No star imports:** All imports must be explicit
 - **Static imports:** Restricted to specific utility classes (Preconditions, Mockito, etc.)
+- **Forbidden imports:** Bans dangerous packages (sun.*, junit.framework.*, legacy Guava)
+- **Unused imports:** Automatically removed
+
+**Type Safety:**
 - **Interface types:** Must use `List`, `Set`, `Map` instead of concrete implementations in APIs
+- **No primitive wrapper instantiation:** Use autoboxing instead
+- **No Collections.* imports:** Use explicit static imports for readability
+
+**Code Quality Patterns:**
 - **No System.out/err:** Must use proper logging instead of console output
+- **No printStackTrace():** Use proper logging framework
 - **No object instantiation in method calls:** Extract object creation to separate variables for debugging
-- **Forbidden imports:** Bans dangerous packages (sun.*, junit.framework.*, etc.)
+- **No excessive method chaining:** Maximum 3 chained method calls
+- **No logical OR in method calls:** Extract to boolean variables
+- **No nested Map.of calls:** Extract inner maps to variables
+
+**Modern Java Restrictions:**
+- **No streams:** Use simple loops instead of `stream()`, `map()`, `filter()`, `collect()`
+- **No Collectors:** Use simple loops for better readability and performance
+- **No Optional chaining:** Use simple if statements instead of `flatMap()`, complex `orElse()` chains
+- **No CompletableFuture chaining:** Use simple async patterns instead of `thenApply()`, `thenCompose()`
+- **No ternary operators:** Use if-else statements for better readability
+- **No sealed classes:** Use regular inheritance
+- **No pattern matching with guards:** Use simple switch or if-else
+- **No module system:** Use classpath-based projects
+
+**Code Complexity:**
+- **Cyclomatic complexity:** Maximum 8 per method
+- **NPath complexity:** Maximum 100 per method
+- **No nested blocks:** Avoid unnecessary code blocks
+- **No complex if statements:** Extract multiple && conditions to boolean variables
+- **No tautological expressions:** Remove `x || !x` patterns
+- **No contradictory expressions:** Remove `x && !x` patterns
+
+**Variable Usage:**
+- **No var with diamond operator:** Use explicit type or clear initialization
+- **No var with complex expressions:** Extract to intermediate variables
+- **No hidden fields:** Avoid shadowing instance variables (except constructors/setters)
+- **No multiple variable declarations:** One variable per line
+
+**Testing Exceptions:**
+- Test files have relaxed rules for static imports, javadoc, magic numbers, string literals
+- Console output allowed in tests for debugging
+- Some complexity rules relaxed for test setup
 
 ### Javadoc Standards
 

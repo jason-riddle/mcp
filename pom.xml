@@ -116,6 +116,13 @@
             <version>1.1.0-beta7</version>
             <scope>test</scope>
         </dependency>
+        <!-- jqwik for property-based testing with permutations -->
+        <dependency>
+            <groupId>net.jqwik</groupId>
+            <artifactId>jqwik</artifactId>
+            <version>1.9.0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <!-- Build Configuration -->
@@ -377,6 +384,27 @@
                                 </goals>
                             </execution>
                         </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <!-- Permutation Testing Profile -->
+        <profile>
+            <id>permutation-tests</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>${surefire-plugin.version}</version>
+                        <configuration>
+                            <groups>permutation</groups>
+                            <systemPropertyVariables>
+                                <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+                                <maven.home>${maven.home}</maven.home>
+                                <permutation.test.max.size>10</permutation.test.max.size>
+                                <permutation.test.timeout>300</permutation.test.timeout>
+                            </systemPropertyVariables>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
