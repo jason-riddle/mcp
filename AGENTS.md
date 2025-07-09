@@ -473,6 +473,37 @@ quarkus.log.category."io.quarkus.container.image.jib.deployment.JibProcessor".le
 
 This project uses GitHub Actions for automated testing and quality assurance. The key workflow uses Claude Code actions to perform intelligent permutation testing analysis.
 
+### Workflow Directory Structure
+
+```text
+.github/
+└── workflows/
+    ├── ci.yml                        # Standard CI pipeline
+    └── claude-permutation-testing.yml  # Claude-powered permutation testing
+```
+
+#### Workflow Files
+
+- **`ci.yml`** - Standard CI pipeline with format checks, style checks, unit tests, integration tests, and build
+- **`claude-permutation-testing.yml`** - Claude Code action for intelligent permutation testing analysis
+
+#### CI Workflow (`ci.yml`)
+
+The standard CI pipeline includes:
+- **Format Check**: Spotless formatting validation
+- **Checkstyle Check**: Code style verification
+- **Unit Tests**: Core functionality tests
+- **Integration Tests**: End-to-end testing
+- **Build**: Application packaging
+
+#### Claude Permutation Testing (`claude-permutation-testing.yml`)
+
+Automated permutation testing with Claude analysis:
+- **Security Check**: Restricts execution to authorized users and branches
+- **Smart Test Selection**: Analyzes code changes to select relevant tests
+- **Execution**: Runs targeted JQwik permutation tests
+- **Reporting**: Provides analysis and recommendations
+
 ### Claude Code Actions Comparison
 
 There are two Claude Code actions available, each designed for different use cases:
@@ -742,6 +773,11 @@ When switching from `claude-code-action` to `claude-code-base-action`:
 #### Tool Permission Denied
 - **Cause**: Tool not listed in `allowed_tools`
 - **Solution**: Add specific tool pattern to `allowed_tools`
+
+#### "Unexpected input(s) 'additional_permissions'"
+- **Cause**: Using `additional_permissions` parameter with `claude-code-base-action@beta`
+- **Solution**: Remove the `additional_permissions` parameter - it's not supported by the base action
+- **Context**: This parameter was valid in earlier versions but is no longer supported
 
 ## Deployment
 
