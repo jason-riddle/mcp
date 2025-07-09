@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.stream.Collectors;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 
@@ -184,10 +183,15 @@ public class MemoryService {
             List<Relation> created = new ArrayList<>();
 
             for (Relation newRelation : relations) {
-                boolean exists = existingRelations.stream()
-                        .anyMatch(r -> r.from().equals(newRelation.from())
-                                && r.to().equals(newRelation.to())
-                                && r.relationType().equals(newRelation.relationType()));
+                boolean exists = false;
+                for (Relation r : existingRelations) {
+                    if (r.from().equals(newRelation.from())
+                            && r.to().equals(newRelation.to())
+                            && r.relationType().equals(newRelation.relationType())) {
+                        exists = true;
+                        break;
+                    }
+                }
 
                 if (!exists) {
                     existingRelations.add(newRelation);
@@ -260,14 +264,23 @@ public class MemoryService {
             MemoryGraph graph = readGraph();
 
             // Filter out entities to delete
-            List<Entity> remainingEntities = graph.entities().stream()
-                    .filter(e -> !entityNames.contains(e.name()))
-                    .collect(Collectors.toList());
+            List<Entity> remainingEntities = new ArrayList<>();
+            for (Entity e : graph.entities()) {
+                boolean shouldDelete = entityNames.contains(e.name());
+                if (!shouldDelete) {
+                    remainingEntities.add(e);
+                }
+            }
 
             // Filter out relations involving deleted entities
-            List<Relation> remainingRelations = graph.relations().stream()
-                    .filter(r -> !entityNames.contains(r.from()) && !entityNames.contains(r.to()))
-                    .collect(Collectors.toList());
+            List<Relation> remainingRelations = new ArrayList<>();
+            for (Relation r : graph.relations()) {
+                boolean fromDeleted = entityNames.contains(r.from());
+                boolean toDeleted = entityNames.contains(r.to());
+                if (!fromDeleted && !toDeleted) {
+                    remainingRelations.add(r);
+                }
+            }
 
             MemoryGraph updatedGraph = new MemoryGraph(remainingEntities, remainingRelations);
             writeGraph(updatedGraph);
@@ -372,21 +385,37 @@ public class MemoryService {
             String lowerQuery = query.toLowerCase();
 
             // Find matching entities
-            List<Entity> matchingEntities = graph.entities().stream()
-                    .filter(e -> e.name().toLowerCase().contains(lowerQuery)
-                            || e.entityType().toLowerCase().contains(lowerQuery)
-                            || e.observations().stream()
-                                    .anyMatch(o -> o.toLowerCase().contains(lowerQuery)))
-                    .collect(Collectors.toList());
+            List<Entity> matchingEntities = new ArrayList<>();
+            for (Entity e : graph.entities()) {
+                boolean nameMatches = e.name().toLowerCase().contains(lowerQuery);
+                boolean typeMatches = e.entityType().toLowerCase().contains(lowerQuery);
+                boolean observationMatches = false;
+                for (String o : e.observations()) {
+                    if (o.toLowerCase().contains(lowerQuery)) {
+                        observationMatches = true;
+                        break;
+                    }
+                }
+                if (nameMatches || typeMatches || observationMatches) {
+                    matchingEntities.add(e);
+                }
+            }
 
             // Get entity names for relation filtering
-            List<String> entityNames =
-                    matchingEntities.stream().map(Entity::name).collect(Collectors.toList());
+            List<String> entityNames = new ArrayList<>();
+            for (Entity entity : matchingEntities) {
+                entityNames.add(entity.name());
+            }
 
             // Find relations between matching entities
-            List<Relation> matchingRelations = graph.relations().stream()
-                    .filter(r -> entityNames.contains(r.from()) && entityNames.contains(r.to()))
-                    .collect(Collectors.toList());
+            List<Relation> matchingRelations = new ArrayList<>();
+            for (Relation r : graph.relations()) {
+                boolean fromMatches = entityNames.contains(r.from());
+                boolean toMatches = entityNames.contains(r.to());
+                if (fromMatches && toMatches) {
+                    matchingRelations.add(r);
+                }
+            }
 
             return new MemoryGraph(matchingEntities, matchingRelations);
         } finally {
@@ -406,14 +435,22 @@ public class MemoryService {
             MemoryGraph graph = readGraph();
 
             // Find requested entities
-            List<Entity> requestedEntities = graph.entities().stream()
-                    .filter(e -> names.contains(e.name()))
-                    .collect(Collectors.toList());
+            List<Entity> requestedEntities = new ArrayList<>();
+            for (Entity e : graph.entities()) {
+                if (names.contains(e.name())) {
+                    requestedEntities.add(e);
+                }
+            }
 
             // Find relations between requested entities
-            List<Relation> relevantRelations = graph.relations().stream()
-                    .filter(r -> names.contains(r.from()) && names.contains(r.to()))
-                    .collect(Collectors.toList());
+            List<Relation> relevantRelations = new ArrayList<>();
+            for (Relation r : graph.relations()) {
+                boolean fromRequested = names.contains(r.from());
+                boolean toRequested = names.contains(r.to());
+                if (fromRequested && toRequested) {
+                    relevantRelations.add(r);
+                }
+            }
 
             return new MemoryGraph(requestedEntities, relevantRelations);
         } finally {
