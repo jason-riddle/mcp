@@ -97,8 +97,9 @@ class MemoryServiceTest {
         memoryService.createEntities(List.of(user));
 
         // Add observations
-        var observationMap = java.util.Map.of("TestUser", List.of("New observation", "Another observation"));
-        var added = memoryService.addObservations(observationMap);
+        final Map<String, List<String>> observationMap =
+                Map.of("TestUser", List.of("New observation", "Another observation"));
+        final Map<String, List<String>> added = memoryService.addObservations(observationMap);
 
         assertEquals(1, added.size());
         assertEquals(2, added.get("TestUser").size());
