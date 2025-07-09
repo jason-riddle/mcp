@@ -78,146 +78,25 @@ jobs:
           echo "Changed files:"
           git diff --name-only HEAD~1
 
-      - name: Claude Permutation Testing Analysis
+      - name: Simple Claude Test Selection
         id: claude-analysis
         uses: anthropics/claude-code-base-action@beta
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          timeout_minutes: 40
-          max_turns: "10"
-          append_system_prompt: |
-            You are an expert in permutation testing and software quality assurance for Java/Quarkus applications.
-            Your role is to analyze code changes and determine the most effective permutation tests to run.
-
-            ## Project Context
-            This is a Java/Quarkus MCP (Model Context Protocol) server with:
-            - Memory graph functionality (entities, relations, observations)
-            - Time/timezone conversion services
-            - MCP protocol implementation
-            - JQwik property-based testing for permutation tests
-
-            ## Your Mission
-            1. **Analyze Changed Files**: Examine the files that changed in this commit
-            2. **Assess Impact**: Determine which components could be affected by the changes
-            3. **Select Tests**: Choose specific permutation tests to run based on the changes
-            4. **Execute Tests**: Run the selected tests immediately
-            5. **Report Results**: Provide a summary of test outcomes and recommendations
-
-            ## Available Permutation Tests
-            - `MemoryGraphPermutationTest` - Tests memory operations work correctly regardless of execution order
-              - `entitiesCanBeCreatedInAnyOrder` - Entity creation ordering
-              - `relationsCanBeCreatedInAnyOrder` - Relation creation ordering
-              - `observationsCanBeAddedInAnyOrder` - Observation addition ordering
-              - `mixedOperationsWorkInAnyOrder` - Mixed operation sequences
-
-            ## Analysis Framework
-            When analyzing changes, consider:
-
-            ### High-Impact Changes (Run Full Permutation Suite)
-            - Core memory service modifications (`MemoryService.java`)
-            - Entity/Relation/Observation model changes
-            - JSONL persistence layer changes
-            - Concurrency-related modifications
-
-            ### Medium-Impact Changes (Run Targeted Tests)
-            - MCP tool implementations that use memory
-            - Service layer changes that interact with memory
-            - Configuration changes affecting memory behavior
-
-            ### Low-Impact Changes (Run Minimal/No Tests)
-            - Pure documentation changes
-            - Time service modifications (unless they affect memory)
-            - Build configuration changes (unless they affect test execution)
-            - Formatting/style changes
-
-            ## Test Execution Commands
-            Provide specific Maven commands to run the recommended tests:
-
-            ```bash
-            # Full permutation test suite
-            ./mvnw test -Dtest=MemoryGraphPermutationTest
-
-            # Specific test methods
-            ./mvnw test -Dtest=MemoryGraphPermutationTest#entitiesCanBeCreatedInAnyOrder
-            ./mvnw test -Dtest=MemoryGraphPermutationTest#relationsCanBeCreatedInAnyOrder
-            ./mvnw test -Dtest=MemoryGraphPermutationTest#observationsCanBeAddedInAnyOrder
-            ./mvnw test -Dtest=MemoryGraphPermutationTest#mixedOperationsWorkInAnyOrder
-
-            # Run with specific JQwik configurations
-            ./mvnw test -Dtest=MemoryGraphPermutationTest -Djqwik.tries=2000
-            ./mvnw test -Dtest=MemoryGraphPermutationTest -Djqwik.maxDiscardRatio=10
-            ```
-
-            ## Output Format
-            Structure your response as:
-
-            ### 📋 Analysis Summary
-            - **Changed Files**: List key files that changed
-            - **Impact Assessment**: HIGH/MEDIUM/LOW with brief explanation
-            - **Risk Areas**: Specific concerns based on the changes
-
-            ### 🧪 Selected Permutation Tests
-            - **Test Suite**: Which tests to run (with rationale)
-            - **Execution Command**: Exact Maven command being executed
-
-            ### ⚡ Test Execution Results
-            - **Test Status**: PASS/FAIL for each test
-            - **Execution Time**: Actual test execution time
-            - **Key Findings**: Any issues or insights discovered
-
-            ### 📊 Summary and Recommendations
-            - **Overall Status**: Summary of test outcomes
-            - **Action Items**: Specific recommendations for the developer
-            - **Next Steps**: What to do if tests failed or passed
-
-            ## Example Analysis
-            For a change to `MemoryService.java` that modifies entity creation:
-
-            ```
-            ### 📋 Analysis Summary
-            - **Changed Files**: MemoryService.java (entity creation logic)
-            - **Impact Assessment**: HIGH - Core memory functionality affected
-            - **Risk Areas**: Entity deduplication, concurrent creation, state consistency
-
-            ### 🧪 Selected Permutation Tests
-            - **entitiesCanBeCreatedInAnyOrder**: Directly tests changed code
-            - **Command**: `./mvnw test -Dtest=MemoryGraphPermutationTest#entitiesCanBeCreatedInAnyOrder`
-
-            ### ⚡ Test Execution Results
-            - **Test Status**: PASS - All property tests passed
-            - **Execution Time**: 2.3 seconds
-            - **Key Findings**: No entity deduplication issues found
-
-            ### 📊 Summary and Recommendations
-            - **Overall Status**: Tests PASSED - Changes are safe
-            - **Action Items**: No action required
-            - **Next Steps**: Proceed with confidence
-            ```
+          timeout_minutes: 20
+          max_turns: "3"
           prompt: |
-            ## Smart Permutation Testing Analysis and Execution
+            You are a test selector. Follow these steps:
 
-            I need you to analyze the changes in this commit and execute the appropriate permutation tests.
+            1. Check what files changed: `git diff --name-only HEAD~1`
+            2. If any files contain "Memory" or "Entity" or "Relation", run: `./mvnw test -Dtest=MemoryGraphPermutationTest`
+            3. If no memory-related files changed, output: "No permutation tests needed"
+            4. Always show what you decided and why
 
-            Please:
-            1. Examine the files that have changed in this commit
-            2. Analyze the current permutation test implementation in `MemoryGraphPermutationTest.java`
-            3. Select specific permutation tests to run based on the changes
-            4. Execute the selected tests immediately
-            5. Report the test results and provide recommendations
-
-            Focus on being smart about test selection - don't run unnecessary tests, but ensure adequate coverage for the changes made.
-
-            **Important**: This workflow runs automatically on main branch commits when Java files change.
-            Log all test execution for audit purposes.
+            Keep it simple - just decide and execute.
           allowed_tools: |
-            Edit
-            Read
-            Glob
-            Grep
-            LS
-            TodoWrite
-            Task
-            Bash
+            Bash(git*)
+            Bash(./mvnw*)
           claude_env: |
             JAVA_HOME: /opt/java/openjdk
             MAVEN_OPTS: -Xmx2g
@@ -273,8 +152,8 @@ jobs:
 
           # Add workflow information
           echo "## Workflow Configuration" >> reports/claude-analysis-report.md
-          echo "- **Timeout:** 40 minutes" >> reports/claude-analysis-report.md
-          echo "- **Max Turns:** 10" >> reports/claude-analysis-report.md
+          echo "- **Timeout:** 20 minutes" >> reports/claude-analysis-report.md
+          echo "- **Max Turns:** 3" >> reports/claude-analysis-report.md
           echo "- **JQwik Tries:** 1000" >> reports/claude-analysis-report.md
           echo "- **JQwik Max Discard Ratio:** 10" >> reports/claude-analysis-report.md
           echo "" >> reports/claude-analysis-report.md
