@@ -81,14 +81,12 @@ jobs:
 
 
       - name: Claude Permutation Testing Analysis
-        uses: anthropics/claude-code-action@beta
+        uses: anthropics/claude-code-base-action@beta
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
           timeout_minutes: 4
           max_turns: "5"
-          trigger_phrase: "@claude-permutation"
-          custom_instructions: |
+          append_system_prompt: |
             You are an expert in permutation testing and software quality assurance for Java/Quarkus applications.
             Your role is to analyze code changes and determine the most effective permutation tests to run.
 
@@ -196,7 +194,7 @@ jobs:
             - **Action Items**: No action required
             - **Next Steps**: Proceed with confidence
             ```
-          direct_prompt: |
+          prompt: |
             ## Smart Permutation Testing Analysis and Execution
 
             I need you to analyze the changes in this commit and execute the appropriate permutation tests.
@@ -212,8 +210,6 @@ jobs:
 
             **Important**: This workflow runs automatically on main branch commits when Java files change.
             Log all test execution for audit purposes.
-
-            If this is triggered by a comment, also consider the specific request in the comment.
           allowed_tools: |
             Edit
             Read

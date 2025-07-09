@@ -106,15 +106,7 @@ class MemoryGraphPermutationTest {
             final String to = parts[1];
             final String relationType = parts[2];
 
-            boolean found = false;
-            for (final Relation relation : graph.relations()) {
-                if (relation.from().equals(from)
-                        && relation.to().equals(to)
-                        && relation.relationType().equals(relationType)) {
-                    found = true;
-                    break;
-                }
-            }
+            final boolean found = findRelationInGraph(graph, from, to, relationType);
             assertTrue(found, "Relation " + from + " -> " + to + " (" + relationType + ") should be found in graph");
         }
 
@@ -272,5 +264,19 @@ class MemoryGraphPermutationTest {
     @Provide
     Arbitrary<String> testOperations() {
         return Arbitraries.of("create_entity", "add_relation", "add_observation");
+    }
+
+    private boolean findRelationInGraph(
+            final MemoryGraph graph, final String from, final String to, final String relationType) {
+        for (final Relation relation : graph.relations()) {
+            if (relation.from().equals(from)) {
+                if (relation.to().equals(to)) {
+                    if (relation.relationType().equals(relationType)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }
