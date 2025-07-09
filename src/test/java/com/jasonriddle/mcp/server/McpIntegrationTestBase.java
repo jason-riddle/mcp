@@ -72,7 +72,7 @@ abstract class McpIntegrationTestBase {
         assertNotNull(mcpClient);
 
         String result = mcpClient.executeTool(ToolExecutionRequest.builder()
-                .name("memory_read_graph")
+                .name("memory.read_graph")
                 .arguments("{}")
                 .build());
 
@@ -100,7 +100,7 @@ abstract class McpIntegrationTestBase {
                         List.of("This is a test entity for integration testing")))));
 
         String createResult = mcpClient.executeTool(ToolExecutionRequest.builder()
-                .name("memory_create_entities")
+                .name("memory.create_entities")
                 .arguments(createEntitiesJson)
                 .build());
 
@@ -108,7 +108,7 @@ abstract class McpIntegrationTestBase {
         assertTrue(createResult.length() > 0);
 
         String readResult = mcpClient.executeTool(ToolExecutionRequest.builder()
-                .name("memory_read_graph")
+                .name("memory.read_graph")
                 .arguments("{}")
                 .build());
 
@@ -134,7 +134,7 @@ abstract class McpIntegrationTestBase {
         String searchArgsJson = objectMapper.writeValueAsString(Map.of("query", searchTerm));
 
         String searchResult = mcpClient.executeTool(ToolExecutionRequest.builder()
-                .name("memory_search_nodes")
+                .name("memory.search_nodes")
                 .arguments(searchArgsJson)
                 .build());
 
@@ -170,16 +170,16 @@ abstract class McpIntegrationTestBase {
 
             boolean foundMemoryPrompt = false;
             for (var prompt : prompts) {
-                if ("memory_best_practices".equals(prompt.name())) {
+                if ("memory.best_practices".equals(prompt.name())) {
                     foundMemoryPrompt = true;
                     break;
                 }
             }
 
-            assertTrue(foundMemoryPrompt, "Should find memory_best_practices prompt");
+            assertTrue(foundMemoryPrompt, "Should find memory.best_practices prompt");
 
             var promptArgs = Map.<String, Object>of();
-            var promptResult = mcpClient.getPrompt("memory_best_practices", promptArgs);
+            var promptResult = mcpClient.getPrompt("memory.best_practices", promptArgs);
             assertNotNull(promptResult, "Should be able to get prompt content");
             assertFalse(promptResult.messages().isEmpty(), "Prompt should have message content");
 
@@ -235,7 +235,7 @@ abstract class McpIntegrationTestBase {
         for (int attempt = 1; attempt <= maxRetries; attempt++) {
             try {
                 String result = mcpClient.executeTool(ToolExecutionRequest.builder()
-                        .name("memory_read_graph")
+                        .name("memory.read_graph")
                         .arguments("{}")
                         .build());
 
@@ -252,13 +252,13 @@ abstract class McpIntegrationTestBase {
     }
 
     /**
-     * Tests the get_current_time tool functionality.
+     * Tests the time.get_current_time tool functionality.
      */
     protected void testGetCurrentTime() throws Exception {
         String argsJson = objectMapper.writeValueAsString(Map.of("timezone", "America/New_York"));
 
         String result = mcpClient.executeTool(ToolExecutionRequest.builder()
-                .name("get_current_time")
+                .name("time.get_current_time")
                 .arguments(argsJson)
                 .build());
 
@@ -281,7 +281,7 @@ abstract class McpIntegrationTestBase {
     }
 
     /**
-     * Tests the convert_time tool functionality.
+     * Tests the time.convert_time tool functionality.
      */
     protected void testConvertTime() throws Exception {
         String argsJson = objectMapper.writeValueAsString(Map.of(
@@ -290,7 +290,7 @@ abstract class McpIntegrationTestBase {
                 "targetTimezone", "Europe/London"));
 
         String result = mcpClient.executeTool(ToolExecutionRequest.builder()
-                .name("convert_time")
+                .name("time.convert_time")
                 .arguments(argsJson)
                 .build());
 

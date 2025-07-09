@@ -105,7 +105,7 @@ final class McpServerStdioIntegrationTest extends McpIntegrationTestBase {
 
         // Execute a tool to ensure connection is working
         String result = mcpClient.executeTool(ToolExecutionRequest.builder()
-                .name("memory_read_graph")
+                .name("memory.read_graph")
                 .arguments("{}")
                 .build());
 
@@ -135,7 +135,7 @@ final class McpServerStdioIntegrationTest extends McpIntegrationTestBase {
 
         // Verify the new connection works
         String newResult = mcpClient.executeTool(ToolExecutionRequest.builder()
-                .name("memory_read_graph")
+                .name("memory.read_graph")
                 .arguments("{}")
                 .build());
 
@@ -185,7 +185,7 @@ final class McpServerStdioIntegrationTest extends McpIntegrationTestBase {
                         "observations", List.of(testObservation)))));
 
         String createResult = mcpClient.executeTool(ToolExecutionRequest.builder()
-                .name("memory_create_entities")
+                .name("memory.create_entities")
                 .arguments(createEntitiesJson)
                 .build());
 
@@ -196,7 +196,7 @@ final class McpServerStdioIntegrationTest extends McpIntegrationTestBase {
     private void verifyEntityExists(
             final String testEntityName, final String testEntityType, final String testObservation) throws Exception {
         String readResult = mcpClient.executeTool(ToolExecutionRequest.builder()
-                .name("memory_read_graph")
+                .name("memory.read_graph")
                 .arguments("{}")
                 .build());
 
@@ -223,7 +223,7 @@ final class McpServerStdioIntegrationTest extends McpIntegrationTestBase {
     private void verifyEntityFoundInSearch(final String testEntityName) throws Exception {
         String searchArgsJson = objectMapper.writeValueAsString(Map.of("query", "CrudTest"));
         String searchResult = mcpClient.executeTool(ToolExecutionRequest.builder()
-                .name("memory_search_nodes")
+                .name("memory.search_nodes")
                 .arguments(searchArgsJson)
                 .build());
 
@@ -250,7 +250,7 @@ final class McpServerStdioIntegrationTest extends McpIntegrationTestBase {
         String deleteEntitiesJson = objectMapper.writeValueAsString(Map.of("entityNames", List.of(testEntityName)));
 
         String deleteResult = mcpClient.executeTool(ToolExecutionRequest.builder()
-                .name("memory_delete_entities")
+                .name("memory.delete_entities")
                 .arguments(deleteEntitiesJson)
                 .build());
 
@@ -260,7 +260,7 @@ final class McpServerStdioIntegrationTest extends McpIntegrationTestBase {
 
     private void verifyEntityNotFoundAfterDeletion(final String testEntityName) throws Exception {
         String readAfterDeleteResult = mcpClient.executeTool(ToolExecutionRequest.builder()
-                .name("memory_read_graph")
+                .name("memory.read_graph")
                 .arguments("{}")
                 .build());
 
@@ -281,7 +281,7 @@ final class McpServerStdioIntegrationTest extends McpIntegrationTestBase {
         // Verify search also doesn't find the entity
         String searchArgsJson = objectMapper.writeValueAsString(Map.of("query", "CrudTest"));
         String searchAfterDeleteResult = mcpClient.executeTool(ToolExecutionRequest.builder()
-                .name("memory_search_nodes")
+                .name("memory.search_nodes")
                 .arguments(searchArgsJson)
                 .build());
 

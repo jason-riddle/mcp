@@ -30,7 +30,7 @@ public final class McpTimeTools {
      * @param timezone IANA timezone name (e.g., 'America/New_York', 'Europe/London').
      * @return time result containing timezone, datetime, and DST status.
      */
-    @Tool(name = "get_current_time", description = "Get current time in a specific timezone")
+    @Tool(name = "time.get_current_time", description = "Get current time in a specific timezone")
     public Map<String, Object> getCurrentTime(
             @ToolArg(description = "IANA timezone name (e.g., 'America/New_York', 'Europe/London')")
                     final String timezone) {
@@ -50,7 +50,7 @@ public final class McpTimeTools {
      * @param targetTimezone target IANA timezone name.
      * @return conversion result with source, target, and time difference.
      */
-    @Tool(name = "convert_time", description = "Convert time between timezones")
+    @Tool(name = "time.convert_time", description = "Convert time between timezones")
     public Map<String, Object> convertTime(
             @ToolArg(description = "Source IANA timezone name") final String sourceTimezone,
             @ToolArg(description = "Time to convert in 24-hour format (HH:MM)") final String time,

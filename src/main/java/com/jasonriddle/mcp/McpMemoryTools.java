@@ -27,7 +27,7 @@ public final class McpMemoryTools {
      * @param entities entities to create.
      * @return created entities as JSON string.
      */
-    @Tool(name = "memory_create_entities", description = "Create multiple new entities in the knowledge graph")
+    @Tool(name = "memory.create_entities", description = "Create multiple new entities in the knowledge graph")
     public String createEntities(
             @ToolArg(description = "Array of entities with name, entityType, and observations")
                     final List<Map<String, Object>> entities) {
@@ -55,7 +55,7 @@ public final class McpMemoryTools {
      * @param relations relations to create.
      * @return created relations as JSON string.
      */
-    @Tool(name = "memory_create_relations", description = "Create multiple new relations between entities")
+    @Tool(name = "memory.create_relations", description = "Create multiple new relations between entities")
     public String createRelations(
             @ToolArg(description = "Array of relations with from, to, and relationType")
                     final List<Map<String, String>> relations) {
@@ -86,7 +86,7 @@ public final class McpMemoryTools {
      * @param observations observations to add.
      * @return added observations as JSON string.
      */
-    @Tool(name = "memory_add_observations", description = "Add new observations to existing entities")
+    @Tool(name = "memory.add_observations", description = "Add new observations to existing entities")
     public String addObservations(
             @ToolArg(description = "Array of objects with entityName and contents")
                     final List<Map<String, Object>> observations) {
@@ -117,7 +117,7 @@ public final class McpMemoryTools {
      * @param entityNames names of entities to delete.
      * @return deleted entity names as JSON string.
      */
-    @Tool(name = "memory_delete_entities", description = "Remove entities and their relations from the knowledge graph")
+    @Tool(name = "memory.delete_entities", description = "Remove entities and their relations from the knowledge graph")
     public String deleteEntities(
             @ToolArg(description = "Array of entity names to delete") final List<String> entityNames) {
         final List<String> deleted = memoryService.deleteEntities(entityNames);
@@ -130,7 +130,7 @@ public final class McpMemoryTools {
      * @param deletions deletions to perform.
      * @return deleted observations as JSON string.
      */
-    @Tool(name = "memory_delete_observations", description = "Remove specific observations from entities")
+    @Tool(name = "memory.delete_observations", description = "Remove specific observations from entities")
     public String deleteObservations(
             @ToolArg(description = "Array of objects with entityName and observations to delete")
                     final List<Map<String, Object>> deletions) {
@@ -161,7 +161,7 @@ public final class McpMemoryTools {
      * @param relations relations to delete.
      * @return deleted relations as JSON string.
      */
-    @Tool(name = "memory_delete_relations", description = "Remove specific relations from the knowledge graph")
+    @Tool(name = "memory.delete_relations", description = "Remove specific relations from the knowledge graph")
     public String deleteRelations(
             @ToolArg(description = "Array of relations with from, to, and relationType")
                     final List<Map<String, String>> relations) {
@@ -191,7 +191,7 @@ public final class McpMemoryTools {
      *
      * @return complete graph structure as JSON string.
      */
-    @Tool(name = "memory_read_graph", description = "Read the entire knowledge graph")
+    @Tool(name = "memory.read_graph", description = "Read the entire knowledge graph")
     public MemoryGraph readGraph() {
         return memoryService.readGraph();
     }
@@ -202,7 +202,7 @@ public final class McpMemoryTools {
      * @param query search query.
      * @return matching entities and relations as JSON string.
      */
-    @Tool(name = "memory_search_nodes", description = "Search for nodes in the knowledge graph based on a query")
+    @Tool(name = "memory.search_nodes", description = "Search for nodes in the knowledge graph based on a query")
     public MemoryGraph searchNodes(
             @ToolArg(description = "The search query to match against entity names, types, and observation content")
                     final String query) {
@@ -215,7 +215,7 @@ public final class McpMemoryTools {
      * @param names entity names to retrieve.
      * @return requested entities and relations as JSON string.
      */
-    @Tool(name = "memory_open_nodes", description = "Retrieve specific nodes by name")
+    @Tool(name = "memory.open_nodes", description = "Retrieve specific nodes by name")
     public MemoryGraph openNodes(@ToolArg(description = "Array of entity names to retrieve") final List<String> names) {
         return memoryService.openNodes(names);
     }

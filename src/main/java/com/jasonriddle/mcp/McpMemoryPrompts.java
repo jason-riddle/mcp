@@ -16,7 +16,7 @@ public final class McpMemoryPrompts {
      *
      * @return memory best practices prompt message.
      */
-    @Prompt(name = "memory_best_practices", description = "Guide Claude on effective memory management patterns")
+    @Prompt(name = "memory.best_practices", description = "Guide Claude on effective memory management patterns")
     PromptMessage memoryBestPracticesPrompt() {
         String content = buildMemoryGuideContent();
         TextContent textContent = new TextContent(content);
@@ -97,7 +97,7 @@ public final class McpMemoryPrompts {
             - Use relationship traversal to explore connected concepts
 
             ### Entity Modification
-            - **Add observations**: Use `memory_add_observations`
+            - **Add observations**: Use `memory.add_observations`
             - **Create relationships**: Use `memory.create_relations`
             - **Update information**: Add new observations, archive old ones
 

@@ -92,7 +92,7 @@ The server provides MCP tools for managing a persistent knowledge graph. This se
 
 Before creating new entities, explore what already exists in your memory graph:
 
-**memory_search_nodes** - Search for existing entities and content
+**memory.search_nodes** - Search for existing entities and content
 ```json
 {
   "query": "Jason"
@@ -100,7 +100,7 @@ Before creating new entities, explore what already exists in your memory graph:
 ```
 *Use this to find entities by name, type, or content. Search for "person", "preferences", or specific topics.*
 
-**memory_open_nodes** - Get complete details for specific entities
+**memory.open_nodes** - Get complete details for specific entities
 ```json
 {
   "names": ["Jason", "Technical_Preferences"]
@@ -108,7 +108,7 @@ Before creating new entities, explore what already exists in your memory graph:
 ```
 *Retrieve full entity information including all observations and relationships.*
 
-**memory_read_graph** - View the entire knowledge graph
+**memory.read_graph** - View the entire knowledge graph
 ```json
 {}
 ```
@@ -118,7 +118,7 @@ Before creating new entities, explore what already exists in your memory graph:
 
 Once you understand your existing knowledge, start building:
 
-**memory_create_entities** - Create new knowledge nodes
+**memory.create_entities** - Create new knowledge nodes
 ```json
 {
   "entities": [
@@ -137,7 +137,7 @@ Once you understand your existing knowledge, start building:
 ```
 *Common entity types: `person`, `preferences`, `project`, `system`, `tool`*
 
-**memory_create_relations** - Link entities together
+**memory.create_relations** - Link entities together
 ```json
 {
   "relations": [
@@ -160,7 +160,7 @@ Once you understand your existing knowledge, start building:
 
 Keep your knowledge current by adding details and removing outdated information:
 
-**memory_add_observations** - Add new facts to existing entities
+**memory.add_observations** - Add new facts to existing entities
 ```json
 {
   "observations": [
@@ -179,7 +179,7 @@ Keep your knowledge current by adding details and removing outdated information:
 
 #### Cleanup & Maintenance
 
-**memory_delete_entities** - Remove outdated entities
+**memory.delete_entities** - Remove outdated entities
 ```json
 {
   "entityNames": ["Old_Project", "Deprecated_Tool"]
@@ -187,7 +187,7 @@ Keep your knowledge current by adding details and removing outdated information:
 ```
 *This also removes all relations involving these entities.*
 
-**memory_delete_relations** - Remove specific connections
+**memory.delete_relations** - Remove specific connections
 ```json
 {
   "relations": [
@@ -200,7 +200,7 @@ Keep your knowledge current by adding details and removing outdated information:
 }
 ```
 
-**memory_delete_observations** - Remove outdated facts
+**memory.delete_observations** - Remove outdated facts
 ```json
 {
   "deletions": [
@@ -225,11 +225,11 @@ Keep your knowledge current by adding details and removing outdated information:
 - Include temporal context when relevant
 
 **Typical Workflow:**
-1. Search for existing entities (`memory_search_nodes`)
-2. Create new entities if needed (`memory_create_entities`)
-3. Link entities with relationships (`memory_create_relations`)
-4. Add details over time (`memory_add_observations`)
-5. Clean up outdated information (`memory_delete_*`)
+1. Search for existing entities (`memory.search_nodes`)
+2. Create new entities if needed (`memory.create_entities`)
+3. Link entities with relationships (`memory.create_relations`)
+4. Add details over time (`memory.add_observations`)
+5. Clean up outdated information (`memory.delete_*`)
 
 ### Time Tools
 
@@ -237,7 +237,7 @@ The server provides MCP tools for time and timezone operations, useful for sched
 
 #### Getting Current Time
 
-**get_current_time** - Get current time in any timezone with DST information
+**time.get_current_time** - Get current time in any timezone with DST information
 ```json
 {
   "timezone": "America/New_York"
@@ -257,7 +257,7 @@ The server provides MCP tools for time and timezone operations, useful for sched
 
 #### Converting Between Timezones
 
-**convert_time** - Convert time between any two timezones
+**time.convert_time** - Convert time between any two timezones
 ```json
 {
   "sourceTimezone": "America/New_York",
@@ -379,9 +379,9 @@ Access memory data via URI resources for discovery and health monitoring. These 
 
 #### Integration with Memory Tools
 
-- **memory://types** helps you choose consistent entity types before using `memory_create_entities`
-- **memory://status** reveals issues that can be fixed with `memory_delete_*` tools
-- Both resources provide context for effective use of `memory_search_nodes`
+- **memory://types** helps you choose consistent entity types before using `memory.create_entities`
+- **memory://status** reveals issues that can be fixed with `memory.delete_*` tools
+- Both resources provide context for effective use of `memory.search_nodes`
 
 ### Memory Prompts
 
@@ -389,7 +389,7 @@ Access comprehensive guidance for effective memory management. Unlike tools and 
 
 #### Getting Memory Management Guidance
 
-**memory_best_practices** - Comprehensive guide for effective memory management
+**memory.best_practices** - Comprehensive guide for effective memory management
 
 This prompt provides detailed guidance on:
 
