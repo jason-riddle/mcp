@@ -20,7 +20,7 @@ import org.mockito.MockitoAnnotations;
 /**
  * Tests for WeatherService.
  */
-final class WeatherServiceTest {
+final class WeatherServiceUnitTest {
 
     @Mock
     private WeatherClient weatherClient;

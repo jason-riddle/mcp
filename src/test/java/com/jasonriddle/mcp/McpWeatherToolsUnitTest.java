@@ -22,7 +22,7 @@ import org.mockito.MockitoAnnotations;
 /**
  * Tests for McpWeatherTools MCP integration.
  */
-final class McpWeatherToolsTest {
+final class McpWeatherToolsUnitTest {
 
     @Mock
     private WeatherService weatherService;

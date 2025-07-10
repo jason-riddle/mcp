@@ -73,9 +73,9 @@ make test-integration                 # Run integration tests
 # or run directly
 # ./mvnw verify -DskipITs=false
 
-./mvnw test -Dtest=MemoryServiceTest  # Run specific test class
-./mvnw test -Dtest=TimeServiceTest   # Run time service tests
-./mvnw test -Dtest=WeatherServiceTest # Run weather service tests
+./mvnw test -Dtest=MemoryServiceUnitTest  # Run specific test class
+./mvnw test -Dtest=TimeServiceUnitTest   # Run time service tests
+./mvnw test -Dtest=WeatherServiceUnitTest # Run weather service tests
 
 # VCR Mock Tests (requires WEATHER_API_KEY)
 ./mvnw test -Dtest=WeatherServiceVcrMockTest  # Run VCR tests
@@ -337,23 +337,23 @@ src/main/java/com.jasonriddle.mcp/
 
 ```text
 src/test/java/com.jasonriddle.mcp/
-├── McpMemoryPromptsTest.java                       # Tests for memory prompts
-├── McpMemoryResourcesTest.java                     # Tests for memory resources
-├── McpMemoryToolsTest.java                         # Tests for memory tools
-├── McpTimeToolsTest.java                           # Tests for time tools
-├── McpWeatherToolsTest.java                        # Tests for weather tools
+├── McpMemoryPromptsUnitTest.java                   # Unit tests for memory prompts
+├── McpMemoryResourcesUnitTest.java                 # Unit tests for memory resources
+├── McpMemoryToolsUnitTest.java                     # Unit tests for memory tools
+├── McpTimeToolsUnitTest.java                       # Unit tests for time tools
+├── McpWeatherToolsUnitTest.java                    # Unit tests for weather tools
 ├── package-info.java                               # Package documentation
 ├── config/                                         # Configuration tests
 │   ├── ConfigurationTestConstants.java            # Test constants for configuration
-│   ├── ConfigurationValidationTest.java           # Tests for configuration validation
-│   ├── HerokuConfigurationValidationTest.java     # Tests for Heroku configuration
+│   ├── ConfigurationValidationUnitTest.java       # Unit tests for configuration validation
+│   ├── HerokuConfigurationValidationUnitTest.java # Unit tests for Heroku configuration
 │   ├── HerokuTestProfile.java                     # Heroku test profile
-│   ├── ProdConfigurationValidationTest.java       # Tests for production configuration
+│   ├── ProdConfigurationValidationUnitTest.java   # Unit tests for production configuration
 │   ├── ProdTestProfile.java                       # Production test profile
 │   └── package-info.java                          # Package documentation
 ├── memory/                                         # Memory implementation tests
 │   ├── MemoryGraphPermutationTest.java            # JQwik permutation tests for memory graph
-│   ├── MemoryServiceTest.java                     # Tests for memory service
+│   ├── MemoryServiceUnitTest.java                  # Unit tests for memory service
 │   └── package-info.java                          # Package documentation
 ├── security/                                       # Security tests (disabled)
 │   └── ApiKeyAuthenticationDisabledIntegrationTest.java.disabled  # Disabled auth tests
@@ -363,10 +363,10 @@ src/test/java/com.jasonriddle.mcp/
 │   ├── McpServerStdioIntegrationTest.java          # Integration tests for STDIO server
 │   └── package-info.java                          # Package documentation
 ├── time/                                           # Time service tests
-│   ├── TimeServiceTest.java                       # Tests for time service
+│   ├── TimeServiceUnitTest.java                    # Unit tests for time service
 │   └── package-info.java                          # Package documentation
 └── weather/                                        # Weather service tests
-    ├── WeatherServiceTest.java                    # Tests for weather service
+    ├── WeatherServiceUnitTest.java                 # Unit tests for weather service
     ├── WeatherServiceVcrMockTest.java              # VCR mock tests for weather API
     └── package-info.java                          # Package documentation
 ```

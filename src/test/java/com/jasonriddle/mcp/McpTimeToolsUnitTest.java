@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests for McpTimeTools MCP integration.
  */
-final class McpTimeToolsTest {
+final class McpTimeToolsUnitTest {
 
     private TimeService timeService;
     private McpTimeTools mcpTimeTools;

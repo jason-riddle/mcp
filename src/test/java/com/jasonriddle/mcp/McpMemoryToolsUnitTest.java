@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests for McpMemoryTools MCP integration.
  */
-final class McpMemoryToolsTest {
+final class McpMemoryToolsUnitTest {
 
     private Path tempMemoryFile;
     private MemoryService memoryService;

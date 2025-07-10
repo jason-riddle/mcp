@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Unit tests for McpMemoryPrompts.
  */
-final class McpMemoryPromptsTest {
+final class McpMemoryPromptsUnitTest {
 
     private final McpMemoryPrompts mcpMemoryPrompts = new McpMemoryPrompts();
 

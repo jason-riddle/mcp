@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
  * Unit tests for McpMemoryResources.
  */
 @QuarkusTest
-final class McpMemoryResourcesTest {
+final class McpMemoryResourcesUnitTest {
 
     private Path tempMemoryFile;
     private MemoryService memoryService;

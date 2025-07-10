@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
  * Tests for MemoryService.
  */
 @QuarkusTest
-class MemoryServiceTest {
+class MemoryServiceUnitTest {
 
     private Path tempMemoryFile;
     private MemoryService memoryService;

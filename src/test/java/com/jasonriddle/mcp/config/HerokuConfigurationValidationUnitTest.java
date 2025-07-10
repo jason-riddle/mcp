@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 @QuarkusTest
 @TestProfile(HerokuTestProfile.class)
 @DisplayName("Heroku Configuration Validation")
-final class HerokuConfigurationValidationTest {
+final class HerokuConfigurationValidationUnitTest {
 
     @Inject
     Config config;

@@ -26,7 +26,7 @@ import org.junit.jupiter.params.provider.ValueSource;
  */
 @QuarkusTest
 @DisplayName("Configuration Validation")
-final class ConfigurationValidationTest {
+final class ConfigurationValidationUnitTest {
 
     @Inject
     Config config;

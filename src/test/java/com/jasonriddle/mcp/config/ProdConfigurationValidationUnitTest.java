@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 @QuarkusTest
 @TestProfile(ProdTestProfile.class)
 @DisplayName("Production Configuration Validation")
-final class ProdConfigurationValidationTest {
+final class ProdConfigurationValidationUnitTest {
 
     @Inject
     Config config;

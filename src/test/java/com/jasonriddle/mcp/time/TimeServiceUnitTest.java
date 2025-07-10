@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
  * Tests for TimeService.
  */
 @QuarkusTest
-class TimeServiceTest {
+class TimeServiceUnitTest {
 
     private TimeService timeService;
 
