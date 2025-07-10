@@ -1,0 +1,155 @@
+package com.jasonriddle.mcp.server.transport;
+
+// Authenticated HTTP MCP transport factory with Bearer token support
+
+import dev.langchain4j.mcp.client.transport.McpTransport;
+import dev.langchain4j.mcp.client.transport.http.HttpMcpTransport;
+import java.io.IOException;
+import java.time.Duration;
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
+/**
+ * Factory for creating authenticated HTTP MCP transports with Bearer token support.
+ *
+ * This factory creates HttpMcpTransport instances with custom OkHttp clients
+ * that automatically add Authorization header with Bearer token to all requests.
+ */
+public final class AuthenticatedHttpMcpTransport {
+
+    private AuthenticatedHttpMcpTransport() {
+        // Utility class
+    }
+
+    /**
+     * Creates an authenticated HTTP MCP transport with Bearer token.
+     *
+     * @param sseUrl SSE endpoint URL
+     * @param bearerToken Bearer token for authentication
+     * @param timeout request timeout
+     * @param logRequests enable request logging
+     * @param logResponses enable response logging
+     * @return configured McpTransport with authentication
+     */
+    public static McpTransport create(final String sseUrl, final String bearerToken, final Duration timeout,
+            final boolean logRequests, final boolean logResponses) {
+
+        if (sseUrl == null || sseUrl.isEmpty()) {
+            throw new IllegalArgumentException("SSE URL is required");
+        }
+        if (bearerToken == null || bearerToken.isEmpty()) {
+            throw new IllegalArgumentException("Bearer token is required");
+        }
+
+        OkHttpClient authenticatedClient = new OkHttpClient.Builder()
+                .connectTimeout(timeout)
+                .readTimeout(timeout)
+                .writeTimeout(timeout)
+                .addInterceptor(new BearerTokenInterceptor(bearerToken))
+                .build();
+
+        return new HttpMcpTransport.Builder()
+                .sseUrl(sseUrl)
+                .timeout(timeout)
+                .logRequests(logRequests)
+                .logResponses(logResponses)
+                .build();
+    }
+
+    /**
+     * Builder for creating authenticated HTTP MCP transports.
+     */
+    public static final class Builder {
+        private String sseUrl;
+        private String bearerToken;
+        private Duration timeout = Duration.ofSeconds(10);
+        private boolean logRequests = false;
+        private boolean logResponses = false;
+
+        /**
+         * Sets the SSE endpoint URL.
+         *
+         * @param url SSE endpoint URL
+         * @return this builder
+         */
+        public Builder sseUrl(final String url) {
+            this.sseUrl = url;
+            return this;
+        }
+
+        /**
+         * Sets the Bearer token for authentication.
+         *
+         * @param token Bearer token value
+         * @return this builder
+         */
+        public Builder bearerToken(final String token) {
+            this.bearerToken = token;
+            return this;
+        }
+
+        /**
+         * Sets the timeout for HTTP operations.
+         *
+         * @param requestTimeout timeout duration
+         * @return this builder
+         */
+        public Builder timeout(final Duration requestTimeout) {
+            this.timeout = requestTimeout;
+            return this;
+        }
+
+        /**
+         * Enables or disables request logging.
+         *
+         * @param enableRequestLogging true to enable request logging
+         * @return this builder
+         */
+        public Builder logRequests(final boolean enableRequestLogging) {
+            this.logRequests = enableRequestLogging;
+            return this;
+        }
+
+        /**
+         * Enables or disables response logging.
+         *
+         * @param enableResponseLogging true to enable response logging
+         * @return this builder
+         */
+        public Builder logResponses(final boolean enableResponseLogging) {
+            this.logResponses = enableResponseLogging;
+            return this;
+        }
+
+        /**
+         * Builds the authenticated McpTransport instance.
+         *
+         * @return configured transport instance
+         */
+        public McpTransport build() {
+            return create(sseUrl, bearerToken, timeout, logRequests, logResponses);
+        }
+    }
+
+    /**
+     * OkHttp interceptor that adds Bearer token authentication to all requests.
+     */
+    private static final class BearerTokenInterceptor implements Interceptor {
+        private final String bearerToken;
+
+        BearerTokenInterceptor(final String bearerToken) {
+            this.bearerToken = bearerToken;
+        }
+
+        @Override
+        public Response intercept(final Chain chain) throws IOException {
+            Request originalRequest = chain.request();
+            Request authenticatedRequest = originalRequest.newBuilder()
+                    .header("Authorization", "Bearer " + bearerToken)
+                    .build();
+            return chain.proceed(authenticatedRequest);
+        }
+    }
+}

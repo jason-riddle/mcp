@@ -1,0 +1,215 @@
+package com.jasonriddle.mcp.server;
+
+// End-to-end tests for MCP Server remote endpoint functionality
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.jasonriddle.mcp.server.transport.AuthenticatedHttpMcpTransport;
+import dev.langchain4j.agent.tool.ToolExecutionRequest;
+import dev.langchain4j.mcp.client.DefaultMcpClient;
+import dev.langchain4j.mcp.client.transport.McpTransport;
+import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.junit.QuarkusTestProfile;
+import io.quarkus.test.junit.TestProfile;
+import java.time.Duration;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.Test;
+
+/**
+ * End-to-end tests for MCP Server remote Heroku endpoint.
+ *
+ * This test suite verifies that our MCP client can successfully communicate
+ * with a remote MCP server hosted on Heroku using Bearer token authentication.
+ * These are true end-to-end tests that validate the complete flow from client
+ * to remote production service.
+ */
+@QuarkusTest
+@TestProfile(McpServerRemoteEndToEndTest.RemoteTestProfile.class)
+final class McpServerRemoteEndToEndTest extends McpIntegrationTestBase {
+
+    private static final String REMOTE_SSE_URL = "https://us.inference.heroku.com/mcp/sse";
+    private static final String BEARER_TOKEN = "inf-cd3c9a8e-6c0a-4582-acb1-a629dd440f04";
+    private static final Duration REMOTE_TIMEOUT = Duration.ofSeconds(30);
+    private static final String REMOTE_TEST_MEMORY_FILE = "memory-remote-e2e-test.jsonl";
+
+    /**
+     * Test profile configuration for remote MCP end-to-end tests.
+     */
+    public static final class RemoteTestProfile implements QuarkusTestProfile {
+        @Override
+        public Map<String, String> getConfigOverrides() {
+            return Map.of(
+                    "memory.file.path", REMOTE_TEST_MEMORY_FILE,
+                    "weather.api.key", "test-api-key",
+                    "quarkus.mcp.server.sse.enabled", "false",
+                    "quarkus.mcp.server.stdio.enabled", "false",
+                    "quarkus.mcp.server.stdio.initialization-enabled", "false");
+        }
+
+        @Override
+        public String getConfigProfile() {
+            return "remote-e2e-test";
+        }
+    }
+
+    @Override
+    protected String getTestMemoryFile() {
+        return REMOTE_TEST_MEMORY_FILE;
+    }
+
+    @Override
+    protected void setupMcpClient() throws Exception {
+        McpTransport transport = new AuthenticatedHttpMcpTransport.Builder()
+                .sseUrl(REMOTE_SSE_URL)
+                .bearerToken(BEARER_TOKEN)
+                .timeout(REMOTE_TIMEOUT)
+                .logRequests(true)
+                .logResponses(true)
+                .build();
+
+        mcpClient = new DefaultMcpClient.Builder()
+                .clientName("remote-e2e-test-client")
+                .protocolVersion("2024-11-05")
+                .toolExecutionTimeout(REMOTE_TIMEOUT)
+                .transport(transport)
+                .build();
+
+        // Allow more time for remote connection establishment
+        Thread.sleep(3000);
+    }
+
+    @Test
+    void shouldEstablishRemoteConnection() throws Exception {
+        assertNotNull(mcpClient);
+
+        String result = mcpClient.executeTool(ToolExecutionRequest.builder()
+                .name("memory.read_graph")
+                .arguments("{}")
+                .build());
+
+        assertNotNull(result);
+        assertTrue(result.length() > 0);
+
+        JsonNode jsonNode = objectMapper.readTree(result);
+        assertNotNull(jsonNode);
+        assertTrue(jsonNode.has("entities"));
+        assertTrue(jsonNode.has("relations"));
+    }
+
+    @Test
+    void shouldExecuteRemoteMemoryOperations() throws Exception {
+        String createEntitiesJson = objectMapper.writeValueAsString(Map.of(
+                "entities",
+                List.of(Map.of(
+                        "name", "RemoteE2ETestEntity",
+                        "entityType", "EndToEndTest",
+                        "observations", List.of("This is a remote end-to-end test entity")))));
+
+        String createResult = mcpClient.executeTool(ToolExecutionRequest.builder()
+                .name("memory.create_entities")
+                .arguments(createEntitiesJson)
+                .build());
+
+        assertNotNull(createResult);
+        assertTrue(createResult.length() > 0);
+
+        String readResult = mcpClient.executeTool(ToolExecutionRequest.builder()
+                .name("memory.read_graph")
+                .arguments("{}")
+                .build());
+
+        assertNotNull(readResult);
+        JsonNode graphNode = objectMapper.readTree(readResult);
+        JsonNode entities = graphNode.get("entities");
+
+        boolean foundEntity = false;
+        for (JsonNode entity : entities) {
+            if ("RemoteE2ETestEntity".equals(entity.get("name").asText())) {
+                foundEntity = true;
+                break;
+            }
+        }
+        assertTrue(foundEntity, "RemoteE2ETestEntity should be found in remote memory graph");
+    }
+
+    @Test
+    void shouldExecuteRemoteTimeTools() throws Exception {
+        String timeArgsJson = objectMapper.writeValueAsString(Map.of("timezone", "America/New_York"));
+
+        String timeResult = mcpClient.executeTool(ToolExecutionRequest.builder()
+                .name("time.get_current_time")
+                .arguments(timeArgsJson)
+                .build());
+
+        assertNotNull(timeResult);
+        JsonNode timeNode = objectMapper.readTree(timeResult);
+        assertTrue(timeNode.has("timezone"));
+        assertTrue(timeNode.has("datetime"));
+    }
+
+    @Test
+    void shouldExecuteRemoteWeatherTools() throws Exception {
+        String weatherArgsJson = objectMapper.writeValueAsString(Map.of("location", "New York"));
+
+        String weatherResult = mcpClient.executeTool(ToolExecutionRequest.builder()
+                .name("weather.get_current_weather")
+                .arguments(weatherArgsJson)
+                .build());
+
+        assertNotNull(weatherResult);
+        JsonNode weatherNode = objectMapper.readTree(weatherResult);
+        assertTrue(weatherNode.has("location"));
+        assertTrue(weatherNode.has("temperature"));
+    }
+
+    @Test
+    void shouldDiscoverRemotePrompts() throws Exception {
+        var prompts = mcpClient.listPrompts();
+        assertNotNull(prompts);
+        assertFalse(prompts.isEmpty());
+
+        boolean foundMemoryPrompt = false;
+        for (var prompt : prompts) {
+            if ("memory.best_practices".equals(prompt.name())) {
+                foundMemoryPrompt = true;
+                break;
+            }
+        }
+        assertTrue(foundMemoryPrompt, "Should find memory.best_practices prompt on remote server");
+    }
+
+    @Test
+    void shouldDiscoverRemoteResources() throws Exception {
+        var resources = mcpClient.listResources();
+        assertNotNull(resources);
+        assertFalse(resources.isEmpty());
+
+        boolean foundTypesResource = false;
+        for (var resource : resources) {
+            if ("memory://types".equals(resource.uri())) {
+                foundTypesResource = true;
+                break;
+            }
+        }
+        assertTrue(foundTypesResource, "Should find memory://types resource on remote server");
+    }
+
+    @Test
+    void shouldSearchRemoteNodes() throws Exception {
+        String searchArgsJson = objectMapper.writeValueAsString(Map.of("query", "RemoteE2ETestEntity"));
+
+        String searchResult = mcpClient.executeTool(ToolExecutionRequest.builder()
+                .name("memory.search_nodes")
+                .arguments(searchArgsJson)
+                .build());
+
+        assertNotNull(searchResult);
+        JsonNode searchNode = objectMapper.readTree(searchResult);
+        assertTrue(searchNode.has("entities"));
+        assertTrue(searchNode.has("relations"));
+    }
+}
