@@ -16,8 +16,13 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
@@ -37,6 +42,7 @@ final class WeatherServiceVCRIntegrationTest {
     private static final String BASE_URL = "https://api.openweathermap.org/data/2.5";
     private static final String API_KEY = System.getenv("WEATHER_API_KEY");
     private static final String UNITS = "imperial";
+    private static final Pattern API_KEY_PATTERN = Pattern.compile("appid=[^&]*");
 
     private ObjectMapper objectMapper;
     private AdvancedSettings vcrSettings;
@@ -45,11 +51,19 @@ final class WeatherServiceVCRIntegrationTest {
     void setUp() {
         objectMapper = new ObjectMapper();
 
-        // Configure VCR to censor API key
+        // Configure VCR with enhanced censoring for API keys
         vcrSettings = new AdvancedSettings();
         vcrSettings.censors = new Censors()
                 .censorQueryParametersByKeys(List.of("appid"))
                 .censorHeadersByKeys(List.of("Authorization", "X-API-Key"));
+    }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        // Post-process all cassette files to ensure API keys are censored
+        if (API_KEY != null) {
+            censorApiKeysInAllCassettes();
+        }
     }
 
     @Test
@@ -250,5 +264,63 @@ final class WeatherServiceVCRIntegrationTest {
             case "bypass" -> Mode.Bypass;
             default -> Mode.Auto;
         };
+    }
+
+    /**
+     * Manual URI censoring method to ensure API keys are always masked.
+     * This provides a backup to EasyVCR's built-in censoring which can be inconsistent.
+     *
+     * @param uri the URI string to censor
+     * @return the URI with API key replaced with asterisks
+     */
+    private String censorApiKeyInUri(final String uri) {
+        if (uri == null || API_KEY == null) {
+            return uri;
+        }
+        // Replace both the actual API key and the appid parameter value with asterisks
+        return API_KEY_PATTERN.matcher(uri).replaceAll("appid=*****");
+    }
+
+    /**
+     * Post-process all cassette files to ensure API keys are properly censored.
+     * This method reads each cassette file and replaces any exposed API keys with asterisks.
+     */
+    private void censorApiKeysInAllCassettes() throws Exception {
+        final Path cassettesDir = Paths.get(CASSETTES_PATH);
+        if (!Files.exists(cassettesDir)) {
+            return;
+        }
+
+        try (var directoryStream = Files.newDirectoryStream(cassettesDir, "*.json")) {
+            for (final Path cassetteFile : directoryStream) {
+                try {
+                    final String originalContent = Files.readString(cassetteFile, StandardCharsets.UTF_8);
+                    final String censoredContent = censorApiKeyInContent(originalContent);
+                    if (!originalContent.equals(censoredContent)) {
+                        Files.writeString(cassetteFile, censoredContent, StandardCharsets.UTF_8);
+                    }
+                } catch (final Exception e) {
+                    throw new RuntimeException("Failed to censor API key in cassette: " + cassetteFile, e);
+                }
+            }
+        }
+    }
+
+    /**
+     * Censor API keys in the content of a cassette file.
+     *
+     * @param content the original cassette file content
+     * @return the content with API keys replaced with asterisks
+     */
+    private String censorApiKeyInContent(final String content) {
+        if (content == null || API_KEY == null) {
+            return content;
+        }
+        // Replace direct API key occurrences
+        String censoredContent = content.replace(API_KEY, "*****");
+        // Replace encoded API key occurrences
+        final String encodedApiKey = URLEncoder.encode(API_KEY, StandardCharsets.UTF_8);
+        censoredContent = censoredContent.replace(encodedApiKey, "*****");
+        return censoredContent;
     }
 }
