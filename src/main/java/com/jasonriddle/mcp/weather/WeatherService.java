@@ -43,6 +43,11 @@ public final class WeatherService {
      * @return current weather data.
      */
     public WeatherData getCurrentWeather(final String location) {
+        if (apiKey == null || apiKey.trim().isEmpty()) {
+            throw new WeatherServiceException(
+                    "Weather API key is not configured. Set WEATHER_API_KEY environment variable.");
+        }
+
         try {
             final Map<String, Object> response = weatherClient.getCurrentWeather(location, apiKey, DEFAULT_UNITS);
 
@@ -60,6 +65,11 @@ public final class WeatherService {
      * @return list of forecast data.
      */
     public List<WeatherForecast> getForecast(final String location, final int days) {
+        if (apiKey == null || apiKey.trim().isEmpty()) {
+            throw new WeatherServiceException(
+                    "Weather API key is not configured. Set WEATHER_API_KEY environment variable.");
+        }
+
         try {
             final int count = Math.min(days * 8, 40); // 8 forecasts per day, max 40
             final Map<String, Object> response = weatherClient.getForecast(location, apiKey, DEFAULT_UNITS, count);
@@ -208,6 +218,15 @@ public final class WeatherService {
      * Exception for weather service errors.
      */
     public static final class WeatherServiceException extends RuntimeException {
+        /**
+         * Creates a new weather service exception.
+         *
+         * @param message error message.
+         */
+        public WeatherServiceException(final String message) {
+            super(message);
+        }
+
         /**
          * Creates a new weather service exception.
          *
