@@ -297,9 +297,11 @@
                         <include>**/*IntegrationTest.java</include>
                     </includes>
                     <excludes>
-                        <exclude>**/*PropertyTest.java</exclude>
+                        <!-- End-to-End Tests -->
                         <exclude>**/*EndToEndTest.java</exclude>
                         <exclude>**/*E2ETest.java</exclude>
+                        <!-- Property Tests -->
+                        <exclude>**/*PropertyTest.java</exclude>
                     </excludes>
                     <systemPropertyVariables>
                         <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
@@ -369,13 +371,18 @@
                         <include>**/*Test.java</include>
                     </includes>
                     <excludes>
+                        <!-- Integration Tests -->
                         <exclude>**/*IT.java</exclude>
                         <exclude>**/*IntegrationTest.java</exclude>
-                        <exclude>**/*PropertyTest.java</exclude>
-                        <exclude>**/*MockTest.java</exclude>
-                        <exclude>**/*PITMutationTest.java</exclude>
+                        <!-- End-to-End Tests -->
                         <exclude>**/*EndToEndTest.java</exclude>
                         <exclude>**/*E2ETest.java</exclude>
+                        <!-- Property Tests -->
+                        <exclude>**/*PropertyTest.java</exclude>
+                        <!-- Mock Tests -->
+                        <exclude>**/*MockTest.java</exclude>
+                        <!-- Mutation Tests -->
+                        <exclude>**/*PITMutationTest.java</exclude>
                     </excludes>
                     <systemPropertyVariables>
                         <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
@@ -556,6 +563,7 @@
                         <version>${surefire-plugin.version}</version>
                         <configuration>
                             <includes>
+                                <!-- VCR Mock Tests -->
                                 <include>**/*VCRMockTest.java</include>
                                 <include>**/*VCRIntegrationTest.java</include>
                             </includes>
