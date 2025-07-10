@@ -38,7 +38,7 @@ import org.junit.jupiter.api.condition.EnabledIf;
  */
 final class WeatherServiceVCRMockTest {
 
-    private static final String CASSETTES_PATH = "src/test/resources/cassettes";
+    private static final String CASSETTES_PATH = "src/test/resources/cassettes/weather";
     private static final String BASE_URL = "https://api.openweathermap.org/data/2.5";
     private static final String API_KEY = System.getenv("WEATHER_API_KEY");
     private static final String UNITS = "imperial";

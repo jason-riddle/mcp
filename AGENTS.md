@@ -389,12 +389,13 @@ src/test/resources/
 ├── application-sse-test.properties                 # SSE test configuration
 ├── application-stdio-test.properties              # STDIO test configuration
 ├── application.properties                         # Default test configuration
-└── cassettes/                                     # VCR cassettes for weather API tests
-    ├── current_weather_invalid_location.json      # Invalid location test cassette
-    ├── current_weather_london.json                # London weather test cassette
-    ├── current_weather_new_york.json              # New York weather test cassette
-    ├── current_weather_tokyo_coordinates.json     # Tokyo coordinates test cassette
-    └── forecast_san_francisco.json                # San Francisco forecast test cassette
+└── cassettes/                                     # VCR cassettes for API tests
+    └── weather/                                   # Weather API VCR cassettes
+        ├── current_weather_invalid_location.json  # Invalid location test cassette
+        ├── current_weather_london.json            # London weather test cassette
+        ├── current_weather_new_york.json          # New York weather test cassette
+        ├── current_weather_tokyo_coordinates.json # Tokyo coordinates test cassette
+        └── forecast_san_francisco.json            # San Francisco forecast test cassette
 ```
 
 **Note**: Authentication integration tests were removed because authentication is not functional for MCP STDIO endpoints.
