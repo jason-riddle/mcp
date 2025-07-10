@@ -348,6 +348,7 @@
                         <exclude>**/*IntegrationTest.java</exclude>
                         <exclude>**/*PermutationTest.java</exclude>
                         <exclude>**/*MockTest.java</exclude>
+                        <exclude>**/*PITMutationTest.java</exclude>
                     </excludes>
                     <systemPropertyVariables>
                         <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
@@ -367,7 +368,7 @@
                         <param>com.jasonriddle.mcp.memory.*</param>
                     </targetClasses>
                     <targetTests>
-                        <param>com.jasonriddle.mcp.memory.*Test</param>
+                        <param>com.jasonriddle.mcp.memory.*PITMutationTest</param>
                     </targetTests>
                     <excludedClasses>
                         <param>com.jasonriddle.mcp.memory.package-info</param>
@@ -533,7 +534,7 @@
                                 <param>com.jasonriddle.mcp.memory.Relation</param>
                             </targetClasses>
                             <targetTests>
-                                <param>com.jasonriddle.mcp.memory.MemoryServicePitTest</param>
+                                <param>com.jasonriddle.mcp.memory.*PITMutationTest</param>
                             </targetTests>
                             <excludedMethods>
                                 <param>toString</param>

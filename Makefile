@@ -157,7 +157,7 @@ test-mutation-memory-only: clean ## Run mutation testing only on MemoryService
 	@echo "Running mutation testing on MemoryService only..."
 	@$(MVN) org.pitest:pitest-maven:mutationCoverage \
 		-DtargetClasses=com.jasonriddle.mcp.memory.MemoryService \
-		-DtargetTests=com.jasonriddle.mcp.memory.MemoryServicePitTest \
+		-DtargetTests=com.jasonriddle.mcp.memory.*PITMutationTest \
 		--no-transfer-progress
 	@echo "✓ MemoryService mutation testing complete"
 

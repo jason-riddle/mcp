@@ -71,7 +71,7 @@
         <module name="AbbreviationAsWordInName">
             <property name="ignoreFinal" value="false"/>
             <property name="allowedAbbreviationLength" value="1"/>
-            <property name="allowedAbbreviations" value="XML,HTTP,JSON,API,URL,URI,UUID,DTO,MCP,SSE,VCR,JUnit"/>
+            <property name="allowedAbbreviations" value="XML,HTTP,JSON,API,URL,URI,UUID,DTO,MCP,SSE,VCR,JUnit,PIT"/>
         </module>
         <module name="ClassTypeParameterName"/>
         <module name="ConstantName"/>

@@ -143,7 +143,7 @@ The project includes PITest for mutation testing focused on the memory package. 
 
 **Key Features:**
 - Memory-focused testing: Targets file I/O, concurrency, and data persistence operations
-- Standalone test suite: `MemoryServicePitTest.java` avoids Quarkus DI issues with PITest
+- Standalone test suite: `MemoryServicePITMutationTest.java` avoids Quarkus DI issues with PITest
 - Incremental analysis: Uses history files for faster subsequent runs
 - Performance optimized: 2 threads, configurable timeouts, memory-specific mutators
 
@@ -412,7 +412,7 @@ src/test/java/com.jasonriddle.mcp/
 │   └── package-info.java                          # Package documentation
 ├── memory/                                         # Memory implementation tests
 │   ├── MemoryGraphPermutationTest.java            # JQwik permutation tests for memory graph
-│   ├── MemoryServicePitTest.java                  # PITest standalone mutation tests for memory service
+│   ├── MemoryServicePITMutationTest.java          # PITest standalone mutation tests for memory service
 │   ├── MemoryServiceUnitTest.java                  # Unit tests for memory service
 │   └── package-info.java                          # Package documentation
 ├── security/                                       # Security tests (disabled)

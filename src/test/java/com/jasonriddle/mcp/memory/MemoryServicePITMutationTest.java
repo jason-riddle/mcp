@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
  * Standalone tests for MemoryService designed for PITest mutation testing.
  * These tests do not use @QuarkusTest to avoid dependency injection issues with PITest.
  */
-class MemoryServicePitTest {
+class MemoryServicePITMutationTest {
 
     private Path tempMemoryFile;
     private MemoryService memoryService;
