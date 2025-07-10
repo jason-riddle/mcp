@@ -40,21 +40,6 @@ make env-encrypt             # Encrypt .env to .env.enc using SOPS
 make env-decrypt             # Decrypt .env.enc to .env using SOPS
 ```
 
-### Configuration
-
-Configure via `application.properties`:
-
-```properties
-# Memory file path (default: memory.jsonl)
-memory.file.path=memory.jsonl
-
-# Weather API configuration
-weather.api.key=${WEATHER_API_KEY:}
-
-# Server port (default: 8080)
-quarkus.http.port=8080
-```
-
 ## Secrets Management
 
 ### SOPS Encryption
@@ -105,60 +90,23 @@ make env-decrypt
 
 ### Test Categories
 
-**Unit Tests**: `make test`
-- Core functionality testing
-- Fast execution, no external dependencies
+**Unit Tests**: `make test` - Core functionality testing
+**Integration Tests**: `make test-integration` - End-to-end MCP server testing
+**Property Tests**: `make test-prop` - JQwik permutation testing for memory graph
+**Mock Tests**: `make test-mock` - VCR testing for weather API without API costs
+**Mutation Tests**: `make test-mutation` - PITest mutation testing for memory package
 
-**Integration Tests**: `make test-integration`
-- End-to-end MCP server testing (SSE/STDIO)
-- Configuration validation tests
-
-**Property Tests**: `make test-prop`
-- JQwik property-based testing for memory graph
-- Permutation testing with random inputs
-
-**Mock Tests**: `make test-mock`
-- VCR testing for weather API without API costs
-- Recorded HTTP interactions for deterministic testing
-
-**Mutation Tests**: `make test-mutation`
-- PITest mutation testing for memory package
-- Evaluates test quality by introducing code mutations
-
-### VCR Weather API Testing
-
-Uses EasyVCR Java for deterministic weather API testing:
+### Key Testing Commands
 
 ```bash
-# Set API key and record cassettes (first run)
+# Weather API testing (VCR)
 export WEATHER_API_KEY=your_key
 ./mvnw test -Dtest=WeatherServiceVCRMockTest -Dvcr.mode=record
 
-# Replay cassettes (no API key needed)
-./mvnw test -Dtest=WeatherServiceVCRMockTest -Dvcr.mode=replay
-```
-
-**Key Features:**
-- Records real API responses to cassettes
-- Automatically censors API keys for security
-- Supports Record/Replay/Auto/Bypass modes
-- Eliminates API costs in CI/CD
-
-### PITest Mutation Testing
-
-Evaluates test quality by introducing code mutations:
-
-```bash
+# Mutation testing
 make test-mutation-memory-only    # Quick MemoryService testing
 make test-mutation               # Full memory package
-make test-mutation-incremental   # Faster repeated runs
 ```
-
-**Configuration:**
-- Targets memory package (file I/O, concurrency, persistence)
-- Standalone test suite avoids Quarkus DI issues
-- Reports in `target/pit-reports/index.html`
-- Target: 70%+ mutation score
 
 ## Code Quality
 
@@ -211,233 +159,66 @@ public class Example {
 
 ## Package Structure
 
-### Project Structure
-
-**To update this structure, run:**
-```bash
-tree . -I "target|docs|devenv*|mvnw*|*.log*|*.lock|*.nix|*.yaml|*.md|LICENSE|Procfile|app.json|Makefile|CLAUDE.md|GH_ACTIONS_EXAMPLES.md|system.properties" -P "*.java|*.disabled|checkstyle*.xml|cognitive*.xml|pom.xml|*.yml" --prune --noreport
-```
-
-```text
-Project Root/
-├── .github/                             # GitHub configuration
-│   ├── dependabot.yml                   # Dependabot configuration for dependency updates
-│   └── workflows/                       # GitHub Actions workflows
-│       ├── ci.yml                       # CI pipeline (active)
-│       ├── claude-readme-update-check.yml.disabled    # README maintenance (disabled)
-│       └── claude-smart-permutation-testing.yml.disabled  # Automated testing analysis (disabled)
-├── checkstyle-suppressions.xml         # Checkstyle rule suppressions
-├── checkstyle.xml                       # Checkstyle configuration with Palantir-inspired rules
-├── cognitive-complexity-ruleset.xml    # Cognitive complexity rules for Checkstyle
-├── pom.xml                             # Maven project configuration
-└── src/
-    ├── main/
-    │   └── java/com.jasonriddle.mcp/
-    │       ├── memory/                    # Memory graph implementation
-    │       │   ├── Entity.java            # Entity record representing graph nodes
-    │       │   ├── MemoryGraph.java       # Complete graph structure record
-    │       │   ├── MemoryRecord.java      # Base interface for JSONL records
-    │       │   ├── MemoryService.java     # Core service for graph persistence and operations
-    │       │   ├── Relation.java          # Relation record representing graph edges
-    │       │   └── package-info.java      # Package documentation
-    │       ├── time/                      # Time and timezone services
-    │       │   ├── TimeConversionResult.java  # Result record for time conversions
-    │       │   ├── TimeService.java       # Core service for time operations
-    │       │   └── package-info.java      # Package documentation
-    │       ├── weather/                   # Weather services and data structures
-    │       │   ├── WeatherClient.java     # OpenWeatherMap REST client interface
-    │       │   ├── WeatherData.java       # Current weather data record
-    │       │   ├── WeatherForecast.java   # Weather forecast data record
-    │       │   ├── WeatherService.java    # Core service for weather operations
-    │       │   └── package-info.java      # Package documentation
-    │       ├── McpMemoryPrompts.java      # MCP prompts providing memory guidance
-    │       ├── McpMemoryResources.java    # MCP resources (memory://) for graph access
-    │       ├── McpMemoryTools.java        # MCP tools for graph operations
-    │       ├── McpTimeTools.java          # MCP tools for time and timezone operations
-    │       ├── McpWeatherTools.java       # MCP tools for weather operations
-    │       └── package-info.java          # Package documentation
-    └── test/
-        └── java/com.jasonriddle.mcp/
-            ├── config/                                         # Configuration tests
-            │   ├── ConfigurationTestConstants.java            # Test constants for configuration
-            │   ├── ConfigurationValidationUnitTest.java       # Unit tests for configuration validation
-            │   ├── HerokuConfigurationValidationUnitTest.java # Unit tests for Heroku configuration
-            │   ├── HerokuTestProfile.java                     # Heroku test profile
-            │   ├── ProdConfigurationValidationUnitTest.java   # Unit tests for production configuration
-            │   ├── ProdTestProfile.java                       # Production test profile
-            │   └── package-info.java                          # Package documentation
-            ├── memory/                                         # Memory implementation tests
-            │   ├── MemoryGraphPermutationPropertyTest.java   # JQwik property tests for memory graph
-            │   ├── MemoryServicePITMutationTest.java          # PITest standalone mutation tests for memory service
-            │   ├── MemoryServiceUnitTest.java                  # Unit tests for memory service
-            │   └── package-info.java                          # Package documentation
-            ├── security/                                       # Security tests (disabled)
-            │   └── ApiKeyAuthenticationDisabledIntegrationTest.java.disabled  # Disabled auth tests
-            ├── server/                                         # Server integration tests
-            │   ├── McpIntegrationTestBase.java                 # Base class for integration tests
-            │   ├── McpServerSseIntegrationTest.java            # Integration tests for SSE server
-            │   ├── McpServerStdioIntegrationTest.java          # Integration tests for STDIO server
-            │   └── package-info.java                          # Package documentation
-            ├── time/                                           # Time service tests
-            │   ├── TimeServiceUnitTest.java                    # Unit tests for time service
-            │   └── package-info.java                          # Package documentation
-            ├── weather/                                        # Weather service tests
-            │   ├── WeatherServiceUnitTest.java                 # Unit tests for weather service
-            │   ├── WeatherServiceVCRMockTest.java              # VCR mock tests for weather API
-            │   └── package-info.java                          # Package documentation
-            ├── McpMemoryPromptsUnitTest.java                   # Unit tests for memory prompts
-            ├── McpMemoryResourcesUnitTest.java                 # Unit tests for memory resources
-            ├── McpMemoryToolsUnitTest.java                     # Unit tests for memory tools
-            ├── McpTimeToolsUnitTest.java                       # Unit tests for time tools
-            ├── McpWeatherToolsUnitTest.java                    # Unit tests for weather tools
-            └── package-info.java                               # Package documentation
-```
-
 ### Design Principles
 
-- **Feature-based organization**: Packages by functional areas
+- **Feature-based organization**: Packages by functional areas (memory, time, weather)
 - **Minimal dependencies**: Clear separation between packages
 - **Single responsibility**: One purpose per package
 - **MCP separation**: Protocol classes in root, domain logic in packages
 
+### Key Packages
+
+**Main Source** (`src/main/java/com.jasonriddle.mcp/`):
+- `memory/` - Memory graph implementation and persistence
+- `time/` - Time and timezone services
+- `weather/` - Weather services and OpenWeatherMap integration
+- Root: MCP protocol tools and resources
+
+**Test Source** (`src/test/java/com.jasonriddle.mcp/`):
+- `config/` - Configuration and profile tests
+- `memory/`, `time/`, `weather/` - Feature-specific tests
+- `server/` - Integration tests for MCP servers
+
+Generate full structure: `tree . -I "target|docs|devenv*|mvnw*|*.log*" --prune`
+
 ## GitHub Actions Integration
 
-### Active Workflows
-
-**CI Pipeline** (`.github/workflows/ci.yml`):
+**Active CI Pipeline** (`.github/workflows/ci.yml`):
 - Format/style checks (Spotless, Checkstyle)
 - Unit and integration tests
 - Application build
 
-**Disabled Workflows** (reference only):
-- `claude-readme-update-check.yml.disabled` - README maintenance
-- `claude-smart-permutation-testing.yml.disabled` - Automated testing analysis
+**Claude Code Actions**:
+- `claude-code-action@beta` - Interactive, comment-triggered workflows
+- `claude-code-base-action@beta` - Automated, event-triggered workflows
 
-### Claude Code Actions
-
-Two action types available:
-
-**`claude-code-action@beta`**: Interactive, comment-triggered workflows
-**`claude-code-base-action@beta`**: Automated, event-triggered workflows
-
-Key differences:
-- Comment action: Manual triggers, GitHub integration
-- Base action: Push/schedule triggers, MCP support, direct prompts
+See `GH_ACTIONS_EXAMPLES.md` for detailed workflow examples and migration guide.
 
 ## Deployment
 
-### Heroku Deployment
+### Quick Deployment
 
-**Prerequisites:**
-- Heroku account with billing enabled
-- Heroku CLI, Git, Java 17+
-
-**Configuration Files:**
-- `Procfile` - MCP process type definition
-- `system.properties` - Java 17 runtime
-- `app.json` - One-click deployment
-- `application-heroku.properties` - Heroku-specific config
-
-**Deployment Process:**
-
+**Heroku Setup:**
 ```bash
-# Setup
+# Setup and deploy
 heroku create your-mcp-server-name
 heroku config:set MAVEN_CUSTOM_OPTS="-DskipTests -Dquarkus.container-image.build=false"
-
-# Deploy
-git push origin main
-
-# Add MCP capability
+git push heroku main
 heroku addons:create heroku-inference:claude-3-5-haiku
-
-# Verify
-heroku logs --tail
 ```
 
-**MCP Integration:**
-- Automatic tool availability with Heroku Managed Inference
-- External client configuration via MCP Toolkit URL/Token
-- Auto-scaling to 0 when not in use
-
-**Important Considerations:**
-- Memory stored on ephemeral filesystem (resets on restart)
-- Tool calls limited to 300 seconds
-- Cost: ~$0.0008/second for eco dynos when running
-
-### Troubleshooting
-
-**Common Issues:**
-
-**Container Build Error:**
+**Local Docker:**
 ```bash
-heroku config:set MAVEN_CUSTOM_OPTS="-DskipTests -Dquarkus.container-image.build=false"
+make docker-build && make docker-run
 ```
 
-**MCP Tools Not Available:**
-- Verify Procfile has `mcp-` prefix
-- Ensure Managed Inference add-on attached
-- Check Tools tab in add-on dashboard
-
-**STDIO MCP Server Exits Immediately (RESOLVED):**
-- **Symptom:** Application starts successfully but exits with status 0 after ~0.02s
-- **Root Cause:** `DEBUG [io.qua.mcp.ser.std.run.StdioMcpMessageHandler] EOF received, exiting`
-- **Explanation:** STDIO handler receives EOF due to no stdin stream in Heroku environment
-- **Resolution:** Server actually works correctly via Heroku's MCP proxy infrastructure
-- **Status:** ✅ **WORKING** - E2E tests confirm all 12 MCP tools are functional
-
-**Debug Commands:**
+**Validation:**
 ```bash
-# Enable debug logging
-heroku config:set LOG_LEVEL=DEBUG -a jasons-mcp-server
-
-# Check process status
-heroku ps -a jasons-mcp-server
-
-# Monitor logs for startup behavior
+make test-e2e    # Test MCP server functionality
 heroku logs --tail -a jasons-mcp-server
-
-# Check configuration
-heroku config -a jasons-mcp-server
-
-# Scale process (if needed)
-heroku ps:scale mcp-memory=1 -a jasons-mcp-server
 ```
 
-**Working Behavior Confirmed:**
-- **STDIO Handler:** Starts and receives EOF, causing graceful exit (normal)
-- **Heroku Proxy:** Handles MCP transport independently of dyno state
-- **E2E Results:** All 12 tools accessible (memory, time, weather operations)
-- **Authentication:** Bearer token works with Heroku Managed Inference
-- **Environment:** Heroku Managed Inference with proper INFERENCE_* config vars
-
-**Validation Commands:**
-```bash
-# Test MCP server functionality (recommended)
-make test-e2e
-
-# Check SSE endpoint (connects and streams)
-curl -H "Authorization: Bearer $HEROKU_MCP_TOKEN" \
-     https://us.inference.heroku.com/mcp/sse
-
-# Test message endpoint (JSON-RPC protocol validation)
-curl -H "Authorization: Bearer $HEROKU_MCP_TOKEN" \
-     -X POST https://us.inference.heroku.com/mcp/message
-# Expected: {"jsonrpc":"2.0","id":null,"error":{"code":-32602,"message":"Missing sessionId"}}
-
-# Note: Tools are discovered via MCP protocol, not direct HTTP endpoint
-# Use E2E test for full functionality verification
-```
-
-**Local Testing:**
-```bash
-./mvnw clean package -Dquarkus.profile=heroku
-PORT=8080 java -Dquarkus.profile=heroku -jar target/quarkus-app/quarkus-run.jar
-```
-
-**Quarkus Registry Configuration:**
-Separate registry hostname from project path:
-```properties
-quarkus.container-image.registry=us-central1-docker.pkg.dev
-quarkus.container-image.group=project-id/repository
-```
+**Key Configuration Files:**
+- `Procfile` - MCP process type definition
+- `application-heroku.properties` - Heroku-specific config
+- See `REMOTE_MCP_SERVER.md` for client configuration and troubleshooting
