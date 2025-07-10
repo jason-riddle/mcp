@@ -68,14 +68,20 @@ make checkstyle  # Run style checks
 
 ```bash
 make test                             # Run unit tests
-
 make test-integration                 # Run integration tests
-# or run directly
-# ./mvnw verify -DskipITs=false
+make test-perm                        # Run permutation tests only
+make test-mock                        # Run mock tests only
+make test-all                         # Run all test suites
 
+# Specific test execution
 ./mvnw test -Dtest=MemoryServiceUnitTest  # Run specific test class
 ./mvnw test -Dtest=TimeServiceUnitTest   # Run time service tests
 ./mvnw test -Dtest=WeatherServiceUnitTest # Run weather service tests
+
+# Mutation Testing
+make test-mutation                    # Run PITest mutation testing on memory package
+make test-mutation-incremental        # Run incremental PITest with history
+make test-mutation-memory-only        # Run mutation testing only on MemoryService
 
 # VCR Mock Tests (requires WEATHER_API_KEY)
 ./mvnw test -Dtest=WeatherServiceVCRMockTest  # Run VCR tests
@@ -130,6 +136,48 @@ export WEATHER_API_KEY=your_api_key_here
 - CI/CD runs `make test-mock` without `WEATHER_API_KEY` environment variable
 - Auto mode detects existing cassettes and enables replay automatically
 - Cassettes must be committed to version control for CI/CD functionality
+
+#### PITest Mutation Testing
+
+The project includes PITest for mutation testing focused on the memory package. Mutation testing evaluates test quality by introducing small code changes (mutations) and checking if tests detect them.
+
+**Key Features:**
+- Memory-focused testing: Targets file I/O, concurrency, and data persistence operations
+- Standalone test suite: `MemoryServicePitTest.java` avoids Quarkus DI issues with PITest
+- Incremental analysis: Uses history files for faster subsequent runs
+- Performance optimized: 2 threads, configurable timeouts, memory-specific mutators
+
+**Setup and Execution:**
+```bash
+# Quick MemoryService-only testing
+make test-mutation-memory-only
+
+# Full memory package testing
+make test-mutation
+
+# Incremental testing (faster for repeated runs)
+make test-mutation-incremental
+
+# Direct Maven execution
+./mvnw org.pitest:pitest-maven:mutationCoverage -Pmemory-mutation-tests
+```
+
+**Configuration:**
+- PITest Maven plugin version 1.18.2 with JUnit5 plugin 1.2.2
+- Memory mutation profile (`memory-mutation-tests`) targets memory package classes
+- JVM args configured for Quarkus compatibility: `-Djava.util.logging.manager=org.jboss.logmanager.LogManager`
+- Custom mutators: Conditionals, increments, void method calls, return values
+
+**Test Results Analysis:**
+- Reports generated in `target/pit-reports/index.html`
+- Mutation score indicates test strength (target: 70%+ for memory package)
+- Line coverage shows code executed during mutation testing
+- Survived mutations highlight areas needing additional test coverage
+
+**Limitations:**
+- Requires standalone test suite (not compatible with `@QuarkusTest` due to DI complexity)
+- Focuses on memory package only for performance and relevance
+- Some concurrency mutations may survive due to test environment constraints
 
 ## Code Quality
 
@@ -364,6 +412,7 @@ src/test/java/com.jasonriddle.mcp/
 │   └── package-info.java                          # Package documentation
 ├── memory/                                         # Memory implementation tests
 │   ├── MemoryGraphPermutationTest.java            # JQwik permutation tests for memory graph
+│   ├── MemoryServicePitTest.java                  # PITest standalone mutation tests for memory service
 │   ├── MemoryServiceUnitTest.java                  # Unit tests for memory service
 │   └── package-info.java                          # Package documentation
 ├── security/                                       # Security tests (disabled)
@@ -409,7 +458,7 @@ Each package contains a `package-info.java` file with purpose and responsibiliti
 - **Weather package** (`com.jasonriddle.mcp.weather`): Weather services and data structures for the MCP server
 - **Test packages**: Corresponding test suites for implementation verification
   - **Config test package** (`com.jasonriddle.mcp.config`): Configuration validation tests for default, Heroku, and production profiles
-  - **Memory test package** (`com.jasonriddle.mcp.memory`): Memory service tests including JQwik permutation testing
+  - **Memory test package** (`com.jasonriddle.mcp.memory`): Memory service tests including JQwik permutation testing and PITest mutation testing
   - **Security test package** (`com.jasonriddle.mcp.security`): Security tests (currently disabled for STDIO endpoints)
   - **Server test package** (`com.jasonriddle.mcp.server`): Integration tests for MCP server implementations (SSE and STDIO)
   - **Time test package** (`com.jasonriddle.mcp.time`): Time service tests
