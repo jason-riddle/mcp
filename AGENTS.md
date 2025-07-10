@@ -420,6 +420,11 @@ make test-e2e
 curl -H "Authorization: Bearer $HEROKU_MCP_TOKEN" \
      https://us.inference.heroku.com/mcp/sse
 
+# Test message endpoint (JSON-RPC protocol validation)
+curl -H "Authorization: Bearer $HEROKU_MCP_TOKEN" \
+     -X POST https://us.inference.heroku.com/mcp/message
+# Expected: {"jsonrpc":"2.0","id":null,"error":{"code":-32602,"message":"Missing sessionId"}}
+
 # Note: Tools are discovered via MCP protocol, not direct HTTP endpoint
 # Use E2E test for full functionality verification
 ```

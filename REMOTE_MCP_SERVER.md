@@ -162,6 +162,11 @@ Configure in Tools & Integrations settings:
 curl -H "Authorization: Bearer inf-REPLACE-WITH-INF-TOKEN" \
      https://us.inference.heroku.com/mcp/sse
 
+# Test message endpoint (JSON-RPC protocol validation)
+curl -H "Authorization: Bearer inf-REPLACE-WITH-INF-TOKEN" \
+     -X POST https://us.inference.heroku.com/mcp/message
+# Expected: {"jsonrpc":"2.0","id":null,"error":{"code":-32602,"message":"Missing sessionId"}}
+
 # Note: MCP tools are discovered via protocol handshake, not direct HTTP endpoints
 # Use proper MCP clients for full functionality
 ```
@@ -238,6 +243,28 @@ heroku ps -a jasons-mcp-server
 heroku logs --tail -a jasons-mcp-server
 
 # Test functionality
+make test-e2e
+```
+
+### Available Debug Endpoints
+
+**Working Endpoints:**
+- `/mcp/sse` - SSE transport initiation (returns session endpoint)
+- `/mcp/message` - JSON-RPC protocol communication (requires sessionId)
+
+**Non-functional Endpoints (404):**
+- `/mcp/` `/mcp/info` `/mcp/health` `/mcp/status` `/mcp/capabilities` `/mcp/version` `/mcp/tools`
+
+**Testing Protocol Validation:**
+```bash
+# 1. Test authentication and connectivity
+curl -H "Authorization: Bearer $TOKEN" https://us.inference.heroku.com/mcp/sse
+
+# 2. Test JSON-RPC endpoint exists
+curl -H "Authorization: Bearer $TOKEN" -X POST https://us.inference.heroku.com/mcp/message
+# Should return: Missing sessionId error (confirms endpoint works)
+
+# 3. Full protocol test
 make test-e2e
 ```
 
