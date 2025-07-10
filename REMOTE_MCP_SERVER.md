@@ -34,7 +34,7 @@ The server is accessible via Heroku's Managed Inference with OAuth authenticatio
 
 ```bash
 # Add the remote MCP server with authentication
-claude mcp add --transport sse heroku-mcp https://us.inference.heroku.com/mcp --header "Authorization: Bearer YOUR_TOKEN"
+claude mcp add --transport sse heroku-inf-mcp https://us.inference.heroku.com/mcp --header "Authorization: Bearer YOUR_TOKEN"
 ```
 
 Replace `YOUR_TOKEN` with your actual Heroku MCP token from:
@@ -49,7 +49,7 @@ Create or edit `.claude.json` in your project root:
 ```json
 {
   "mcpServers": {
-    "heroku-mcp": {
+    "heroku-inf-mcp": {
       "command": "npx",
       "args": [
         "-y",
@@ -73,7 +73,7 @@ For better space handling:
 ```json
 {
   "mcpServers": {
-    "heroku-mcp": {
+    "heroku-inf-mcp": {
       "command": "npx",
       "args": [
         "-y",
@@ -97,10 +97,10 @@ For better space handling:
 claude mcp list
 
 # Get details for your server
-claude mcp get heroku-mcp
+claude mcp get heroku-inf-mcp
 
 # Remove server if needed
-claude mcp remove heroku-mcp
+claude mcp remove heroku-inf-mcp
 
 # Check status in interactive mode
 /mcp
@@ -126,7 +126,7 @@ claude mcp remove heroku-mcp
    {
      "type": "url",
      "url": "https://us.inference.heroku.com/mcp",
-     "name": "heroku-mcp",
+     "name": "heroku-inf-mcp",
      "authorization_token": "inf-REPLACE-WITH-INF-TOKEN"
    }
    ```
@@ -145,7 +145,7 @@ Configure in Tools & Integrations settings:
 ```json
 {
   "mcpServers": {
-    "heroku-mcp": {
+    "heroku-inf-mcp": {
       "url": "https://us.inference.heroku.com/mcp",
       "headers": {
         "Authorization": "Bearer inf-REPLACE-WITH-INF-TOKEN"
@@ -265,7 +265,7 @@ make test-e2e
 
 **Claude Code**:
 ```bash
-claude mcp remove heroku-mcp
+claude mcp remove heroku-inf-mcp
 ```
 
 **Heroku Level** (if needed):
