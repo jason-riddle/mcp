@@ -369,6 +369,25 @@
                 </configuration>
             </plugin>
 
+            <!-- Surefire Report Plugin for HTML Reports -->
+            <!-- Docs: https://maven.apache.org/surefire/maven-surefire-report-plugin/report-mojo.html -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+                <version>${surefire-plugin.version}</version>
+                <configuration>
+                    <aggregate>true</aggregate>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>report-only</goal>
+                        </goals>
+                        <phase>test</phase>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
     </build>
 
@@ -438,11 +457,16 @@
                         <version>${surefire-plugin.version}</version>
                         <configuration>
                             <groups>permutation</groups>
+                            <trimStackTrace>false</trimStackTrace>
                             <systemPropertyVariables>
                                 <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
                                 <maven.home>${maven.home}</maven.home>
                                 <permutation.test.max.size>10</permutation.test.max.size>
                                 <permutation.test.timeout>540</permutation.test.timeout>
+                                <!-- jqwik configuration: https://jqwik.net/docs/current/user-guide.html -->
+                                <jqwik.reporting.usejunitplatform>true</jqwik.reporting.usejunitplatform>
+                                <jqwik.tries.default>100</jqwik.tries.default>
+                                <jqwik.generation.default-after-failure>PREVIOUS_SEED</jqwik.generation.default-after-failure>
                             </systemPropertyVariables>
                         </configuration>
                     </plugin>
