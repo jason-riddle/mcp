@@ -14,6 +14,13 @@ PROJECT_NAME := jasons-mcp-server
 JAR_FILE := target/quarkus-app/quarkus-run.jar
 MVN := ./mvnw
 
+# CI Profile Configuration
+ifeq ($(CI),true)
+	MAVEN_PROFILE := -Pci-testing
+else
+	MAVEN_PROFILE :=
+endif
+
 # ============================================================================
 # DOCKER CONFIGURATION
 # ============================================================================
@@ -104,7 +111,7 @@ checkstyle: ## Run checkstyle verification
 
 test: clean ## Run unit tests
 	@echo "Running unit tests..."
-	@$(MVN) test -q --no-transfer-progress $(MAVEN_OPTS)
+	@$(MVN) test -q --no-transfer-progress $(MAVEN_PROFILE)
 	@echo "✓ Unit tests completed"
 
 test-watch: ## Run tests in watch mode
@@ -114,17 +121,17 @@ test-watch: ## Run tests in watch mode
 
 test-integration: clean ## Run integration tests
 	@echo "Running integration tests..."
-	@$(MVN) verify -DskipITs=false -q --no-transfer-progress $(MAVEN_OPTS)
+	@$(MVN) verify -DskipITs=false -q --no-transfer-progress $(MAVEN_PROFILE)
 	@echo "✓ Integration tests completed"
 
 test-prop: clean ## Run property tests only
 	@echo "Running property tests..."
-	@$(MVN) test -Dtest=*PropertyTest -q --no-transfer-progress $(MAVEN_OPTS)
+	@$(MVN) test -Dtest=*PropertyTest -q --no-transfer-progress $(MAVEN_PROFILE)
 	@echo "✓ Property tests completed"
 
 test-mock: clean ## Run mock tests only
 	@echo "Running mock tests..."
-	@$(MVN) test -Dtest=*MockTest -q --no-transfer-progress $(MAVEN_OPTS)
+	@$(MVN) test -Dtest=*MockTest -q --no-transfer-progress $(MAVEN_PROFILE)
 	@echo "✓ Mock tests completed"
 
 test-all: clean ## Run all tests (unit, integration, permutation, mock)
@@ -145,7 +152,7 @@ test-all: clean ## Run all tests (unit, integration, permutation, mock)
 
 test-mutation: clean ## Run PITest mutation testing on memory package
 	@echo "Running PITest mutation testing on memory package..."
-	@$(MVN) clean test-compile org.pitest:pitest-maven:mutationCoverage -Pmemory-mutation-tests -q --no-transfer-progress $(MAVEN_OPTS)
+	@$(MVN) clean test-compile org.pitest:pitest-maven:mutationCoverage -Pmemory-mutation-tests -q --no-transfer-progress $(MAVEN_PROFILE)
 	@echo "✓ Mutation testing complete. Reports available in target/pit-reports/"
 
 test-mutation-incremental: ## Run incremental PITest mutation testing

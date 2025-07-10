@@ -73,7 +73,7 @@ jobs:
       - name: Run unit tests
         run: make test
         env:
-          MAVEN_OPTS: "-Pci-testing"
+          CI: true
 
         # - name: Upload test results
         #   uses: actions/upload-artifact@v4
@@ -103,7 +103,7 @@ jobs:
         run: make test-integration
         env:
           WEATHER_API_KEY: test-api-key
-          MAVEN_OPTS: "-Pci-testing"
+          CI: true
 
         # - name: Upload integration test results
         #   uses: actions/upload-artifact@v4
@@ -132,7 +132,7 @@ jobs:
       - name: Run mutation tests
         run: make test-mutation
         env:
-          MAVEN_OPTS: "-Pci-testing"
+          CI: true
 
       - name: Upload mutation test reports
         uses: actions/upload-artifact@v4
@@ -191,7 +191,7 @@ jobs:
       - name: Run property tests
         run: make test-prop
         env:
-          MAVEN_OPTS: "-Pci-testing"
+          CI: true
 
   mock-tests:
     name: Mock Tests
@@ -212,4 +212,4 @@ jobs:
       - name: Run mock tests
         run: make test-mock
         env:
-          MAVEN_OPTS: "-Pci-testing"
+          CI: true
