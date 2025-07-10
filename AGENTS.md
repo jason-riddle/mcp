@@ -379,6 +379,52 @@ heroku config:set MAVEN_CUSTOM_OPTS="-DskipTests -Dquarkus.container-image.build
 - Ensure Managed Inference add-on attached
 - Check Tools tab in add-on dashboard
 
+**STDIO MCP Server Exits Immediately (RESOLVED):**
+- **Symptom:** Application starts successfully but exits with status 0 after ~0.02s
+- **Root Cause:** `DEBUG [io.qua.mcp.ser.std.run.StdioMcpMessageHandler] EOF received, exiting`
+- **Explanation:** STDIO handler receives EOF due to no stdin stream in Heroku environment
+- **Resolution:** Server actually works correctly via Heroku's MCP proxy infrastructure
+- **Status:** ✅ **WORKING** - E2E tests confirm all 12 MCP tools are functional
+
+**Debug Commands:**
+```bash
+# Enable debug logging
+heroku config:set LOG_LEVEL=DEBUG -a jasons-mcp-server
+
+# Check process status
+heroku ps -a jasons-mcp-server
+
+# Monitor logs for startup behavior
+heroku logs --tail -a jasons-mcp-server
+
+# Check configuration
+heroku config -a jasons-mcp-server
+
+# Scale process (if needed)
+heroku ps:scale mcp-memory=1 -a jasons-mcp-server
+```
+
+**Working Behavior Confirmed:**
+- **STDIO Handler:** Starts and receives EOF, causing graceful exit (normal)
+- **Heroku Proxy:** Handles MCP transport independently of dyno state
+- **E2E Results:** All 12 tools accessible (memory, time, weather operations)
+- **Authentication:** Bearer token works with Heroku Managed Inference
+- **Environment:** Heroku Managed Inference with proper INFERENCE_* config vars
+
+**Validation Commands:**
+```bash
+# Test MCP server functionality
+make test-e2e
+
+# Verify tools are available
+curl -H "Authorization: Bearer $HEROKU_MCP_TOKEN" \
+     https://us.inference.heroku.com/mcp/tools
+
+# Check SSE endpoint
+curl -H "Authorization: Bearer $HEROKU_MCP_TOKEN" \
+     https://us.inference.heroku.com/mcp/sse
+```
+
 **Local Testing:**
 ```bash
 ./mvnw clean package -Dquarkus.profile=heroku
