@@ -1,5 +1,5 @@
 # Modern Makefile best practices
-.PHONY: help clean build dev run format checkstyle test test-watch test-integration test-perm test-mock test-all docker-build docker-run docker-clean
+.PHONY: help clean build dev run format checkstyle test test-watch test-integration test-perm test-mock test-all test-mutation test-mutation-incremental test-mutation-memory-only docker-build docker-run docker-clean
 .DELETE_ON_ERROR:
 .ONESHELL:
 
@@ -138,6 +138,28 @@ test-all: clean ## Run all tests (unit, integration, permutation, mock)
 	@echo "4/4 Running mock tests..."
 	@$(MVN) test -Dtest=*MockTest --no-transfer-progress || echo "Mock tests failed - continuing"
 	@echo "✓ All test suites completed (check output above for any failures)"
+
+# ============================================================================
+# MUTATION TESTING
+# ============================================================================
+
+test-mutation: clean ## Run PITest mutation testing on memory package
+	@echo "Running PITest mutation testing on memory package..."
+	@$(MVN) clean test-compile org.pitest:pitest-maven:mutationCoverage -Pmemory-mutation-tests --no-transfer-progress
+	@echo "✓ Mutation testing complete. Reports available in target/pit-reports/"
+
+test-mutation-incremental: ## Run incremental PITest mutation testing
+	@echo "Running incremental PITest mutation testing..."
+	@$(MVN) org.pitest:pitest-maven:mutationCoverage -DwithHistory -Pmemory-mutation-tests --no-transfer-progress
+	@echo "✓ Incremental mutation testing complete"
+
+test-mutation-memory-only: clean ## Run mutation testing only on MemoryService
+	@echo "Running mutation testing on MemoryService only..."
+	@$(MVN) org.pitest:pitest-maven:mutationCoverage \
+		-DtargetClasses=com.jasonriddle.mcp.memory.MemoryService \
+		-DtargetTests=com.jasonriddle.mcp.memory.MemoryServicePitTest \
+		--no-transfer-progress
+	@echo "✓ MemoryService mutation testing complete"
 
 # test-stdio: clean ## Run STDIO integration tests only
 # 	@echo "Running STDIO integration tests..."
