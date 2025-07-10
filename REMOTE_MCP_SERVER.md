@@ -158,13 +158,12 @@ Configure in Tools & Integrations settings:
 ### Generic HTTP Client
 
 ```bash
-# Test tools endpoint
-curl -H "Authorization: Bearer inf-REPLACE-WITH-INF-TOKEN" \
-     https://us.inference.heroku.com/mcp/tools
-
-# Test SSE endpoint
+# Test SSE endpoint (connects and streams)
 curl -H "Authorization: Bearer inf-REPLACE-WITH-INF-TOKEN" \
      https://us.inference.heroku.com/mcp/sse
+
+# Note: MCP tools are discovered via protocol handshake, not direct HTTP endpoints
+# Use proper MCP clients for full functionality
 ```
 
 ## Authentication

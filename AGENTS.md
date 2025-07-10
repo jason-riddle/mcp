@@ -413,16 +413,15 @@ heroku ps:scale mcp-memory=1 -a jasons-mcp-server
 
 **Validation Commands:**
 ```bash
-# Test MCP server functionality
+# Test MCP server functionality (recommended)
 make test-e2e
 
-# Verify tools are available
-curl -H "Authorization: Bearer $HEROKU_MCP_TOKEN" \
-     https://us.inference.heroku.com/mcp/tools
-
-# Check SSE endpoint
+# Check SSE endpoint (connects and streams)
 curl -H "Authorization: Bearer $HEROKU_MCP_TOKEN" \
      https://us.inference.heroku.com/mcp/sse
+
+# Note: Tools are discovered via MCP protocol, not direct HTTP endpoint
+# Use E2E test for full functionality verification
 ```
 
 **Local Testing:**
