@@ -52,6 +52,9 @@
         <!-- MCP Versions -->
         <mcp.version>1.3.1</mcp.version>
 
+        <!-- Error Prone Version -->
+        <error-prone.version>2.39.0</error-prone.version>
+
         <!-- Test Configuration -->
         <skipITs>true</skipITs>
     </properties>
@@ -168,6 +171,7 @@
             </plugin>
 
             <!-- Code Formatting with Spotless -->
+            <!-- Docs: https://github.com/diffplug/spotless/blob/main/plugin-maven/README.md -->
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>
                 <artifactId>spotless-maven-plugin</artifactId>
@@ -221,6 +225,7 @@
             </plugin>
 
             <!-- Jandex Maven Plugin for CDI Bean Discovery -->
+            <!-- Docs: https://quarkus.io/guides/cdi-reference -->
             <plugin>
                 <groupId>io.smallrye</groupId>
                 <artifactId>jandex-maven-plugin</artifactId>
@@ -236,6 +241,7 @@
             </plugin>
 
             <!-- Checkstyle Plugin -->
+            <!-- Docs: https://maven.apache.org/plugins/maven-checkstyle-plugin/ -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
@@ -259,15 +265,29 @@
             </plugin>
 
             <!-- Java Compiler Plugin -->
+            <!-- Docs: https://maven.apache.org/plugins/maven-compiler-plugin/ -->
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${compiler-plugin.version}</version>
                 <configuration>
                     <parameters>true</parameters>
+                    <compilerArgs>
+                        <arg>-XDcompilePolicy=simple</arg>
+                        <arg>--should-stop=ifError=FLOW</arg>
+                        <arg>-Xplugin:ErrorProne</arg>
+                    </compilerArgs>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>com.google.errorprone</groupId>
+                            <artifactId>error_prone_core</artifactId>
+                            <version>${error-prone.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
 
             <!-- Failsafe Plugin for Integration Tests -->
+            <!-- Docs: https://maven.apache.org/surefire/maven-failsafe-plugin/ -->
             <plugin>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>${surefire-plugin.version}</version>
@@ -296,6 +316,7 @@
             </plugin>
 
             <!-- PMD Plugin for Cognitive Complexity -->
+            <!-- Docs: https://maven.apache.org/plugins/maven-pmd-plugin/ -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
@@ -321,6 +342,7 @@
             </plugin>
 
             <!-- Maven Release Plugin -->
+            <!-- Docs: https://maven.apache.org/maven-release/maven-release-plugin/ -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
@@ -336,6 +358,7 @@
             </plugin>
 
             <!-- Surefire Plugin for Unit Tests -->
+            <!-- Docs: https://maven.apache.org/surefire/maven-surefire-plugin/ -->
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${surefire-plugin.version}</version>
@@ -414,6 +437,25 @@
                 </dependencies>
             </plugin>
 
+            <!-- Surefire Report Plugin for HTML Reports -->
+            <!-- Docs: https://maven.apache.org/surefire/maven-surefire-report-plugin/report-mojo.html -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+                <version>${surefire-plugin.version}</version>
+                <configuration>
+                    <aggregate>true</aggregate>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>report-only</goal>
+                        </goals>
+                        <phase>test</phase>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
     </build>
 
@@ -435,6 +477,7 @@
                 </property>
             </activation>
             <properties>
+                <!-- quarkus native build configuration: https://quarkus.io/guides/building-native-image -->
                 <quarkus.native.enabled>true</quarkus.native.enabled>
                 <skipITs>false</skipITs>
             </properties>
@@ -483,11 +526,16 @@
                         <version>${surefire-plugin.version}</version>
                         <configuration>
                             <groups>permutation</groups>
+                            <trimStackTrace>false</trimStackTrace>
                             <systemPropertyVariables>
                                 <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
                                 <maven.home>${maven.home}</maven.home>
                                 <permutation.test.max.size>10</permutation.test.max.size>
                                 <permutation.test.timeout>540</permutation.test.timeout>
+                                <!-- jqwik configuration: https://jqwik.net/docs/current/user-guide.html -->
+                                <jqwik.reporting.usejunitplatform>true</jqwik.reporting.usejunitplatform>
+                                <jqwik.tries.default>100</jqwik.tries.default>
+                                <jqwik.generation.default-after-failure>PREVIOUS_SEED</jqwik.generation.default-after-failure>
                             </systemPropertyVariables>
                         </configuration>
                     </plugin>
@@ -510,6 +558,7 @@
                             <systemPropertyVariables>
                                 <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
                                 <maven.home>${maven.home}</maven.home>
+                                <!-- easyvcr confugration: https://github.com/EasyPost/easyvcr-java -->
                                 <vcr.mode>replay</vcr.mode>
                             </systemPropertyVariables>
                         </configuration>
