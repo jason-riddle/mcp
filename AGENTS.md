@@ -543,21 +543,23 @@ quarkus.log.category."io.quarkus.container.image.jib.deployment.JibProcessor".le
 
 ## GitHub Actions Integration
 
-This project uses GitHub Actions for automated testing and quality assurance. The key workflow uses Claude Code actions to perform intelligent permutation testing analysis.
+This project uses GitHub Actions for automated testing and quality assurance. Additional Claude Code workflows are available but currently disabled.
 
 ### Workflow Directory Structure
 
 ```text
 .github/
 └── workflows/
-    ├── ci.yml                        # Standard CI pipeline
-    └── claude-permutation-testing.yml  # Claude-powered permutation testing
+    ├── ci.yml                                          # Standard CI pipeline
+    ├── claude-readme-update-check.yml.disabled        # Claude-powered README updates (disabled)
+    └── claude-smart-permutation-testing.yml.disabled  # Claude-powered permutation testing (disabled)
 ```
 
 #### Workflow Files
 
 - **`ci.yml`** - Standard CI pipeline with format checks, style checks, unit tests, integration tests, and build
-- **`claude-permutation-testing.yml`** - Claude Code action for intelligent permutation testing analysis
+- **`claude-readme-update-check.yml.disabled`** - Claude Code action for automated README updates (currently disabled)
+- **`claude-smart-permutation-testing.yml.disabled`** - Claude Code action for intelligent permutation testing analysis (currently disabled)
 
 #### CI Workflow (`ci.yml`)
 
@@ -568,13 +570,15 @@ The standard CI pipeline includes:
 - **Integration Tests**: End-to-end testing
 - **Build**: Application packaging
 
-#### Claude Permutation Testing (`claude-permutation-testing.yml`)
+#### Disabled Claude Workflows
 
-Automated permutation testing with Claude analysis:
-- **Security Check**: Restricts execution to authorized users and branches
-- **Smart Test Selection**: Analyzes code changes to select relevant tests
-- **Execution**: Runs targeted JQwik permutation tests
-- **Reporting**: Provides analysis and recommendations
+**Claude README Update Check (`claude-readme-update-check.yml.disabled`):**
+- Automated README update checking and maintenance (currently disabled)
+
+**Claude Permutation Testing (`claude-smart-permutation-testing.yml.disabled`):**
+- Automated permutation testing with Claude analysis (currently disabled)
+- Security checks, smart test selection, targeted JQwik test execution
+- Analysis and recommendations for test improvements
 
 ### Claude Code Actions Comparison
 
