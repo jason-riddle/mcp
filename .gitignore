@@ -20,6 +20,7 @@
 .devenv
 .devenv.flake.nix
 .env
+!.env.enc
 .gemini
 .idea
 .jqwik-database

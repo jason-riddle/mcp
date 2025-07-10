@@ -1,5 +1,5 @@
 # Modern Makefile best practices
-.PHONY: help clean build dev run format checkstyle test test-watch test-integration test-prop test-mock test-e2e test-all test-mutation test-mutation-incremental test-mutation-memory-only docker-build docker-run docker-clean
+.PHONY: help clean build dev run format checkstyle test test-watch test-integration test-prop test-mock test-e2e test-all test-mutation test-mutation-incremental test-mutation-memory-only docker-build docker-run docker-clean env-encrypt env-decrypt
 .DELETE_ON_ERROR:
 .ONESHELL:
 
@@ -204,6 +204,36 @@ docker-clean: ## Remove Docker images for this project
 	@echo "Removing Docker images for $(PROJECT_NAME)..."
 	@docker images -q $(PROJECT_NAME) | xargs -r docker rmi -f
 	@echo "✓ Docker images removed"
+
+# ============================================================================
+# SECRETS MANAGEMENT
+# ============================================================================
+
+env-encrypt: ## Encrypt .env file to .env.enc using SOPS
+	@echo "Encrypting .env file..."
+	@if [ ! -f ".env" ]; then \
+		echo "✗ .env file not found"; \
+		exit 1; \
+	fi
+	@if [ ! -f ".sops.yaml" ]; then \
+		echo "✗ .sops.yaml configuration not found"; \
+		exit 1; \
+	fi
+	@sops --encrypt --input-type binary --output-type binary .env > .env.enc
+	@echo "✓ .env encrypted to .env.enc"
+
+env-decrypt: ## Decrypt .env.enc file to .env using SOPS
+	@echo "Decrypting .env.enc file..."
+	@if [ ! -f ".env.enc" ]; then \
+		echo "✗ .env.enc file not found"; \
+		exit 1; \
+	fi
+	@if [ ! -f ".sops.yaml" ]; then \
+		echo "✗ .sops.yaml configuration not found"; \
+		exit 1; \
+	fi
+	@sops --decrypt --input-type binary --output-type binary .env.enc > .env
+	@echo "✓ .env.enc decrypted to .env"
 
 # ============================================================================
 # UTILITY RULES

@@ -4,6 +4,7 @@ This guide provides instructions for automated agents contributing to this repos
 
 ## Table of Contents
 - [Quick Start](#quick-start)
+- [Secrets Management](#secrets-management)
 - [Testing](#testing)
 - [Code Quality](#code-quality)
 - [Package Structure](#package-structure)
@@ -33,6 +34,10 @@ make test-all                # All test suites
 make test-integration        # Integration tests
 make test-mutation          # PITest mutation testing
 make test-mock              # VCR mock tests
+
+# Secrets management
+make env-encrypt             # Encrypt .env to .env.enc using SOPS
+make env-decrypt             # Decrypt .env.enc to .env using SOPS
 ```
 
 ### Configuration
@@ -49,6 +54,52 @@ weather.api.key=${WEATHER_API_KEY:}
 # Server port (default: 8080)
 quarkus.http.port=8080
 ```
+
+## Secrets Management
+
+### SOPS Encryption
+
+Environment variables are encrypted using SOPS (Secrets OPerationS) with SSH key encryption. This ensures sensitive data can be safely committed to the repository.
+
+**Configuration Files:**
+- `.sops.yaml` - SOPS configuration with SSH public keys
+- `.env` - Plaintext environment variables (gitignored)
+- `.env.enc` - Encrypted environment variables (committed)
+
+**SSH Keys Used:**
+All SSH keys from [jason-riddle.keys](https://github.com/jason-riddle.keys) are supported for encryption:
+- 3 ED25519 keys for modern authentication
+- 1 RSA key for legacy compatibility
+
+### Usage
+
+**Encrypt secrets before committing:**
+```bash
+make env-encrypt
+```
+
+**Decrypt secrets for local development:**
+```bash
+make env-decrypt
+```
+
+**Development Workflow:**
+1. Edit `.env` file with secrets
+2. Run `make env-encrypt` to create `.env.enc`
+3. Commit `.env.enc` (`.env` is gitignored)
+4. Other developers run `make env-decrypt` to get secrets
+
+**Key Features:**
+- **Multi-key redundancy**: Any of the 4 SSH private keys can decrypt
+- **Binary encryption**: Proper handling of environment file format
+- **Automatic validation**: Makefile checks for required files
+- **Cross-platform**: Works with both ED25519 and RSA keys
+
+**Security Notes:**
+- Never commit `.env` files (automatically gitignored)
+- Always encrypt before committing changes
+- SSH private keys are required for decryption
+- Encrypted files use binary SOPS format for reliability
 
 ## Testing
 
