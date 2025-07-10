@@ -363,89 +363,93 @@ This project follows strict javadoc standards for all Java files.
 
 This project follows a feature-based package organization.
 
-### Main Package Structure
+### Project Structure
 
 ```text
-src/main/java/com.jasonriddle.mcp/
-├── McpMemoryPrompts.java      # MCP prompts providing memory guidance
-├── McpMemoryResources.java    # MCP resources (memory://) for graph access
-├── McpMemoryTools.java        # MCP tools for graph operations
-├── McpTimeTools.java          # MCP tools for time and timezone operations
-├── McpWeatherTools.java       # MCP tools for weather operations
-├── package-info.java          # Package documentation
-├── memory/                    # Memory graph implementation
-│   ├── Entity.java            # Entity record representing graph nodes
-│   ├── MemoryGraph.java       # Complete graph structure record
-│   ├── MemoryRecord.java      # Base interface for JSONL records
-│   ├── MemoryService.java     # Core service for graph persistence and operations
-│   ├── Relation.java          # Relation record representing graph edges
-│   └── package-info.java      # Package documentation
-├── time/                      # Time and timezone services
-│   ├── TimeConversionResult.java  # Result record for time conversions
-│   ├── TimeService.java       # Core service for time operations
-│   └── package-info.java      # Package documentation
-└── weather/                   # Weather services and data structures
-    ├── WeatherClient.java     # OpenWeatherMap REST client interface
-    ├── WeatherData.java       # Current weather data record
-    ├── WeatherForecast.java   # Weather forecast data record
-    ├── WeatherService.java    # Core service for weather operations
-    └── package-info.java      # Package documentation
+Project Root/
+├── checkstyle.xml                      # Checkstyle configuration with Palantir-inspired rules
+├── checkstyle-suppressions.xml        # Checkstyle rule suppressions
+├── cognitive-complexity-ruleset.xml   # Cognitive complexity rules for Checkstyle
+├── pom.xml                            # Maven project configuration
+├── system.properties                  # Heroku Java runtime specification
+└── src/
+    ├── main/
+    │   ├── java/com.jasonriddle.mcp/
+    │   │   ├── McpMemoryPrompts.java      # MCP prompts providing memory guidance
+    │   │   ├── McpMemoryResources.java    # MCP resources (memory://) for graph access
+    │   │   ├── McpMemoryTools.java        # MCP tools for graph operations
+    │   │   ├── McpTimeTools.java          # MCP tools for time and timezone operations
+    │   │   ├── McpWeatherTools.java       # MCP tools for weather operations
+    │   │   ├── package-info.java          # Package documentation
+    │   │   ├── memory/                    # Memory graph implementation
+    │   │   │   ├── Entity.java            # Entity record representing graph nodes
+    │   │   │   ├── MemoryGraph.java       # Complete graph structure record
+    │   │   │   ├── MemoryRecord.java      # Base interface for JSONL records
+    │   │   │   ├── MemoryService.java     # Core service for graph persistence and operations
+    │   │   │   ├── Relation.java          # Relation record representing graph edges
+    │   │   │   └── package-info.java      # Package documentation
+    │   │   ├── time/                      # Time and timezone services
+    │   │   │   ├── TimeConversionResult.java  # Result record for time conversions
+    │   │   │   ├── TimeService.java       # Core service for time operations
+    │   │   │   └── package-info.java      # Package documentation
+    │   │   └── weather/                   # Weather services and data structures
+    │   │       ├── WeatherClient.java     # OpenWeatherMap REST client interface
+    │   │       ├── WeatherData.java       # Current weather data record
+    │   │       ├── WeatherForecast.java   # Weather forecast data record
+    │   │       ├── WeatherService.java    # Core service for weather operations
+    │   │       └── package-info.java      # Package documentation
+    │   └── resources/
+    │       ├── application.properties              # Default application configuration
+    │       ├── application-prod.properties         # Production configuration
+    │       └── application-heroku.properties       # Heroku deployment configuration
+    └── test/
+        ├── java/com.jasonriddle.mcp/
+        │   ├── McpMemoryPromptsUnitTest.java                   # Unit tests for memory prompts
+        │   ├── McpMemoryResourcesUnitTest.java                 # Unit tests for memory resources
+        │   ├── McpMemoryToolsUnitTest.java                     # Unit tests for memory tools
+        │   ├── McpTimeToolsUnitTest.java                       # Unit tests for time tools
+        │   ├── McpWeatherToolsUnitTest.java                    # Unit tests for weather tools
+        │   ├── package-info.java                               # Package documentation
+        │   ├── config/                                         # Configuration tests
+        │   │   ├── ConfigurationTestConstants.java            # Test constants for configuration
+        │   │   ├── ConfigurationValidationUnitTest.java       # Unit tests for configuration validation
+        │   │   ├── HerokuConfigurationValidationUnitTest.java # Unit tests for Heroku configuration
+        │   │   ├── HerokuTestProfile.java                     # Heroku test profile
+        │   │   ├── ProdConfigurationValidationUnitTest.java   # Unit tests for production configuration
+        │   │   ├── ProdTestProfile.java                       # Production test profile
+        │   │   └── package-info.java                          # Package documentation
+        │   ├── memory/                                         # Memory implementation tests
+        │   │   ├── MemoryGraphPermutationTest.java            # JQwik permutation tests for memory graph
+        │   │   ├── MemoryServicePITMutationTest.java          # PITest standalone mutation tests for memory service
+        │   │   ├── MemoryServiceUnitTest.java                  # Unit tests for memory service
+        │   │   └── package-info.java                          # Package documentation
+        │   ├── security/                                       # Security tests (disabled)
+        │   │   └── ApiKeyAuthenticationDisabledIntegrationTest.java.disabled  # Disabled auth tests
+        │   ├── server/                                         # Server integration tests
+        │   │   ├── McpIntegrationTestBase.java                 # Base class for integration tests
+        │   │   ├── McpServerSseIntegrationTest.java            # Integration tests for SSE server
+        │   │   ├── McpServerStdioIntegrationTest.java          # Integration tests for STDIO server
+        │   │   └── package-info.java                          # Package documentation
+        │   ├── time/                                           # Time service tests
+        │   │   ├── TimeServiceUnitTest.java                    # Unit tests for time service
+        │   │   └── package-info.java                          # Package documentation
+        │   └── weather/                                        # Weather service tests
+        │       ├── WeatherServiceUnitTest.java                 # Unit tests for weather service
+        │       ├── WeatherServiceVCRMockTest.java              # VCR mock tests for weather API
+        │       └── package-info.java                          # Package documentation
+        └── resources/
+            ├── application.properties                         # Default test configuration
+            ├── application-sse-test.properties                # SSE test configuration
+            ├── application-stdio-test.properties             # STDIO test configuration
+            └── cassettes/                                     # VCR cassettes for API tests
+                └── weather/                                   # Weather API VCR cassettes
+                    ├── current_weather_invalid_location.json  # Invalid location test cassette
+                    ├── current_weather_london.json            # London weather test cassette
+                    ├── current_weather_new_york.json          # New York weather test cassette
+                    ├── current_weather_tokyo_coordinates.json # Tokyo coordinates test cassette
+                    └── forecast_san_francisco.json            # San Francisco forecast test cassette
 ```
 
-### Test Package Structure
-
-```text
-src/test/java/com.jasonriddle.mcp/
-├── McpMemoryPromptsUnitTest.java                   # Unit tests for memory prompts
-├── McpMemoryResourcesUnitTest.java                 # Unit tests for memory resources
-├── McpMemoryToolsUnitTest.java                     # Unit tests for memory tools
-├── McpTimeToolsUnitTest.java                       # Unit tests for time tools
-├── McpWeatherToolsUnitTest.java                    # Unit tests for weather tools
-├── package-info.java                               # Package documentation
-├── config/                                         # Configuration tests
-│   ├── ConfigurationTestConstants.java            # Test constants for configuration
-│   ├── ConfigurationValidationUnitTest.java       # Unit tests for configuration validation
-│   ├── HerokuConfigurationValidationUnitTest.java # Unit tests for Heroku configuration
-│   ├── HerokuTestProfile.java                     # Heroku test profile
-│   ├── ProdConfigurationValidationUnitTest.java   # Unit tests for production configuration
-│   ├── ProdTestProfile.java                       # Production test profile
-│   └── package-info.java                          # Package documentation
-├── memory/                                         # Memory implementation tests
-│   ├── MemoryGraphPermutationTest.java            # JQwik permutation tests for memory graph
-│   ├── MemoryServicePITMutationTest.java          # PITest standalone mutation tests for memory service
-│   ├── MemoryServiceUnitTest.java                  # Unit tests for memory service
-│   └── package-info.java                          # Package documentation
-├── security/                                       # Security tests (disabled)
-│   └── ApiKeyAuthenticationDisabledIntegrationTest.java.disabled  # Disabled auth tests
-├── server/                                         # Server integration tests
-│   ├── McpIntegrationTestBase.java                 # Base class for integration tests
-│   ├── McpServerSseIntegrationTest.java            # Integration tests for SSE server
-│   ├── McpServerStdioIntegrationTest.java          # Integration tests for STDIO server
-│   └── package-info.java                          # Package documentation
-├── time/                                           # Time service tests
-│   ├── TimeServiceUnitTest.java                    # Unit tests for time service
-│   └── package-info.java                          # Package documentation
-└── weather/                                        # Weather service tests
-    ├── WeatherServiceUnitTest.java                 # Unit tests for weather service
-    ├── WeatherServiceVCRMockTest.java              # VCR mock tests for weather API
-    └── package-info.java                          # Package documentation
-```
-
-### Test Resources Structure
-
-```text
-src/test/resources/
-├── application-sse-test.properties                 # SSE test configuration
-├── application-stdio-test.properties              # STDIO test configuration
-├── application.properties                         # Default test configuration
-└── cassettes/                                     # VCR cassettes for API tests
-    └── weather/                                   # Weather API VCR cassettes
-        ├── current_weather_invalid_location.json  # Invalid location test cassette
-        ├── current_weather_london.json            # London weather test cassette
-        ├── current_weather_new_york.json          # New York weather test cassette
-        ├── current_weather_tokyo_coordinates.json # Tokyo coordinates test cassette
-        └── forecast_san_francisco.json            # San Francisco forecast test cassette
-```
 
 **Note**: Authentication integration tests were removed because authentication is not functional for MCP STDIO endpoints.
 
