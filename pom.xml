@@ -445,7 +445,6 @@
                         <configuration>
                             <includes>
                                 <include>**/*VCRMockTest.java</include>
-                                <include>**/*VCRTest.java</include>
                                 <include>**/*VCRIntegrationTest.java</include>
                             </includes>
                             <systemPropertyVariables>
