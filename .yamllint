@@ -16,4 +16,3 @@ ignore: |
   .github/stale.yml
   .travis.yml
   .venv
-  .sops.yaml
