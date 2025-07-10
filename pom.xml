@@ -46,6 +46,8 @@
         <maven-release-plugin.version>3.1.1</maven-release-plugin.version>
         <maven-javadoc-plugin.version>3.11.2</maven-javadoc-plugin.version>
         <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
+        <pitest.version>1.18.2</pitest.version>
+        <pitest-junit5.version>1.2.2</pitest-junit5.version>
 
         <!-- MCP Versions -->
         <mcp.version>1.3.1</mcp.version>
@@ -354,6 +356,63 @@
                 </configuration>
             </plugin>
 
+            <!-- PITest Mutation Testing Plugin -->
+            <plugin>
+                <groupId>org.pitest</groupId>
+                <artifactId>pitest-maven</artifactId>
+                <version>${pitest.version}</version>
+                <configuration>
+                    <!-- Memory-focused configuration -->
+                    <targetClasses>
+                        <param>com.jasonriddle.mcp.memory.*</param>
+                    </targetClasses>
+                    <targetTests>
+                        <param>com.jasonriddle.mcp.memory.*Test</param>
+                    </targetTests>
+                    <excludedClasses>
+                        <param>com.jasonriddle.mcp.memory.package-info</param>
+                    </excludedClasses>
+                    <!-- Performance optimization -->
+                    <threads>2</threads>
+                    <timeoutConstant>8000</timeoutConstant>
+                    <timeoutFactor>1.25</timeoutFactor>
+                    <!-- JVM arguments for Quarkus compatibility -->
+                    <jvmArgs>
+                        <param>-Xmx2048m</param>
+                        <param>-XX:+UseG1GC</param>
+                        <param>-Djava.util.logging.manager=org.jboss.logmanager.LogManager</param>
+                        <param>-Dquarkus.log.level=WARN</param>
+                    </jvmArgs>
+                    <!-- Output configuration -->
+                    <outputFormats>
+                        <param>HTML</param>
+                        <param>XML</param>
+                    </outputFormats>
+                    <reportsDirectory>${project.build.directory}/pit-reports</reportsDirectory>
+                    <!-- Memory-specific mutators -->
+                    <mutators>
+                        <mutator>CONDITIONALS_BOUNDARY</mutator>
+                        <mutator>INCREMENTS</mutator>
+                        <mutator>INVERT_NEGS</mutator>
+                        <mutator>MATH</mutator>
+                        <mutator>NEGATE_CONDITIONALS</mutator>
+                        <mutator>VOID_METHOD_CALLS</mutator>
+                        <mutator>EMPTY_RETURNS</mutator>
+                        <mutator>FALSE_RETURNS</mutator>
+                        <mutator>TRUE_RETURNS</mutator>
+                        <mutator>NULL_RETURNS</mutator>
+                        <mutator>PRIMITIVE_RETURNS</mutator>
+                    </mutators>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.pitest</groupId>
+                        <artifactId>pitest-junit5-plugin</artifactId>
+                        <version>${pitest-junit5.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
         </plugins>
     </build>
 
@@ -453,6 +512,51 @@
                                 <vcr.mode>replay</vcr.mode>
                             </systemPropertyVariables>
                         </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <!-- Memory Mutation Testing Profile -->
+        <profile>
+            <id>memory-mutation-tests</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.pitest</groupId>
+                        <artifactId>pitest-maven</artifactId>
+                        <version>${pitest.version}</version>
+                        <configuration>
+                            <targetClasses>
+                                <param>com.jasonriddle.mcp.memory.MemoryService</param>
+                                <param>com.jasonriddle.mcp.memory.MemoryGraph</param>
+                                <param>com.jasonriddle.mcp.memory.Entity</param>
+                                <param>com.jasonriddle.mcp.memory.Relation</param>
+                            </targetClasses>
+                            <targetTests>
+                                <param>com.jasonriddle.mcp.memory.MemoryServicePitTest</param>
+                            </targetTests>
+                            <excludedMethods>
+                                <param>toString</param>
+                                <param>hashCode</param>
+                                <param>equals</param>
+                            </excludedMethods>
+                            <verbose>true</verbose>
+                            <historyInputFile>${project.build.directory}/pit-history/history.bin</historyInputFile>
+                            <historyOutputFile>${project.build.directory}/pit-history/history.bin</historyOutputFile>
+                            <jvmArgs>
+                                <param>-Xmx2048m</param>
+                                <param>-XX:+UseG1GC</param>
+                            </jvmArgs>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>memory-mutation-testing</id>
+                                <goals>
+                                    <goal>mutationCoverage</goal>
+                                </goals>
+                                <phase>test</phase>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>
