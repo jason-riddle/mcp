@@ -50,7 +50,7 @@ target
 tmp
 
 # VCR cassettes - commit these to version control for CI/CD replay
-# but ignore any with sensitive data patterns
-src/test/resources/cassettes/
+# API keys are automatically censored by EasyVCR
+!src/test/resources/cassettes/
 !src/test/resources/cassettes/*.yaml
 !src/test/resources/cassettes/*.json

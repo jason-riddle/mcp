@@ -1,0 +1,50 @@
+[
+  {
+    "recordedAt": 1752105964,
+    "request": {
+      "body": "",
+      "method": "GET",
+      "headers": {},
+      "uri": "https://api.openweathermap.org/data/2.5/weather?%75%6E%69%74%73\u003d%69%6D%70%65%72%69%61%6C\u0026%61%70%70%69%64\u003d%2A%2A%2A%2A%2A\u0026%71\u003d%49%6E%76%61%6C%69%64%4C%6F%63%61%74%69%6F%6E%54%68%61%74%44%6F%65%73%4E%6F%74%45%78%69%73%74"
+    },
+    "response": {
+      "body": "{\"cod\":\"404\",\"message\":\"city not found\"}",
+      "httpVersion": null,
+      "headers": {
+        "null": [
+          "HTTP/1.1 404 Not Found"
+        ],
+        "Access-Control-Allow-Origin": [
+          "*"
+        ],
+        "Access-Control-Allow-Methods": [
+          "GET, POST"
+        ],
+        "Access-Control-Allow-Credentials": [
+          "true"
+        ],
+        "X-Cache-Key": [
+          "/data/2.5/weather?q\u003dinvalidlocationthatdoesnotexist\u0026units\u003dimperial"
+        ],
+        "Connection": [
+          "keep-alive"
+        ],
+        "Content-Length": [
+          "40"
+        ],
+        "Date": [
+          "Thu, 10 Jul 2025 00:06:04 GMT"
+        ],
+        "Content-Type": [
+          "application/json; charset\u003dutf-8"
+        ]
+      },
+      "status": {
+        "code": 404,
+        "message": "Not Found"
+      },
+      "uri": "https://api.openweathermap.org/data/2.5/weather?%75%6E%69%74%73\u003d%69%6D%70%65%72%69%61%6C\u0026%61%70%70%69%64\u003d%2A%2A%2A%2A%2A\u0026%71\u003d%49%6E%76%61%6C%69%64%4C%6F%63%61%74%69%6F%6E%54%68%61%74%44%6F%65%73%4E%6F%74%45%78%69%73%74"
+    },
+    "duration": 293
+  }
+]

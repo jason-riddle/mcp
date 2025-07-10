@@ -1,0 +1,54 @@
+[
+  {
+    "recordedAt": 1752105964,
+    "request": {
+      "body": "",
+      "method": "GET",
+      "headers": {
+        "Accept": [
+          "application/json"
+        ]
+      },
+      "uri": "https://api.openweathermap.org/data/2.5/weather?q\u003dLondon%2CUK\u0026appid\u003d*****\u0026units\u003dimperial?%75%6E%69%74%73\u003d%69%6D%70%65%72%69%61%6C\u0026%61%70%70%69%64\u003d%2A%2A%2A%2A%2A\u0026%71\u003d%4C%6F%6E%64%6F%6E%2C%55%4B"
+    },
+    "response": {
+      "body": "{\"coord\":{\"lon\":-0.1257,\"lat\":51.5085},\"weather\":[{\"id\":804,\"main\":\"Clouds\",\"description\":\"overcast clouds\",\"icon\":\"04n\"}],\"base\":\"stations\",\"main\":{\"temp\":67.62,\"feels_like\":67.23,\"temp_min\":64.9,\"temp_max\":69.01,\"pressure\":1022,\"humidity\":67,\"sea_level\":1022,\"grnd_level\":1018},\"visibility\":10000,\"wind\":{\"speed\":1.99,\"deg\":280,\"gust\":3},\"clouds\":{\"all\":97},\"dt\":1752105862,\"sys\":{\"type\":2,\"id\":2091269,\"country\":\"GB\",\"sunrise\":1752119718,\"sunset\":1752178562},\"timezone\":3600,\"id\":2643743,\"name\":\"London\",\"cod\":200}",
+      "httpVersion": null,
+      "headers": {
+        "null": [
+          "HTTP/1.1 200 OK"
+        ],
+        "Access-Control-Allow-Origin": [
+          "*"
+        ],
+        "Access-Control-Allow-Methods": [
+          "GET, POST"
+        ],
+        "Access-Control-Allow-Credentials": [
+          "true"
+        ],
+        "X-Cache-Key": [
+          "/data/2.5/weather?q\u003dlondon%2cuk\u0026units\u003dimperial"
+        ],
+        "Connection": [
+          "keep-alive"
+        ],
+        "Content-Length": [
+          "517"
+        ],
+        "Date": [
+          "Thu, 10 Jul 2025 00:06:04 GMT"
+        ],
+        "Content-Type": [
+          "application/json; charset\u003dutf-8"
+        ]
+      },
+      "status": {
+        "code": 200,
+        "message": "OK"
+      },
+      "uri": "https://api.openweathermap.org/data/2.5/weather?q\u003dLondon%2CUK\u0026appid\u003d*****\u0026units\u003dimperial?%75%6E%69%74%73\u003d%69%6D%70%65%72%69%61%6C\u0026%61%70%70%69%64\u003d%2A%2A%2A%2A%2A\u0026%71\u003d%4C%6F%6E%64%6F%6E%2C%55%4B"
+    },
+    "duration": 80
+  }
+]

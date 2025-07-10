@@ -1,0 +1,54 @@
+[
+  {
+    "recordedAt": 1752105964,
+    "request": {
+      "body": "",
+      "method": "GET",
+      "headers": {
+        "Accept": [
+          "application/json"
+        ]
+      },
+      "uri": "https://api.openweathermap.org/data/2.5/forecast?q\u003dSan+Francisco%2CUS\u0026appid\u003d*****\u0026units\u003dimperial\u0026cnt\u003d8?%75%6E%69%74%73\u003d%69%6D%70%65%72%69%61%6C\u0026%63%6E%74\u003d%38\u0026%61%70%70%69%64\u003d%2A%2A%2A%2A%2A\u0026%71\u003d%53%61%6E+%46%72%61%6E%63%69%73%63%6F%2C%55%53"
+    },
+    "response": {
+      "body": "{\"cod\":\"200\",\"message\":0,\"cnt\":8,\"list\":[{\"dt\":1752116400,\"main\":{\"temp\":64.96,\"feels_like\":64.67,\"temp_min\":64.96,\"temp_max\":66.72,\"pressure\":1018,\"sea_level\":1018,\"grnd_level\":1014,\"humidity\":75,\"temp_kf\":-0.98},\"weather\":[{\"id\":801,\"main\":\"Clouds\",\"description\":\"few clouds\",\"icon\":\"02d\"}],\"clouds\":{\"all\":13},\"wind\":{\"speed\":8.86,\"deg\":245,\"gust\":11.23},\"visibility\":10000,\"pop\":0,\"sys\":{\"pod\":\"d\"},\"dt_txt\":\"2025-07-10 03:00:00\"},{\"dt\":1752127200,\"main\":{\"temp\":60.03,\"feels_like\":59.68,\"temp_min\":58.01,\"temp_max\":60.03,\"pressure\":1018,\"sea_level\":1018,\"grnd_level\":1014,\"humidity\":84,\"temp_kf\":1.12},\"weather\":[{\"id\":800,\"main\":\"Clear\",\"description\":\"clear sky\",\"icon\":\"01n\"}],\"clouds\":{\"all\":7},\"wind\":{\"speed\":7.58,\"deg\":220,\"gust\":8.28},\"visibility\":10000,\"pop\":0,\"sys\":{\"pod\":\"n\"},\"dt_txt\":\"2025-07-10 06:00:00\"},{\"dt\":1752138000,\"main\":{\"temp\":57.76,\"feels_like\":57.51,\"temp_min\":57.76,\"temp_max\":57.76,\"pressure\":1017,\"sea_level\":1017,\"grnd_level\":1013,\"humidity\":91,\"temp_kf\":0},\"weather\":[{\"id\":800,\"main\":\"Clear\",\"description\":\"clear sky\",\"icon\":\"01n\"}],\"clouds\":{\"all\":5},\"wind\":{\"speed\":6.93,\"deg\":213,\"gust\":7.47},\"visibility\":10000,\"pop\":0,\"sys\":{\"pod\":\"n\"},\"dt_txt\":\"2025-07-10 09:00:00\"},{\"dt\":1752148800,\"main\":{\"temp\":55.27,\"feels_like\":54.82,\"temp_min\":55.27,\"temp_max\":55.27,\"pressure\":1016,\"sea_level\":1016,\"grnd_level\":1012,\"humidity\":92,\"temp_kf\":0},\"weather\":[{\"id\":801,\"main\":\"Clouds\",\"description\":\"few clouds\",\"icon\":\"02n\"}],\"clouds\":{\"all\":15},\"wind\":{\"speed\":6.04,\"deg\":199,\"gust\":6.15},\"visibility\":10000,\"pop\":0,\"sys\":{\"pod\":\"n\"},\"dt_txt\":\"2025-07-10 12:00:00\"},{\"dt\":1752159600,\"main\":{\"temp\":57.38,\"feels_like\":56.71,\"temp_min\":57.38,\"temp_max\":57.38,\"pressure\":1017,\"sea_level\":1017,\"grnd_level\":1013,\"humidity\":83,\"temp_kf\":0},\"weather\":[{\"id\":801,\"main\":\"Clouds\",\"description\":\"few clouds\",\"icon\":\"02d\"}],\"clouds\":{\"all\":21},\"wind\":{\"speed\":4.43,\"deg\":193,\"gust\":5.1},\"visibility\":10000,\"pop\":0,\"sys\":{\"pod\":\"d\"},\"dt_txt\":\"2025-07-10 15:00:00\"},{\"dt\":1752170400,\"main\":{\"temp\":63.21,\"feels_like\":62.44,\"temp_min\":63.21,\"temp_max\":63.21,\"pressure\":1016,\"sea_level\":1016,\"grnd_level\":1012,\"humidity\":68,\"temp_kf\":0},\"weather\":[{\"id\":801,\"main\":\"Clouds\",\"description\":\"few clouds\",\"icon\":\"02d\"}],\"clouds\":{\"all\":22},\"wind\":{\"speed\":6.04,\"deg\":245,\"gust\":5.55},\"visibility\":10000,\"pop\":0,\"sys\":{\"pod\":\"d\"},\"dt_txt\":\"2025-07-10 18:00:00\"},{\"dt\":1752181200,\"main\":{\"temp\":64.11,\"feels_like\":63.32,\"temp_min\":64.11,\"temp_max\":64.11,\"pressure\":1015,\"sea_level\":1015,\"grnd_level\":1011,\"humidity\":66,\"temp_kf\":0},\"weather\":[{\"id\":801,\"main\":\"Clouds\",\"description\":\"few clouds\",\"icon\":\"02d\"}],\"clouds\":{\"all\":21},\"wind\":{\"speed\":9.71,\"deg\":261,\"gust\":10.6},\"visibility\":10000,\"pop\":0,\"sys\":{\"pod\":\"d\"},\"dt_txt\":\"2025-07-10 21:00:00\"},{\"dt\":1752192000,\"main\":{\"temp\":62.17,\"feels_like\":61.32,\"temp_min\":62.17,\"temp_max\":62.17,\"pressure\":1013,\"sea_level\":1013,\"grnd_level\":1009,\"humidity\":69,\"temp_kf\":0},\"weather\":[{\"id\":801,\"main\":\"Clouds\",\"description\":\"few clouds\",\"icon\":\"02d\"}],\"clouds\":{\"all\":22},\"wind\":{\"speed\":11.77,\"deg\":246,\"gust\":14.43},\"visibility\":10000,\"pop\":0,\"sys\":{\"pod\":\"d\"},\"dt_txt\":\"2025-07-11 00:00:00\"}],\"city\":{\"id\":5391959,\"name\":\"San Francisco\",\"coord\":{\"lat\":37.7749,\"lon\":-122.4194},\"country\":\"US\",\"population\":805235,\"timezone\":-25200,\"sunrise\":1752065750,\"sunset\":1752118420}}",
+      "httpVersion": null,
+      "headers": {
+        "null": [
+          "HTTP/1.1 200 OK"
+        ],
+        "Access-Control-Allow-Origin": [
+          "*"
+        ],
+        "Access-Control-Allow-Methods": [
+          "GET, POST"
+        ],
+        "Access-Control-Allow-Credentials": [
+          "true"
+        ],
+        "X-Cache-Key": [
+          "/data/2.5/forecast?cnt\u003d8\u0026q\u003dsan+francisco%2cus\u0026units\u003dimperial"
+        ],
+        "Connection": [
+          "keep-alive"
+        ],
+        "Content-Length": [
+          "3336"
+        ],
+        "Date": [
+          "Thu, 10 Jul 2025 00:06:04 GMT"
+        ],
+        "Content-Type": [
+          "application/json; charset\u003dutf-8"
+        ]
+      },
+      "status": {
+        "code": 200,
+        "message": "OK"
+      },
+      "uri": "https://api.openweathermap.org/data/2.5/forecast?q\u003dSan+Francisco%2CUS\u0026appid\u003d*****\u0026units\u003dimperial\u0026cnt\u003d8?%75%6E%69%74%73\u003d%69%6D%70%65%72%69%61%6C\u0026%63%6E%74\u003d%38\u0026%61%70%70%69%64\u003d%2A%2A%2A%2A%2A\u0026%71\u003d%53%61%6E+%46%72%61%6E%63%69%73%63%6F%2C%55%53"
+    },
+    "duration": 70
+  }
+]

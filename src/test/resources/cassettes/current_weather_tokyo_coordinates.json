@@ -1,0 +1,54 @@
+[
+  {
+    "recordedAt": 1752105964,
+    "request": {
+      "body": "",
+      "method": "GET",
+      "headers": {
+        "Accept": [
+          "application/json"
+        ]
+      },
+      "uri": "https://api.openweathermap.org/data/2.5/weather?%75%6E%69%74%73\u003d%69%6D%70%65%72%69%61%6C\u0026%61%70%70%69%64\u003d%2A%2A%2A%2A%2A\u0026%6C%61%74\u003d%33%35%2E%36%37%36%32\u0026%6C%6F%6E\u003d%31%33%39%2E%36%35%30%33"
+    },
+    "response": {
+      "body": "{\"coord\":{\"lon\":139.65,\"lat\":35.68},\"weather\":[{\"id\":801,\"main\":\"Clouds\",\"description\":\"few clouds\",\"icon\":\"02d\"}],\"base\":\"stations\",\"main\":{\"temp\":89.47,\"feels_like\":98.44,\"temp_min\":87.08,\"temp_max\":90.82,\"pressure\":1011,\"humidity\":60,\"sea_level\":1011,\"grnd_level\":1009},\"visibility\":10000,\"wind\":{\"speed\":10.36,\"deg\":170},\"clouds\":{\"all\":20},\"dt\":1752105710,\"sys\":{\"type\":1,\"id\":8063,\"country\":\"JP\",\"sunrise\":1752089610,\"sunset\":1752141571},\"timezone\":32400,\"id\":1862143,\"name\":\"Horinouchi\",\"cod\":200}",
+      "httpVersion": null,
+      "headers": {
+        "null": [
+          "HTTP/1.1 200 OK"
+        ],
+        "Access-Control-Allow-Origin": [
+          "*"
+        ],
+        "Access-Control-Allow-Methods": [
+          "GET, POST"
+        ],
+        "Access-Control-Allow-Credentials": [
+          "true"
+        ],
+        "X-Cache-Key": [
+          "/data/2.5/weather?lat\u003d35.68\u0026lon\u003d139.65\u0026units\u003dimperial"
+        ],
+        "Connection": [
+          "keep-alive"
+        ],
+        "Content-Length": [
+          "504"
+        ],
+        "Date": [
+          "Thu, 10 Jul 2025 00:06:04 GMT"
+        ],
+        "Content-Type": [
+          "application/json; charset\u003dutf-8"
+        ]
+      },
+      "status": {
+        "code": 200,
+        "message": "OK"
+      },
+      "uri": "https://api.openweathermap.org/data/2.5/weather?%75%6E%69%74%73\u003d%69%6D%70%65%72%69%61%6C\u0026%61%70%70%69%64\u003d%2A%2A%2A%2A%2A\u0026%6C%61%74\u003d%33%35%2E%36%37%36%32\u0026%6C%6F%6E\u003d%31%33%39%2E%36%35%30%33"
+    },
+    "duration": 161
+  }
+]

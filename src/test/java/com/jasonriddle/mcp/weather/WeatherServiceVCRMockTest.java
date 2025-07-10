@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
+import org.junit.jupiter.api.condition.EnabledIf;
 
 /**
  * VCR mock tests for WeatherService using real OpenWeatherMap API calls.
@@ -33,10 +33,10 @@ import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
  *
  * To run these tests:
  * - Set WEATHER_API_KEY environment variable
- * - Run: mvn test -Dtest=WeatherServiceVcrMockTest
+ * - Run: mvn test -Dtest=WeatherServiceVCRMockTest
  * - For CI/CD: mvn verify -Pvcr-tests (uses replay mode)
  */
-final class WeatherServiceVcrMockTest {
+final class WeatherServiceVCRMockTest {
 
     private static final String CASSETTES_PATH = "src/test/resources/cassettes";
     private static final String BASE_URL = "https://api.openweathermap.org/data/2.5";
@@ -67,7 +67,7 @@ final class WeatherServiceVcrMockTest {
     }
 
     @Test
-    @EnabledIfEnvironmentVariable(named = "WEATHER_API_KEY", matches = ".*")
+    @EnabledIf("shouldEnableVcrTests")
     void testGetCurrentWeatherNewYork() throws Exception {
         // Given
         final String location = "New York,US";
@@ -93,7 +93,7 @@ final class WeatherServiceVcrMockTest {
     }
 
     @Test
-    @EnabledIfEnvironmentVariable(named = "WEATHER_API_KEY", matches = ".*")
+    @EnabledIf("shouldEnableVcrTests")
     void testGetCurrentWeatherLondon() throws Exception {
         // Given
         final String location = "London,UK";
@@ -118,7 +118,7 @@ final class WeatherServiceVcrMockTest {
     }
 
     @Test
-    @EnabledIfEnvironmentVariable(named = "WEATHER_API_KEY", matches = ".*")
+    @EnabledIf("shouldEnableVcrTests")
     void testGetForecastSanFrancisco() throws Exception {
         // Given
         final String location = "San Francisco,US";
@@ -149,7 +149,7 @@ final class WeatherServiceVcrMockTest {
     }
 
     @Test
-    @EnabledIfEnvironmentVariable(named = "WEATHER_API_KEY", matches = ".*")
+    @EnabledIf("shouldEnableVcrTests")
     void testGetCurrentWeatherWithCoordinates() throws Exception {
         // Given - Tokyo coordinates
         final String location = "35.6762,139.6503";
@@ -169,7 +169,7 @@ final class WeatherServiceVcrMockTest {
     }
 
     @Test
-    @EnabledIfEnvironmentVariable(named = "WEATHER_API_KEY", matches = ".*")
+    @EnabledIf("shouldEnableVcrTests")
     void testGetCurrentWeatherWithInvalidLocation() throws Exception {
         // Given
         final String location = "InvalidLocationThatDoesNotExist";
@@ -322,5 +322,61 @@ final class WeatherServiceVcrMockTest {
         final String encodedApiKey = URLEncoder.encode(API_KEY, StandardCharsets.UTF_8);
         censoredContent = censoredContent.replace(encodedApiKey, "*****");
         return censoredContent;
+    }
+
+    /**
+     * Determines if VCR tests should be enabled.
+     * Tests run when:
+     * - API key is available (for record/auto modes)
+     * - In replay mode (cassettes exist, no API key needed)
+     * - In auto mode with existing cassettes (defaults to replay)
+     *
+     * @return true if tests should be enabled
+     */
+    static boolean shouldEnableVcrTests() {
+        final String apiKey = System.getenv("WEATHER_API_KEY");
+        final String vcrMode = System.getProperty("vcr.mode", "auto");
+
+        // Always enable for replay mode (cassettes don't need API key)
+        if ("replay".equalsIgnoreCase(vcrMode)) {
+            return true;
+        }
+
+        // For auto mode, check if cassettes exist (enables replay without API key)
+        if ("auto".equalsIgnoreCase(vcrMode) && cassettesExist()) {
+            return true;
+        }
+
+        // For record mode or auto mode without cassettes, require API key
+        return apiKey != null && !apiKey.isEmpty();
+    }
+
+    /**
+     * Check if VCR cassettes exist for these tests.
+     *
+     * @return true if cassette files exist
+     */
+    private static boolean cassettesExist() {
+        final Path cassettesDir = Paths.get(CASSETTES_PATH);
+        if (!Files.exists(cassettesDir)) {
+            return false;
+        }
+
+        // Check for existence of key cassette files
+        final String[] cassetteNames = {
+            "current_weather_new_york.json",
+            "current_weather_london.json",
+            "forecast_san_francisco.json",
+            "current_weather_tokyo_coordinates.json",
+            "current_weather_invalid_location.json"
+        };
+
+        for (final String cassetteName : cassetteNames) {
+            if (!Files.exists(cassettesDir.resolve(cassetteName))) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

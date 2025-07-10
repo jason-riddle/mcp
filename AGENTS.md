@@ -78,7 +78,7 @@ make test-integration                 # Run integration tests
 ./mvnw test -Dtest=WeatherServiceUnitTest # Run weather service tests
 
 # VCR Mock Tests (requires WEATHER_API_KEY)
-./mvnw test -Dtest=WeatherServiceVcrMockTest  # Run VCR tests
+./mvnw test -Dtest=WeatherServiceVCRMockTest  # Run VCR tests
 ./mvnw verify -Pvcr-tests             # Run VCR tests in CI/CD mode (replay only)
 ```
 
@@ -98,17 +98,18 @@ The project includes VCR (Video Cassette Recorder) integration tests for the wea
 export WEATHER_API_KEY=your_api_key_here
 
 # Record new cassettes (first run with real API)
-./mvnw test -Dtest=WeatherServiceVcrMockTest -Dvcr.mode=record
+./mvnw test -Dtest=WeatherServiceVCRMockTest -Dvcr.mode=record
 
 # Replay existing cassettes (subsequent runs, no API key needed)
-./mvnw test -Dtest=WeatherServiceVcrMockTest -Dvcr.mode=replay
+./mvnw test -Dtest=WeatherServiceVCRMockTest -Dvcr.mode=replay
 
 # Auto mode (record if not exists, replay if exists)
-./mvnw test -Dtest=WeatherServiceVcrMockTest -Dvcr.mode=auto
+./mvnw test -Dtest=WeatherServiceVCRMockTest -Dvcr.mode=auto
 ```
 
 **CI/CD Integration:**
 - Use `mvn verify -Pvcr-tests` for CI/CD pipelines
+- VCR profile includes `**/*VCRMockTest.java` pattern for test discovery
 - Cassettes are committed to version control for replay
 - Tests run in `replay` mode by default in CI/CD
 
@@ -122,6 +123,13 @@ export WEATHER_API_KEY=your_api_key_here
 - API keys automatically censored in cassette recordings
 - Safe to commit cassettes to version control
 - No sensitive data exposure in test artifacts
+- ✅ **Verified**: All cassette files show `appid=*****` with no API key exposure
+
+**Cassette Commit Requirements:**
+- Tests use `@EnabledIf("shouldEnableVcrTests")` to run in replay mode without API key
+- CI/CD runs `make test-mock` without `WEATHER_API_KEY` environment variable
+- Auto mode detects existing cassettes and enables replay automatically
+- Cassettes must be committed to version control for CI/CD functionality
 
 ## Code Quality
 
@@ -147,7 +155,7 @@ This project follows **Palantir Java Format** with enhanced Checkstyle rules bas
 
 **Naming Conventions:**
 - **Magic numbers:** Only `-1, 0, 1, 2, 8, 10, 16, 100, 1000` allowed as literals
-- **Abbreviations:** Allow `XML, HTTP, JSON, API, URL, URI, UUID, DTO, MCP, SSE, JUnit`
+- **Abbreviations:** Allow `XML, HTTP, JSON, API, URL, URI, UUID, DTO, MCP, SSE, VCR, JUnit`
 - **Package names:** Must be all lowercase with dots separating words
 - **Classes:** PascalCase nouns
 - **Methods:** lowerCamelCase verbs
@@ -172,6 +180,9 @@ This project follows **Palantir Java Format** with enhanced Checkstyle rules bas
 - **No excessive method chaining:** Maximum 3 chained method calls
 - **No logical OR in method calls:** Extract to boolean variables
 - **No nested Map.of calls:** Extract inner maps to variables
+
+**Abbreviation Enforcement:**
+- **VCR capitalization:** "Vcr" is forbidden - must use "VCR" (Video Cassette Recorder)
 
 **Modern Java Restrictions:**
 - **No streams:** Use simple loops instead of `stream()`, `map()`, `filter()`, `collect()`
@@ -367,7 +378,7 @@ src/test/java/com.jasonriddle.mcp/
 │   └── package-info.java                          # Package documentation
 └── weather/                                        # Weather service tests
     ├── WeatherServiceUnitTest.java                 # Unit tests for weather service
-    ├── WeatherServiceVcrMockTest.java              # VCR mock tests for weather API
+    ├── WeatherServiceVCRMockTest.java              # VCR mock tests for weather API
     └── package-info.java                          # Package documentation
 ```
 

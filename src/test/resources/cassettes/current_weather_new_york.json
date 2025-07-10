@@ -1,0 +1,54 @@
+[
+  {
+    "recordedAt": 1752105964,
+    "request": {
+      "body": "",
+      "method": "GET",
+      "headers": {
+        "Accept": [
+          "application/json"
+        ]
+      },
+      "uri": "https://api.openweathermap.org/data/2.5/weather?q\u003dNew+York%2CUS\u0026appid\u003d*****\u0026units\u003dimperial?%75%6E%69%74%73\u003d%69%6D%70%65%72%69%61%6C\u0026%61%70%70%69%64\u003d%2A%2A%2A%2A%2A\u0026%71\u003d%4E%65%77+%59%6F%72%6B%2C%55%53"
+    },
+    "response": {
+      "body": "{\"coord\":{\"lon\":-74.006,\"lat\":40.7143},\"weather\":[{\"id\":800,\"main\":\"Clear\",\"description\":\"clear sky\",\"icon\":\"01d\"}],\"base\":\"stations\",\"main\":{\"temp\":85.77,\"feels_like\":91,\"temp_min\":81.97,\"temp_max\":89.29,\"pressure\":1013,\"humidity\":61,\"sea_level\":1013,\"grnd_level\":1011},\"visibility\":10000,\"wind\":{\"speed\":8.01,\"deg\":233,\"gust\":11.01},\"clouds\":{\"all\":0},\"dt\":1752105547,\"sys\":{\"type\":2,\"id\":2008776,\"country\":\"US\",\"sunrise\":1752053597,\"sunset\":1752107333},\"timezone\":-14400,\"id\":5128581,\"name\":\"New York\",\"cod\":200}",
+      "httpVersion": null,
+      "headers": {
+        "null": [
+          "HTTP/1.1 200 OK"
+        ],
+        "Access-Control-Allow-Origin": [
+          "*"
+        ],
+        "Access-Control-Allow-Methods": [
+          "GET, POST"
+        ],
+        "Access-Control-Allow-Credentials": [
+          "true"
+        ],
+        "X-Cache-Key": [
+          "/data/2.5/weather?q\u003dnew+york%2cus\u0026units\u003dimperial"
+        ],
+        "Connection": [
+          "keep-alive"
+        ],
+        "Content-Length": [
+          "515"
+        ],
+        "Date": [
+          "Thu, 10 Jul 2025 00:06:05 GMT"
+        ],
+        "Content-Type": [
+          "application/json; charset\u003dutf-8"
+        ]
+      },
+      "status": {
+        "code": 200,
+        "message": "OK"
+      },
+      "uri": "https://api.openweathermap.org/data/2.5/weather?q\u003dNew+York%2CUS\u0026appid\u003d*****\u0026units\u003dimperial?%75%6E%69%74%73\u003d%69%6D%70%65%72%69%61%6C\u0026%61%70%70%69%64\u003d%2A%2A%2A%2A%2A\u0026%71\u003d%4E%65%77+%59%6F%72%6B%2C%55%53"
+    },
+    "duration": 179
+  }
+]

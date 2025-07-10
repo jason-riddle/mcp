@@ -71,7 +71,7 @@
         <module name="AbbreviationAsWordInName">
             <property name="ignoreFinal" value="false"/>
             <property name="allowedAbbreviationLength" value="1"/>
-            <property name="allowedAbbreviations" value="XML,HTTP,JSON,API,URL,URI,UUID,DTO,MCP,SSE,JUnit"/>
+            <property name="allowedAbbreviations" value="XML,HTTP,JSON,API,URL,URI,UUID,DTO,MCP,SSE,VCR,JUnit"/>
         </module>
         <module name="ClassTypeParameterName"/>
         <module name="ConstantName"/>
@@ -313,6 +313,13 @@
         <module name="RegexpSinglelineJava">
             <property name="format" value="permits\s+\w+"/>
             <property name="message" value="Sealed class permits clause is banned - use regular inheritance"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+
+        <!-- Enforce VCR abbreviation capitalization -->
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="(?&lt;![a-z])Vcr(?![a-z])"/>
+            <property name="message" value="Use 'VCR' instead of 'Vcr' - VCR must be fully capitalized as it's an abbreviation for Video Cassette Recorder"/>
             <property name="ignoreComments" value="true"/>
         </module>
 
