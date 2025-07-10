@@ -78,7 +78,7 @@
     spotless-check = {
       enable = true;
       name = "spotless-check";
-      entry = "./mvnw spotless:check";
+      entry = "make format-check";
       language = "system";
       files = "\\.(java|xml|json|yaml|yml|properties)$";
       pass_filenames = false;
@@ -88,7 +88,7 @@
     maven-checkstyle = {
       enable = true;
       name = "maven-checkstyle";
-      entry = "./mvnw checkstyle:check";
+      entry = "make checkstyle";
       language = "system";
       files = "\\.java$";
       pass_filenames = false;
@@ -118,7 +118,7 @@
     maven-test = {
       enable = true;
       name = "maven-test";
-      entry = "./mvnw test";
+      entry = "make test";
       language = "system";
       files = "\\.(java|xml|properties)$";
       pass_filenames = false;
@@ -148,7 +148,7 @@
     # maven-package = {
     #   enable = true;
     #   name = "maven-package";
-    #   entry = "./mvnw package";
+    #   entry = "make build";
     #   language = "system";
     #   files = "\\.(java|xml|properties)$";
     #   pass_filenames = false;

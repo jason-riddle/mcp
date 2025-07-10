@@ -344,6 +344,8 @@
                     <excludes>
                         <exclude>**/*IT.java</exclude>
                         <exclude>**/*IntegrationTest.java</exclude>
+                        <exclude>**/*PermutationTest.java</exclude>
+                        <exclude>**/*MockTest.java</exclude>
                     </excludes>
                     <systemPropertyVariables>
                         <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>

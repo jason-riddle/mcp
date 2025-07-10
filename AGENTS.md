@@ -537,8 +537,7 @@ quarkus.log.category."io.quarkus.container.image.jib.deployment.JibProcessor".le
 ```bash
 # Run specific test categories
 ./mvnw test                                                     # Unit tests only
-./mvnw verify -DskipITs=false                                   # Include integration tests
-./mvnw test -Dtest=ApiKeyAuthenticationDisabledIntegrationTest  # Security tests
+./mvnw verify -DskipITs=false --no-transfer-progress            # Include integration tests
 ```
 
 ## GitHub Actions Integration
