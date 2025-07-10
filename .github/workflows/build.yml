@@ -2,10 +2,7 @@
 name: Build
 
 on:
-  workflow_run:
-    workflows: ["Code Quality", "Tests"]
-    types:
-      - completed
+  push:
     branches:
       - main
   pull_request:
