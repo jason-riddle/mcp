@@ -1,5 +1,6 @@
 package com.jasonriddle.mcp.weather;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.time.Instant;
@@ -9,6 +10,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
@@ -18,6 +20,7 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 @ApplicationScoped
 public final class WeatherService {
 
+    private static final Logger LOGGER = Logger.getLogger(WeatherService.class.getName());
     private static final String DEFAULT_UNITS = "imperial"; // Fahrenheit
     private static final String MAIN_FIELD = "main";
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -35,6 +38,19 @@ public final class WeatherService {
     @Inject
     @RestClient
     WeatherClient weatherClient;
+
+    /**
+     * Initialize the weather service and log configuration status.
+     */
+    @PostConstruct
+    void initialize() {
+        if (apiKey == null || apiKey.trim().isEmpty()) {
+            LOGGER.warning("Weather API key is not configured. Set WEATHER_API_KEY environment "
+                    + "variable to enable weather features.");
+        } else {
+            LOGGER.info("Weather service initialized with API key");
+        }
+    }
 
     /**
      * Gets current weather for a location.
