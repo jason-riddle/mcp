@@ -69,7 +69,7 @@ make checkstyle  # Run style checks
 ```bash
 make test                             # Run unit tests
 make test-integration                 # Run integration tests
-make test-perm                        # Run permutation tests only
+make test-prop                        # Run property tests only
 make test-mock                        # Run mock tests only
 make test-all                         # Run all test suites
 
@@ -419,7 +419,7 @@ Project Root/
         │   │   ├── ProdTestProfile.java                       # Production test profile
         │   │   └── package-info.java                          # Package documentation
         │   ├── memory/                                         # Memory implementation tests
-        │   │   ├── MemoryGraphPermutationTest.java            # JQwik permutation tests for memory graph
+        │   │   ├── MemoryGraphPermutationPropertyTest.java   # JQwik property tests for memory graph
         │   │   ├── MemoryServicePITMutationTest.java          # PITest standalone mutation tests for memory service
         │   │   ├── MemoryServiceUnitTest.java                  # Unit tests for memory service
         │   │   └── package-info.java                          # Package documentation
@@ -462,7 +462,7 @@ Each package contains a `package-info.java` file with purpose and responsibiliti
 - **Weather package** (`com.jasonriddle.mcp.weather`): Weather services and data structures for the MCP server
 - **Test packages**: Corresponding test suites for implementation verification
   - **Config test package** (`com.jasonriddle.mcp.config`): Configuration validation tests for default, Heroku, and production profiles
-  - **Memory test package** (`com.jasonriddle.mcp.memory`): Memory service tests including JQwik permutation testing and PITest mutation testing
+  - **Memory test package** (`com.jasonriddle.mcp.memory`): Memory service tests including JQwik property testing and PITest mutation testing
   - **Security test package** (`com.jasonriddle.mcp.security`): Security tests (currently disabled for STDIO endpoints)
   - **Server test package** (`com.jasonriddle.mcp.server`): Integration tests for MCP server implementations (SSE and STDIO)
   - **Time test package** (`com.jasonriddle.mcp.time`): Time service tests

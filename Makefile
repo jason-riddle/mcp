@@ -1,5 +1,5 @@
 # Modern Makefile best practices
-.PHONY: help clean build dev run format checkstyle test test-watch test-integration test-perm test-mock test-all test-mutation test-mutation-incremental test-mutation-memory-only docker-build docker-run docker-clean
+.PHONY: help clean build dev run format checkstyle test test-watch test-integration test-prop test-mock test-all test-mutation test-mutation-incremental test-mutation-memory-only docker-build docker-run docker-clean
 .DELETE_ON_ERROR:
 .ONESHELL:
 
@@ -117,10 +117,10 @@ test-integration: clean ## Run integration tests
 	@$(MVN) verify -DskipITs=false --no-transfer-progress
 	@echo "✓ Integration tests completed"
 
-test-perm: clean ## Run permutation tests only
-	@echo "Running permutation tests..."
-	@$(MVN) test -Dtest=*PermutationTest --no-transfer-progress
-	@echo "✓ Permutation tests completed"
+test-prop: clean ## Run property tests only
+	@echo "Running property tests..."
+	@$(MVN) test -Dtest=*PropertyTest --no-transfer-progress
+	@echo "✓ Property tests completed"
 
 test-mock: clean ## Run mock tests only
 	@echo "Running mock tests..."
@@ -133,8 +133,8 @@ test-all: clean ## Run all tests (unit, integration, permutation, mock)
 	@$(MVN) test --no-transfer-progress || echo "Unit tests failed - continuing"
 	@echo "2/4 Running integration tests..."
 	@$(MVN) verify -DskipITs=false --no-transfer-progress || echo "Integration tests failed - continuing"
-	@echo "3/4 Running permutation tests..."
-	@$(MVN) test -Dtest=*PermutationTest --no-transfer-progress || echo "Permutation tests failed - continuing"
+	@echo "3/4 Running property tests..."
+	@$(MVN) test -Dtest=*PropertyTest --no-transfer-progress || echo "Property tests failed - continuing"
 	@echo "4/4 Running mock tests..."
 	@$(MVN) test -Dtest=*MockTest --no-transfer-progress || echo "Mock tests failed - continuing"
 	@echo "✓ All test suites completed (check output above for any failures)"

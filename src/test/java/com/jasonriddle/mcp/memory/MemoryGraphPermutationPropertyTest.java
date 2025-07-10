@@ -26,8 +26,8 @@ import net.jqwik.api.constraints.Size;
  * Property-based permutation tests for MemoryService using JQwik.
  * Tests that memory operations work correctly regardless of execution order.
  */
-@Tag("permutation")
-class MemoryGraphPermutationTest {
+@Tag("permutation-property")
+class MemoryGraphPermutationPropertyTest {
 
     private MemoryService createMemoryService() throws IOException {
         final Path tempFile = Files.createTempFile("memory-permutation-test-" + System.nanoTime(), ".jsonl");

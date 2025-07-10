@@ -297,7 +297,7 @@
                         <include>**/*IntegrationTest.java</include>
                     </includes>
                     <excludes>
-                        <exclude>**/*PermutationTest.java</exclude>
+                        <exclude>**/*PropertyTest.java</exclude>
                     </excludes>
                     <systemPropertyVariables>
                         <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
@@ -369,7 +369,7 @@
                     <excludes>
                         <exclude>**/*IT.java</exclude>
                         <exclude>**/*IntegrationTest.java</exclude>
-                        <exclude>**/*PermutationTest.java</exclude>
+                        <exclude>**/*PropertyTest.java</exclude>
                         <exclude>**/*MockTest.java</exclude>
                         <exclude>**/*PITMutationTest.java</exclude>
                     </excludes>
@@ -378,6 +378,25 @@
                         <maven.home>${maven.home}</maven.home>
                     </systemPropertyVariables>
                 </configuration>
+            </plugin>
+
+            <!-- Surefire Report Plugin for HTML Reports -->
+            <!-- Docs: https://maven.apache.org/surefire/maven-surefire-report-plugin/report-mojo.html -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+                <version>${surefire-plugin.version}</version>
+                <configuration>
+                    <aggregate>true</aggregate>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>report-only</goal>
+                        </goals>
+                        <phase>test</phase>
+                    </execution>
+                </executions>
             </plugin>
 
             <!-- PITest Mutation Testing Plugin -->
@@ -435,25 +454,6 @@
                         <version>${pitest-junit5.version}</version>
                     </dependency>
                 </dependencies>
-            </plugin>
-
-            <!-- Surefire Report Plugin for HTML Reports -->
-            <!-- Docs: https://maven.apache.org/surefire/maven-surefire-report-plugin/report-mojo.html -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-report-plugin</artifactId>
-                <version>${surefire-plugin.version}</version>
-                <configuration>
-                    <aggregate>true</aggregate>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>report-only</goal>
-                        </goals>
-                        <phase>test</phase>
-                    </execution>
-                </executions>
             </plugin>
 
         </plugins>
@@ -525,7 +525,7 @@
                         <artifactId>maven-surefire-plugin</artifactId>
                         <version>${surefire-plugin.version}</version>
                         <configuration>
-                            <groups>permutation</groups>
+                            <groups>permutation-property</groups>
                             <trimStackTrace>false</trimStackTrace>
                             <systemPropertyVariables>
                                 <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
