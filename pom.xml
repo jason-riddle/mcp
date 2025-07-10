@@ -298,6 +298,8 @@
                     </includes>
                     <excludes>
                         <exclude>**/*PropertyTest.java</exclude>
+                        <exclude>**/*EndToEndTest.java</exclude>
+                        <exclude>**/*E2ETest.java</exclude>
                     </excludes>
                     <systemPropertyVariables>
                         <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
@@ -372,6 +374,8 @@
                         <exclude>**/*PropertyTest.java</exclude>
                         <exclude>**/*MockTest.java</exclude>
                         <exclude>**/*PITMutationTest.java</exclude>
+                        <exclude>**/*EndToEndTest.java</exclude>
+                        <exclude>**/*E2ETest.java</exclude>
                     </excludes>
                     <systemPropertyVariables>
                         <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>

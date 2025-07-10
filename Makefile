@@ -137,7 +137,7 @@ test-mock: clean ## Run mock tests only
 test-e2e: clean ## Run end-to-end tests against remote MCP server
 	@echo "Running end-to-end tests..."
 	@echo "Testing remote Heroku MCP endpoint with authentication..."
-	@$(MVN) test -Dtest=McpServerEndToEndTest -q --no-transfer-progress $(MAVEN_PROFILE)
+	@$(MVN) test -Dtest=*EndToEndTest,*E2ETest -q --no-transfer-progress $(MAVEN_PROFILE)
 	@echo "✓ End-to-end tests completed"
 
 test-all: clean ## Run all tests (unit, integration, permutation, mock, e2e)
@@ -151,7 +151,7 @@ test-all: clean ## Run all tests (unit, integration, permutation, mock, e2e)
 	@echo "4/5 Running mock tests..."
 	@$(MVN) test -Dtest=*MockTest -q --no-transfer-progress || echo "Mock tests failed - continuing"
 	@echo "5/5 Running end-to-end tests..."
-	@$(MVN) test -Dtest=McpServerEndToEndTest -q --no-transfer-progress || echo "End-to-end tests failed - continuing"
+	@$(MVN) test -Dtest=*EndToEndTest,*E2ETest -q --no-transfer-progress || echo "End-to-end tests failed - continuing"
 	@echo "✓ All test suites completed (check output above for any failures)"
 
 # ============================================================================
