@@ -104,7 +104,7 @@ checkstyle: ## Run checkstyle verification
 
 test: clean ## Run unit tests
 	@echo "Running unit tests..."
-	@$(MVN) test --no-transfer-progress
+	@$(MVN) test -q --no-transfer-progress $(MAVEN_OPTS)
 	@echo "✓ Unit tests completed"
 
 test-watch: ## Run tests in watch mode
@@ -114,29 +114,29 @@ test-watch: ## Run tests in watch mode
 
 test-integration: clean ## Run integration tests
 	@echo "Running integration tests..."
-	@$(MVN) verify -DskipITs=false --no-transfer-progress
+	@$(MVN) verify -DskipITs=false -q --no-transfer-progress $(MAVEN_OPTS)
 	@echo "✓ Integration tests completed"
 
 test-prop: clean ## Run property tests only
 	@echo "Running property tests..."
-	@$(MVN) test -Dtest=*PropertyTest --no-transfer-progress
+	@$(MVN) test -Dtest=*PropertyTest -q --no-transfer-progress $(MAVEN_OPTS)
 	@echo "✓ Property tests completed"
 
 test-mock: clean ## Run mock tests only
 	@echo "Running mock tests..."
-	@$(MVN) test -Dtest=*MockTest --no-transfer-progress
+	@$(MVN) test -Dtest=*MockTest -q --no-transfer-progress $(MAVEN_OPTS)
 	@echo "✓ Mock tests completed"
 
 test-all: clean ## Run all tests (unit, integration, permutation, mock)
 	@echo "Running all tests..."
 	@echo "1/4 Running unit tests..."
-	@$(MVN) test --no-transfer-progress || echo "Unit tests failed - continuing"
+	@$(MVN) test -q --no-transfer-progress || echo "Unit tests failed - continuing"
 	@echo "2/4 Running integration tests..."
-	@$(MVN) verify -DskipITs=false --no-transfer-progress || echo "Integration tests failed - continuing"
+	@$(MVN) verify -DskipITs=false -q --no-transfer-progress || echo "Integration tests failed - continuing"
 	@echo "3/4 Running property tests..."
-	@$(MVN) test -Dtest=*PropertyTest --no-transfer-progress || echo "Property tests failed - continuing"
+	@$(MVN) test -Dtest=*PropertyTest -q --no-transfer-progress || echo "Property tests failed - continuing"
 	@echo "4/4 Running mock tests..."
-	@$(MVN) test -Dtest=*MockTest --no-transfer-progress || echo "Mock tests failed - continuing"
+	@$(MVN) test -Dtest=*MockTest -q --no-transfer-progress || echo "Mock tests failed - continuing"
 	@echo "✓ All test suites completed (check output above for any failures)"
 
 # ============================================================================
@@ -145,12 +145,12 @@ test-all: clean ## Run all tests (unit, integration, permutation, mock)
 
 test-mutation: clean ## Run PITest mutation testing on memory package
 	@echo "Running PITest mutation testing on memory package..."
-	@$(MVN) clean test-compile org.pitest:pitest-maven:mutationCoverage -Pmemory-mutation-tests --no-transfer-progress
+	@$(MVN) clean test-compile org.pitest:pitest-maven:mutationCoverage -Pmemory-mutation-tests -q --no-transfer-progress $(MAVEN_OPTS)
 	@echo "✓ Mutation testing complete. Reports available in target/pit-reports/"
 
 test-mutation-incremental: ## Run incremental PITest mutation testing
 	@echo "Running incremental PITest mutation testing..."
-	@$(MVN) org.pitest:pitest-maven:mutationCoverage -DwithHistory -Pmemory-mutation-tests --no-transfer-progress
+	@$(MVN) org.pitest:pitest-maven:mutationCoverage -DwithHistory -Pmemory-mutation-tests -q --no-transfer-progress
 	@echo "✓ Incremental mutation testing complete"
 
 test-mutation-memory-only: clean ## Run mutation testing only on MemoryService
@@ -158,7 +158,7 @@ test-mutation-memory-only: clean ## Run mutation testing only on MemoryService
 	@$(MVN) org.pitest:pitest-maven:mutationCoverage \
 		-DtargetClasses=com.jasonriddle.mcp.memory.MemoryService \
 		-DtargetTests=com.jasonriddle.mcp.memory.*PITMutationTest \
-		--no-transfer-progress
+		-q --no-transfer-progress
 	@echo "✓ MemoryService mutation testing complete"
 
 # test-stdio: clean ## Run STDIO integration tests only

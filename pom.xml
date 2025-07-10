@@ -590,7 +590,7 @@
                                 <param>hashCode</param>
                                 <param>equals</param>
                             </excludedMethods>
-                            <verbose>true</verbose>
+                            <verbose>false</verbose>
                             <historyInputFile>${project.build.directory}/pit-history/history.bin</historyInputFile>
                             <historyOutputFile>${project.build.directory}/pit-history/history.bin</historyOutputFile>
                             <jvmArgs>
@@ -610,6 +610,16 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+        <!-- CI Testing Profile - Skip quality checks for faster testing -->
+        <profile>
+            <id>ci-testing</id>
+            <properties>
+                <spotless.check.skip>true</spotless.check.skip>
+                <checkstyle.skip>true</checkstyle.skip>
+                <pmd.skip>true</pmd.skip>
+                <spotless.apply.skip>true</spotless.apply.skip>
+            </properties>
         </profile>
     </profiles>
 </project>
