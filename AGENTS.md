@@ -77,8 +77,8 @@ make test-integration                 # Run integration tests
 ./mvnw test -Dtest=TimeServiceTest   # Run time service tests
 ./mvnw test -Dtest=WeatherServiceTest # Run weather service tests
 
-# VCR Integration Tests (requires WEATHER_API_KEY)
-./mvnw test -Dtest=WeatherServiceVCRIntegrationTest  # Run VCR tests
+# VCR Mock Tests (requires WEATHER_API_KEY)
+./mvnw test -Dtest=WeatherServiceVcrMockTest  # Run VCR tests
 ./mvnw verify -Pvcr-tests             # Run VCR tests in CI/CD mode (replay only)
 ```
 
@@ -98,13 +98,13 @@ The project includes VCR (Video Cassette Recorder) integration tests for the wea
 export WEATHER_API_KEY=your_api_key_here
 
 # Record new cassettes (first run with real API)
-./mvnw test -Dtest=WeatherServiceVCRIntegrationTest -Dvcr.mode=record
+./mvnw test -Dtest=WeatherServiceVcrMockTest -Dvcr.mode=record
 
 # Replay existing cassettes (subsequent runs, no API key needed)
-./mvnw test -Dtest=WeatherServiceVCRIntegrationTest -Dvcr.mode=replay
+./mvnw test -Dtest=WeatherServiceVcrMockTest -Dvcr.mode=replay
 
 # Auto mode (record if not exists, replay if exists)
-./mvnw test -Dtest=WeatherServiceVCRIntegrationTest -Dvcr.mode=auto
+./mvnw test -Dtest=WeatherServiceVcrMockTest -Dvcr.mode=auto
 ```
 
 **CI/CD Integration:**
@@ -367,7 +367,7 @@ src/test/java/com.jasonriddle.mcp/
 │   └── package-info.java                          # Package documentation
 └── weather/                                        # Weather service tests
     ├── WeatherServiceTest.java                    # Tests for weather service
-    ├── WeatherServiceVCRIntegrationTest.java      # VCR integration tests for weather API
+    ├── WeatherServiceVcrMockTest.java              # VCR mock tests for weather API
     └── package-info.java                          # Package documentation
 ```
 
@@ -386,7 +386,7 @@ Each package contains a `package-info.java` file with purpose and responsibiliti
   - **Security test package** (`com.jasonriddle.mcp.security`): Security tests (currently disabled for STDIO endpoints)
   - **Server test package** (`com.jasonriddle.mcp.server`): Integration tests for MCP server implementations (SSE and STDIO)
   - **Time test package** (`com.jasonriddle.mcp.time`): Time service tests
-  - **Weather test package** (`com.jasonriddle.mcp.weather`): Weather service tests
+  - **Weather test package** (`com.jasonriddle.mcp.weather`): Weather service tests including VCR mock testing
 
 ### Design Principles
 

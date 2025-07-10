@@ -28,15 +28,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 
 /**
- * VCR integration tests for WeatherService using real OpenWeatherMap API calls.
+ * VCR mock tests for WeatherService using real OpenWeatherMap API calls.
  * These tests record HTTP interactions to cassettes for replay without API costs.
  *
  * To run these tests:
  * - Set WEATHER_API_KEY environment variable
- * - Run: mvn test -Dtest=WeatherServiceVCRIntegrationTest
+ * - Run: mvn test -Dtest=WeatherServiceVcrMockTest
  * - For CI/CD: mvn verify -Pvcr-tests (uses replay mode)
  */
-final class WeatherServiceVCRIntegrationTest {
+final class WeatherServiceVcrMockTest {
 
     private static final String CASSETTES_PATH = "src/test/resources/cassettes";
     private static final String BASE_URL = "https://api.openweathermap.org/data/2.5";
@@ -215,7 +215,7 @@ final class WeatherServiceVCRIntegrationTest {
         final String url =
                 String.format("%s/weather?q=%s&appid=%s&units=%s", BASE_URL, encodedLocation, API_KEY, UNITS);
 
-        final Mode mode = determineVCRMode();
+        final Mode mode = determineVcrMode();
         final RecordableURL recordableURL = new RecordableURL(url, cassette, mode, vcrSettings);
 
         final RecordableHttpsURLConnection connection = recordableURL.openConnectionSecure();
@@ -228,7 +228,7 @@ final class WeatherServiceVCRIntegrationTest {
     }
 
     private Map<String, Object> makeHttpRequest(final String url, final Cassette cassette) throws Exception {
-        final Mode mode = determineVCRMode();
+        final Mode mode = determineVcrMode();
         final RecordableURL recordableURL = new RecordableURL(url, cassette, mode, vcrSettings);
 
         final RecordableHttpsURLConnection connection = recordableURL.openConnectionSecure();
@@ -256,7 +256,7 @@ final class WeatherServiceVCRIntegrationTest {
         }
     }
 
-    private Mode determineVCRMode() {
+    private Mode determineVcrMode() {
         final String vcrMode = System.getProperty("vcr.mode", "auto");
         return switch (vcrMode.toLowerCase()) {
             case "record" -> Mode.Record;
