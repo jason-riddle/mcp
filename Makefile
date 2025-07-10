@@ -171,10 +171,15 @@ test-mutation-incremental: ## Run incremental PITest mutation testing
 test-mutation-memory-only: clean ## Run mutation testing only on MemoryService
 	@echo "Running mutation testing on MemoryService only..."
 	@$(MVN) org.pitest:pitest-maven:mutationCoverage \
-		-DtargetClasses=com.jasonriddle.mcp.memory.MemoryService \
-		-DtargetTests=com.jasonriddle.mcp.memory.*PITMutationTest \
-		-q --no-transfer-progress
+	 -DtargetClasses=com.jasonriddle.mcp.memory.MemoryService \
+	 -DtargetTests=com.jasonriddle.mcp.memory.*PITMutationTest \
+	 -q --no-transfer-progress
 	@echo "✓ MemoryService mutation testing complete"
+
+test-fuzz: clean ## Run Jazzer fuzzing on TimeService
+	@echo "Running Jazzer fuzzing on TimeService..."
+	@$(MVN) test -Dtest=com.jasonriddle.mcp.time.TimeServiceFuzzTest -P fuzz-time -q --no-transfer-progress
+	@echo "✓ TimeService fuzzing complete"
 
 # test-stdio: clean ## Run STDIO integration tests only
 # 	@echo "Running STDIO integration tests..."

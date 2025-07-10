@@ -578,6 +578,7 @@ make checkstyle             # Run style checks
 # Testing
 make test                   # Run unit tests
 make test-integration       # Run integration tests
+make test-fuzz            # Fuzz TimeService with Jazzer
 
 
 # Cleanup
@@ -601,6 +602,7 @@ make test
 
 # Run integration tests only
 make test-integration
+make test-fuzz
 
 # Run specific test class
 ./mvnw test -Dtest=MemoryServiceTest

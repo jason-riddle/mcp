@@ -147,6 +147,19 @@
             <version>0.5.3</version>
             <scope>test</scope>
         </dependency>
+        <!-- Jazzer for fuzz testing -->
+        <dependency>
+            <groupId>com.code-intelligence</groupId>
+            <artifactId>jazzer-junit</artifactId>
+            <version>0.24.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.code-intelligence</groupId>
+            <artifactId>jazzer-api</artifactId>
+            <version>0.24.0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <!-- Build Configuration -->
@@ -383,6 +396,8 @@
                         <exclude>**/*MockTest.java</exclude>
                         <!-- Mutation Tests -->
                         <exclude>**/*PITMutationTest.java</exclude>
+                        <!-- Fuzz Tests -->
+                        <exclude>**/*FuzzTest.java</exclude>
                     </excludes>
                     <systemPropertyVariables>
                         <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
@@ -619,6 +634,22 @@
                                 <phase>test</phase>
                             </execution>
                         </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <!-- Fuzzing Profile for TimeService -->
+        <profile>
+            <id>fuzz-time</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.code-intelligence</groupId>
+                        <artifactId>jazzer-maven-plugin</artifactId>
+                        <version>0.24.0</version>
+                        <configuration>
+                            <includes>com.jasonriddle.mcp.time.TimeServiceFuzzTest</includes>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>

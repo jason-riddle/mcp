@@ -147,7 +147,7 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    needs: [format-check, checkstyle-check, unit-tests, integration-tests, property-tests, mock-tests, mutation-tests]
+    needs: [format-check, checkstyle-check, unit-tests, integration-tests, property-tests, mock-tests, mutation-tests, test-fuzz]
 
     steps:
       - name: Checkout code
@@ -211,5 +211,26 @@ jobs:
 
       - name: Run mock tests
         run: make test-mock
+        env:
+          CI: true
+
+  test-fuzz:
+    name: Fuzz Time Tools
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Run TimeService fuzzing
+        run: make test-fuzz
         env:
           CI: true
