@@ -1,0 +1,49 @@
+---
+name: Build
+
+on:
+  workflow_run:
+    workflows: ["Code Quality", "Tests"]
+    types:
+      - completed
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    if: ${{ github.event_name == 'pull_request' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build application
+        run: make build
+
+        # - name: Upload build artifacts
+        #   uses: actions/upload-artifact@v4
+        #   with:
+        #     name: build-artifacts
+        #     path: |
+        #       target/quarkus-app/
+        #       target/*.jar
+        #     retention-days: 7
