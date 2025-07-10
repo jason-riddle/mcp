@@ -160,23 +160,81 @@ public class Example {
 
 ## Package Structure
 
-### Architecture
+### Project Structure
+
+**To update this structure, run:**
+```bash
+tree . -I "target|docs|devenv*|mvnw*|*.log*|*.lock|*.nix|*.yaml|*.md|LICENSE|Procfile|app.json|Makefile|CLAUDE.md|GH_ACTIONS_EXAMPLES.md" -P "*.java|*.disabled|checkstyle*.xml|cognitive*.xml|pom.xml|system.properties" --dirsfirst --prune --noreport
+```
 
 ```text
-src/main/java/com.jasonriddle.mcp/
-├── McpMemoryTools.java        # MCP memory operations
-├── McpTimeTools.java          # Time/timezone tools
-├── McpWeatherTools.java       # Weather API tools
-├── memory/                    # Memory graph implementation
-├── time/                      # Time conversion services
-└── weather/                   # Weather services
-
-src/test/java/com.jasonriddle.mcp/
-├── memory/                    # Memory tests (unit, property, mutation)
-├── time/                      # Time service tests
-├── weather/                   # Weather tests (unit, VCR)
-├── server/                    # Integration tests (SSE, STDIO)
-└── config/                    # Configuration tests
+Project Root/
+├── checkstyle-suppressions.xml        # Checkstyle rule suppressions
+├── checkstyle.xml                      # Checkstyle configuration with Palantir-inspired rules
+├── cognitive-complexity-ruleset.xml   # Cognitive complexity rules for Checkstyle
+├── pom.xml                            # Maven project configuration
+├── system.properties                  # Heroku Java runtime specification
+└── src/
+    ├── main/
+    │   └── java/com.jasonriddle.mcp/
+    │       ├── memory/                    # Memory graph implementation
+    │       │   ├── Entity.java            # Entity record representing graph nodes
+    │       │   ├── MemoryGraph.java       # Complete graph structure record
+    │       │   ├── MemoryRecord.java      # Base interface for JSONL records
+    │       │   ├── MemoryService.java     # Core service for graph persistence and operations
+    │       │   ├── Relation.java          # Relation record representing graph edges
+    │       │   └── package-info.java      # Package documentation
+    │       ├── time/                      # Time and timezone services
+    │       │   ├── TimeConversionResult.java  # Result record for time conversions
+    │       │   ├── TimeService.java       # Core service for time operations
+    │       │   └── package-info.java      # Package documentation
+    │       ├── weather/                   # Weather services and data structures
+    │       │   ├── WeatherClient.java     # OpenWeatherMap REST client interface
+    │       │   ├── WeatherData.java       # Current weather data record
+    │       │   ├── WeatherForecast.java   # Weather forecast data record
+    │       │   ├── WeatherService.java    # Core service for weather operations
+    │       │   └── package-info.java      # Package documentation
+    │       ├── McpMemoryPrompts.java      # MCP prompts providing memory guidance
+    │       ├── McpMemoryResources.java    # MCP resources (memory://) for graph access
+    │       ├── McpMemoryTools.java        # MCP tools for graph operations
+    │       ├── McpTimeTools.java          # MCP tools for time and timezone operations
+    │       ├── McpWeatherTools.java       # MCP tools for weather operations
+    │       └── package-info.java          # Package documentation
+    └── test/
+        └── java/com.jasonriddle.mcp/
+            ├── config/                                         # Configuration tests
+            │   ├── ConfigurationTestConstants.java            # Test constants for configuration
+            │   ├── ConfigurationValidationUnitTest.java       # Unit tests for configuration validation
+            │   ├── HerokuConfigurationValidationUnitTest.java # Unit tests for Heroku configuration
+            │   ├── HerokuTestProfile.java                     # Heroku test profile
+            │   ├── ProdConfigurationValidationUnitTest.java   # Unit tests for production configuration
+            │   ├── ProdTestProfile.java                       # Production test profile
+            │   └── package-info.java                          # Package documentation
+            ├── memory/                                         # Memory implementation tests
+            │   ├── MemoryGraphPermutationPropertyTest.java   # JQwik property tests for memory graph
+            │   ├── MemoryServicePITMutationTest.java          # PITest standalone mutation tests for memory service
+            │   ├── MemoryServiceUnitTest.java                  # Unit tests for memory service
+            │   └── package-info.java                          # Package documentation
+            ├── security/                                       # Security tests (disabled)
+            │   └── ApiKeyAuthenticationDisabledIntegrationTest.java.disabled  # Disabled auth tests
+            ├── server/                                         # Server integration tests
+            │   ├── McpIntegrationTestBase.java                 # Base class for integration tests
+            │   ├── McpServerSseIntegrationTest.java            # Integration tests for SSE server
+            │   ├── McpServerStdioIntegrationTest.java          # Integration tests for STDIO server
+            │   └── package-info.java                          # Package documentation
+            ├── time/                                           # Time service tests
+            │   ├── TimeServiceUnitTest.java                    # Unit tests for time service
+            │   └── package-info.java                          # Package documentation
+            ├── weather/                                        # Weather service tests
+            │   ├── WeatherServiceUnitTest.java                 # Unit tests for weather service
+            │   ├── WeatherServiceVCRMockTest.java              # VCR mock tests for weather API
+            │   └── package-info.java                          # Package documentation
+            ├── McpMemoryPromptsUnitTest.java                   # Unit tests for memory prompts
+            ├── McpMemoryResourcesUnitTest.java                 # Unit tests for memory resources
+            ├── McpMemoryToolsUnitTest.java                     # Unit tests for memory tools
+            ├── McpTimeToolsUnitTest.java                       # Unit tests for time tools
+            ├── McpWeatherToolsUnitTest.java                    # Unit tests for weather tools
+            └── package-info.java                               # Package documentation
 ```
 
 ### Design Principles
