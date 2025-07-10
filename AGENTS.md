@@ -164,15 +164,21 @@ public class Example {
 
 **To update this structure, run:**
 ```bash
-tree . -I "target|docs|devenv*|mvnw*|*.log*|*.lock|*.nix|*.yaml|*.md|LICENSE|Procfile|app.json|Makefile|CLAUDE.md|GH_ACTIONS_EXAMPLES.md" -P "*.java|*.disabled|checkstyle*.xml|cognitive*.xml|pom.xml" --prune --noreport
+tree . -I "target|docs|devenv*|mvnw*|*.log*|*.lock|*.nix|*.yaml|*.md|LICENSE|Procfile|app.json|Makefile|CLAUDE.md|GH_ACTIONS_EXAMPLES.md|system.properties" -P "*.java|*.disabled|checkstyle*.xml|cognitive*.xml|pom.xml|*.yml" --prune --noreport
 ```
 
 ```text
 Project Root/
-├── checkstyle-suppressions.xml        # Checkstyle rule suppressions
-├── checkstyle.xml                      # Checkstyle configuration with Palantir-inspired rules
-├── cognitive-complexity-ruleset.xml   # Cognitive complexity rules for Checkstyle
-├── pom.xml                            # Maven project configuration
+├── .github/                             # GitHub configuration
+│   ├── dependabot.yml                   # Dependabot configuration for dependency updates
+│   └── workflows/                       # GitHub Actions workflows
+│       ├── ci.yml                       # CI pipeline (active)
+│       ├── claude-readme-update-check.yml.disabled    # README maintenance (disabled)
+│       └── claude-smart-permutation-testing.yml.disabled  # Automated testing analysis (disabled)
+├── checkstyle-suppressions.xml         # Checkstyle rule suppressions
+├── checkstyle.xml                       # Checkstyle configuration with Palantir-inspired rules
+├── cognitive-complexity-ruleset.xml    # Cognitive complexity rules for Checkstyle
+├── pom.xml                             # Maven project configuration
 └── src/
     ├── main/
     │   └── java/com.jasonriddle.mcp/
