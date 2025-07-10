@@ -164,7 +164,7 @@ public class Example {
 
 **To update this structure, run:**
 ```bash
-tree . -I "target|docs|devenv*|mvnw*|*.log*|*.lock|*.nix|*.yaml|*.md|LICENSE|Procfile|app.json|Makefile|CLAUDE.md|GH_ACTIONS_EXAMPLES.md" -P "*.java|*.disabled|checkstyle*.xml|cognitive*.xml|pom.xml|system.properties" --dirsfirst --prune --noreport
+tree . -I "target|docs|devenv*|mvnw*|*.log*|*.lock|*.nix|*.yaml|*.md|LICENSE|Procfile|app.json|Makefile|CLAUDE.md|GH_ACTIONS_EXAMPLES.md" -P "*.java|*.disabled|checkstyle*.xml|cognitive*.xml|pom.xml" --prune --noreport
 ```
 
 ```text
@@ -173,7 +173,6 @@ Project Root/
 ├── checkstyle.xml                      # Checkstyle configuration with Palantir-inspired rules
 ├── cognitive-complexity-ruleset.xml   # Cognitive complexity rules for Checkstyle
 ├── pom.xml                            # Maven project configuration
-├── system.properties                  # Heroku Java runtime specification
 └── src/
     ├── main/
     │   └── java/com.jasonriddle.mcp/
