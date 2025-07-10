@@ -192,7 +192,7 @@ Generate full structure: `tree . -I "target|docs|devenv*|mvnw*|*.log*" --prune`
 - `claude-code-action@beta` - Interactive, comment-triggered workflows
 - `claude-code-base-action@beta` - Automated, event-triggered workflows
 
-See `GITHUB_ACTIONS.md` for detailed workflow examples and migration guide.
+See `CLAUDE_CODE_GITHUB_ACTIONS.md` for detailed workflow examples and migration guide.
 
 ## Deployment
 
