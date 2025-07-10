@@ -1,4 +1,4 @@
-# GitHub Actions Examples
+# GitHub Actions
 
 This document contains detailed GitHub Actions workflow examples for Claude Code automation.
 
@@ -22,21 +22,21 @@ There are two Claude Code actions available, each designed for different use cas
 
 ## Parameter Differences
 
-| Parameter | `claude-code-action` | `claude-code-base-action` | Notes |
-|-----------|---------------------|-------------------------|-------|
-| `anthropic_api_key` | ✅ | ✅ | Required for both |
-| `github_token` | ✅ | ❌ | Auto-provided for comment action |
-| `trigger_phrase` | ✅ | ❌ | Only for comment-based triggers |
-| `custom_instructions` | ✅ | ❌ | Use `append_system_prompt` instead |
-| `direct_prompt` | ✅ | ❌ | Use `prompt` instead |
-| `prompt` | ❌ | ✅ | Direct prompt for base action |
-| `append_system_prompt` | ❌ | ✅ | Append to system prompt |
-| `system_prompt` | ❌ | ✅ | Override system prompt |
-| `allowed_tools` | ✅ | ✅ | Same format for both |
-| `timeout_minutes` | ✅ | ✅ | Same for both |
-| `max_turns` | ✅ | ✅ | Same for both |
-| `mcp_config` | ❌ | ✅ | MCP server configuration |
-| `claude_env` | ❌ | ✅ | Custom environment variables |
+| Parameter               | `claude-code-action` | `claude-code-base-action` | Notes                                   |
+|-------------------------|----------------------|---------------------------|-----------------------------------------|
+| `anthropic_api_key`     | ✅                   | ✅                        | Required for both                       |
+| `github_token`          | ✅                   | ❌                        | Auto-provided for comment action        |
+| `trigger_phrase`        | ✅                   | ❌                        | Only for comment-based triggers         |
+| `custom_instructions`   | ✅                   | ❌                        | Use `append_system_prompt` instead      |
+| `direct_prompt`         | ✅                   | ❌                        | Use `prompt` instead                    |
+| `prompt`                | ❌                   | ✅                        | Direct prompt for base action           |
+| `append_system_prompt`  | ❌                   | ✅                        | Append to system prompt                 |
+| `system_prompt`         | ❌                   | ✅                        | Override system prompt                  |
+| `allowed_tools`         | ✅                   | ✅                        | Same format for both                    |
+| `timeout_minutes`       | ✅                   | ✅                        | Same for both                           |
+| `max_turns`             | ✅                   | ✅                        | Same for both                           |
+| `mcp_config`            | ❌                   | ✅                        | MCP server configuration                |
+| `claude_env`            | ❌                   | ✅                        | Custom environment variables            |
 
 ## Example Workflows
 

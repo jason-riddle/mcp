@@ -22,8 +22,8 @@ make format
 make checkstyle
 
 # Development
-make dev    # Development mode with live reload
-make run    # Production mode
+make dev                     # Development mode with live reload
+make run                     # Production mode
 
 # Docker
 make docker-build
@@ -90,11 +90,11 @@ make env-decrypt
 
 ### Test Categories
 
-**Unit Tests**: `make test` - Core functionality testing
-**Integration Tests**: `make test-integration` - End-to-end MCP server testing
-**Property Tests**: `make test-prop` - JQwik permutation testing for memory graph
-**Mock Tests**: `make test-mock` - VCR testing for weather API without API costs
-**Mutation Tests**: `make test-mutation` - PITest mutation testing for memory package
+- **Unit Tests**: `make test` - Core functionality testing
+- **Integration Tests**: `make test-integration` - End-to-end MCP server testing
+- **Property Tests**: `make test-prop` - JQwik permutation testing for memory graph
+- **Mock Tests**: `make test-mock` - VCR testing for weather API without API costs
+- **Mutation Tests**: `make test-mutation` - PITest mutation testing for memory package
 
 ### Key Testing Commands
 
@@ -104,7 +104,7 @@ export WEATHER_API_KEY=your_key
 ./mvnw test -Dtest=WeatherServiceVCRMockTest -Dvcr.mode=record
 
 # Mutation testing
-make test-mutation-memory-only    # Quick MemoryService testing
+make test-mutation-memory-only   # Quick MemoryService testing
 make test-mutation               # Full memory package
 ```
 
@@ -113,8 +113,8 @@ make test-mutation               # Full memory package
 ### Formatting and Style
 
 **Tools:**
-- **Spotless** with Palantir Java Format for automatic formatting
-- **Checkstyle** with enhanced Palantir-inspired rules
+- **Spotless**: Palantir Java Format for automatic formatting
+- **Checkstyle**: Enhanced Palantir-inspired rules
 
 **Key Rules:**
 - Final parameters required
@@ -172,7 +172,7 @@ public class Example {
 - `memory/` - Memory graph implementation and persistence
 - `time/` - Time and timezone services
 - `weather/` - Weather services and OpenWeatherMap integration
-- Root: MCP protocol tools and resources
+- Root - MCP protocol tools and resources
 
 **Test Source** (`src/test/java/com.jasonriddle.mcp/`):
 - `config/` - Configuration and profile tests
@@ -188,11 +188,11 @@ Generate full structure: `tree . -I "target|docs|devenv*|mvnw*|*.log*" --prune`
 - Unit and integration tests
 - Application build
 
-**Claude Code Actions**:
+**Claude Code Actions:**
 - `claude-code-action@beta` - Interactive, comment-triggered workflows
 - `claude-code-base-action@beta` - Automated, event-triggered workflows
 
-See `GH_ACTIONS_EXAMPLES.md` for detailed workflow examples and migration guide.
+See `GITHUB_ACTIONS.md` for detailed workflow examples and migration guide.
 
 ## Deployment
 
@@ -214,7 +214,7 @@ make docker-build && make docker-run
 
 **Validation:**
 ```bash
-make test-e2e    # Test MCP server functionality
+make test-e2e                    # Test MCP server functionality
 heroku logs --tail -a jasons-mcp-server
 ```
 
