@@ -5,6 +5,7 @@ package com.jasonriddle.mcp.server.transport;
 import dev.langchain4j.mcp.client.transport.McpTransport;
 import dev.langchain4j.mcp.client.transport.http.HttpMcpTransport;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.time.Duration;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -14,8 +15,8 @@ import okhttp3.Response;
 /**
  * Factory for creating authenticated HTTP MCP transports with Bearer token support.
  *
- * This factory creates HttpMcpTransport instances with custom OkHttp clients
- * that automatically add Authorization header with Bearer token to all requests.
+ * This factory creates HttpMcpTransport instances and uses reflection to inject
+ * a custom OkHttp client that automatically adds Authorization header with Bearer token.
  */
 public final class AuthenticatedHttpMcpTransport {
 
@@ -24,7 +25,7 @@ public final class AuthenticatedHttpMcpTransport {
     }
 
     /**
-     * Creates an authenticated HTTP MCP transport with Bearer token.
+     * Creates an authenticated HTTP MCP transport with Bearer token using reflection.
      *
      * @param sseUrl SSE endpoint URL
      * @param bearerToken Bearer token for authentication
@@ -33,8 +34,12 @@ public final class AuthenticatedHttpMcpTransport {
      * @param logResponses enable response logging
      * @return configured McpTransport with authentication
      */
-    public static McpTransport create(final String sseUrl, final String bearerToken, final Duration timeout,
-            final boolean logRequests, final boolean logResponses) {
+    public static McpTransport create(
+            final String sseUrl,
+            final String bearerToken,
+            final Duration timeout,
+            final boolean logRequests,
+            final boolean logResponses) {
 
         if (sseUrl == null || sseUrl.isEmpty()) {
             throw new IllegalArgumentException("SSE URL is required");
@@ -43,19 +48,34 @@ public final class AuthenticatedHttpMcpTransport {
             throw new IllegalArgumentException("Bearer token is required");
         }
 
-        OkHttpClient authenticatedClient = new OkHttpClient.Builder()
-                .connectTimeout(timeout)
-                .readTimeout(timeout)
-                .writeTimeout(timeout)
-                .addInterceptor(new BearerTokenInterceptor(bearerToken))
-                .build();
-
-        return new HttpMcpTransport.Builder()
+        // Create the HttpMcpTransport
+        HttpMcpTransport transport = new HttpMcpTransport.Builder()
                 .sseUrl(sseUrl)
                 .timeout(timeout)
                 .logRequests(logRequests)
                 .logResponses(logResponses)
                 .build();
+
+        try {
+            // Create authenticated OkHttp client
+            BearerTokenInterceptor tokenInterceptor = new BearerTokenInterceptor(bearerToken);
+            OkHttpClient authenticatedClient = new OkHttpClient.Builder()
+                    .connectTimeout(timeout)
+                    .readTimeout(timeout)
+                    .writeTimeout(timeout)
+                    .addInterceptor(tokenInterceptor)
+                    .build();
+
+            // Use reflection to inject the authenticated client
+            Field clientField = HttpMcpTransport.class.getDeclaredField("client");
+            clientField.setAccessible(true);
+            clientField.set(transport, authenticatedClient);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to inject authenticated HTTP client", e);
+        }
+
+        return transport;
     }
 
     /**
@@ -146,7 +166,8 @@ public final class AuthenticatedHttpMcpTransport {
         @Override
         public Response intercept(final Chain chain) throws IOException {
             Request originalRequest = chain.request();
-            Request authenticatedRequest = originalRequest.newBuilder()
+            Request authenticatedRequest = originalRequest
+                    .newBuilder()
                     .header("Authorization", "Bearer " + bearerToken)
                     .build();
             return chain.proceed(authenticatedRequest);

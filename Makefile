@@ -1,5 +1,5 @@
 # Modern Makefile best practices
-.PHONY: help clean build dev run format checkstyle test test-watch test-integration test-prop test-mock test-all test-mutation test-mutation-incremental test-mutation-memory-only docker-build docker-run docker-clean
+.PHONY: help clean build dev run format checkstyle test test-watch test-integration test-prop test-mock test-e2e test-all test-mutation test-mutation-incremental test-mutation-memory-only docker-build docker-run docker-clean
 .DELETE_ON_ERROR:
 .ONESHELL:
 
@@ -134,16 +134,24 @@ test-mock: clean ## Run mock tests only
 	@$(MVN) test -Dtest=*MockTest -q --no-transfer-progress $(MAVEN_PROFILE)
 	@echo "✓ Mock tests completed"
 
-test-all: clean ## Run all tests (unit, integration, permutation, mock)
+test-e2e: clean ## Run end-to-end tests against remote MCP server
+	@echo "Running end-to-end tests..."
+	@echo "Testing remote Heroku MCP endpoint with authentication..."
+	@$(MVN) test -Dtest=McpServerEndToEndTest -q --no-transfer-progress $(MAVEN_PROFILE)
+	@echo "✓ End-to-end tests completed"
+
+test-all: clean ## Run all tests (unit, integration, permutation, mock, e2e)
 	@echo "Running all tests..."
-	@echo "1/4 Running unit tests..."
+	@echo "1/5 Running unit tests..."
 	@$(MVN) test -q --no-transfer-progress || echo "Unit tests failed - continuing"
-	@echo "2/4 Running integration tests..."
+	@echo "2/5 Running integration tests..."
 	@$(MVN) verify -DskipITs=false -q --no-transfer-progress || echo "Integration tests failed - continuing"
-	@echo "3/4 Running property tests..."
+	@echo "3/5 Running property tests..."
 	@$(MVN) test -Dtest=*PropertyTest -q --no-transfer-progress || echo "Property tests failed - continuing"
-	@echo "4/4 Running mock tests..."
+	@echo "4/5 Running mock tests..."
 	@$(MVN) test -Dtest=*MockTest -q --no-transfer-progress || echo "Mock tests failed - continuing"
+	@echo "5/5 Running end-to-end tests..."
+	@$(MVN) test -Dtest=McpServerEndToEndTest -q --no-transfer-progress || echo "End-to-end tests failed - continuing"
 	@echo "✓ All test suites completed (check output above for any failures)"
 
 # ============================================================================
