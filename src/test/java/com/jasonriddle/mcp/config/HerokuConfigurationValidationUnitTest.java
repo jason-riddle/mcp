@@ -25,23 +25,14 @@ final class HerokuConfigurationValidationUnitTest {
     Config config;
 
     @Test
-    @DisplayName("Should use PORT environment variable")
-    void shouldUsePortEnvironmentVariable() {
-        // In test mode, Quarkus resolves environment variables and may override with test port
+    @DisplayName("Should configure HTTP server for stdio-only transport")
+    void shouldConfigureHttpServerForStdioOnlyTransport() {
+        // In production, HTTP port should be disabled (-1)
+        // In test mode, Quarkus may override with a random port for testing
         String httpPort = config.getValue("quarkus.http.port", String.class);
-        // The port should either be our simulated PORT value (5000) or a dynamic test port
         assertTrue(
-                httpPort.equals("5000") || Integer.parseInt(httpPort) > 1024,
-                String.format(
-                        "Heroku profile must use PORT environment variable or dynamic test port, but was: %s",
-                        httpPort));
-    }
-
-    @Test
-    @DisplayName("Should bind to all interfaces")
-    void shouldBindToAllInterfaces() {
-        String httpHost = config.getValue("quarkus.http.host", String.class);
-        assertEquals("0.0.0.0", httpHost, "Heroku requires binding to all interfaces (0.0.0.0) for proper routing.");
+                httpPort.equals("-1") || Integer.parseInt(httpPort) > 1024,
+                String.format("HTTP server should be disabled (-1) for stdio-only transport, but was: %s", httpPort));
     }
 
     @Test
