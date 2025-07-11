@@ -25,7 +25,7 @@ final class McpTimeToolsUnitTest {
 
     @BeforeEach
     void setUp() {
-        final Clock fixedClock = Clock.fixed(Instant.parse("2024-01-01T12:00:00Z"), ZoneId.of("UTC"));
+        final Clock fixedClock = Clock.fixed(Instant.parse("2006-01-02T15:04:05Z"), ZoneId.of("-07:00"));
         timeService = new TimeService(fixedClock);
         mcpTimeTools = new McpTimeTools();
         mcpTimeTools.timeService = timeService;

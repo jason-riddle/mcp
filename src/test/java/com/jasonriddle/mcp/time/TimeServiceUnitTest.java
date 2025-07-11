@@ -26,7 +26,7 @@ class TimeServiceUnitTest {
 
     @BeforeEach
     void setUp() {
-        fixedClock = Clock.fixed(Instant.parse("2024-01-01T12:00:00Z"), ZoneId.of("UTC"));
+        fixedClock = Clock.fixed(Instant.parse("2006-01-02T15:04:05Z"), ZoneId.of("-07:00"));
         timeService = new TimeService(fixedClock);
     }
 
@@ -257,31 +257,32 @@ class TimeServiceUnitTest {
     void testGetCurrentTimeFixedClock() {
         final ZonedDateTime nyTime = timeService.getCurrentTime("America/New_York");
 
-        assertEquals(7, nyTime.getHour());
-        assertEquals(0, nyTime.getMinute());
+        assertEquals(10, nyTime.getHour());
+        assertEquals(4, nyTime.getMinute());
+        assertEquals(5, nyTime.getSecond());
         assertEquals("America/New_York", nyTime.getZone().getId());
     }
 
     @Test
     void testConvertTimeAcrossDateBoundary() {
-        final Clock eveningClock = Clock.fixed(Instant.parse("2024-01-01T23:30:00Z"), ZoneId.of("UTC"));
+        final Clock eveningClock = Clock.fixed(Instant.parse("2006-01-02T23:30:00Z"), ZoneId.of("-07:00"));
         final TimeService eveningService = new TimeService(eveningClock);
 
-        final TimeConversionResult result = eveningService.convertTime("UTC", "23:30", "Asia/Tokyo");
+        final TimeConversionResult result = eveningService.convertTime("-07:00", "16:30", "Asia/Tokyo");
 
-        assertEquals(23, result.sourceTime().getHour());
+        assertEquals(16, result.sourceTime().getHour());
         assertEquals(30, result.sourceTime().getMinute());
         assertEquals(8, result.targetTime().getHour());
         assertEquals(30, result.targetTime().getMinute());
-        assertEquals(2, result.targetTime().getDayOfMonth());
+        assertEquals(3, result.targetTime().getDayOfMonth());
     }
 
     @Test
     void testIsDaylightSavingTimeSpecificDates() {
         final ZonedDateTime summer =
-                ZonedDateTime.of(LocalDateTime.of(2024, 7, 1, 12, 0), ZoneId.of("America/New_York"));
+                ZonedDateTime.of(LocalDateTime.of(2006, 7, 1, 12, 0), ZoneId.of("America/New_York"));
         final ZonedDateTime winter =
-                ZonedDateTime.of(LocalDateTime.of(2024, 1, 1, 12, 0), ZoneId.of("America/New_York"));
+                ZonedDateTime.of(LocalDateTime.of(2006, 1, 1, 12, 0), ZoneId.of("America/New_York"));
 
         assertTrue(timeService.isDaylightSavingTime(summer));
         assertFalse(timeService.isDaylightSavingTime(winter));
