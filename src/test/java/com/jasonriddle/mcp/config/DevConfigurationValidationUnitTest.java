@@ -3,7 +3,6 @@ package com.jasonriddle.mcp.config;
 import static com.jasonriddle.mcp.config.ConfigurationTestConstants.EXPECTED_APP_NAME;
 import static com.jasonriddle.mcp.config.ConfigurationTestConstants.EXPECTED_VERSION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.quarkus.test.junit.QuarkusTest;
@@ -14,28 +13,28 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * Configuration validation tests for production deployment profile.
+ * Configuration validation tests for development deployment profile.
  */
 @QuarkusTest
-@TestProfile(ProdTestProfile.class)
-@DisplayName("Production Configuration Validation")
-final class ProdConfigurationValidationUnitTest {
+@TestProfile(DevTestProfile.class)
+@DisplayName("Development Configuration Validation")
+final class DevConfigurationValidationUnitTest {
 
     @Inject
     Config config;
 
     @Test
-    @DisplayName("Should use production logging level")
-    void shouldUseProductionLoggingLevel() {
+    @DisplayName("Should use development logging level")
+    void shouldUseDevelopmentLoggingLevel() {
         String logLevel = config.getValue("quarkus.log.level", String.class);
-        assertEquals("INFO", logLevel, "Production profile should use INFO logging level.");
+        assertEquals("DEBUG", logLevel, "Development profile should use DEBUG logging level.");
     }
 
     @Test
-    @DisplayName("Should enable file logging for production")
+    @DisplayName("Should enable file logging for development")
     void shouldEnableFileLogging() {
         Boolean fileLoggingEnabled = config.getValue("quarkus.log.file.enable", Boolean.class);
-        assertTrue(fileLoggingEnabled, "File logging should be enabled in production for audit and debugging.");
+        assertTrue(fileLoggingEnabled, "File logging should be enabled in development for debugging.");
 
         // In test mode, Quarkus overrides log file path
         String logFilePath = config.getValue("quarkus.log.file.path", String.class);
@@ -43,12 +42,11 @@ final class ProdConfigurationValidationUnitTest {
     }
 
     @Test
-    @DisplayName("Should disable container image building")
-    void shouldDisableContainerImageBuilding() {
+    @DisplayName("Should enable container image building")
+    void shouldEnableContainerImageBuilding() {
         Boolean containerBuildEnabled = config.getValue("quarkus.container-image.build", Boolean.class);
-        assertFalse(
-                containerBuildEnabled,
-                "Container image building should be disabled in production (pre-built images used).");
+        assertTrue(
+                containerBuildEnabled, "Container image building should be enabled in development for local testing.");
     }
 
     @Test
@@ -91,13 +89,13 @@ final class ProdConfigurationValidationUnitTest {
     }
 
     @Test
-    @DisplayName("Should have test logging configuration in test mode")
-    void shouldHaveTestLoggingConfiguration() {
-        // In test mode, test configuration takes precedence over production configuration
+    @DisplayName("Should have development logging configuration enabled")
+    void shouldHaveDevelopmentLoggingConfiguration() {
+        // In development mode, debug logging is enabled
         String appLogLevel = config.getValue("quarkus.log.category.\"com.jasonriddle.mcp\".level", String.class);
-        assertEquals("DEBUG", appLogLevel, "Test mode sets application logging to DEBUG.");
+        assertEquals("DEBUG", appLogLevel, "Development mode sets application logging to DEBUG.");
 
         String mcpLogLevel = config.getValue("quarkus.log.category.\"dev.langchain4j.mcp\".level", String.class);
-        assertEquals("DEBUG", mcpLogLevel, "Test mode sets MCP library logging to DEBUG.");
+        assertEquals("DEBUG", mcpLogLevel, "Development mode sets MCP library logging to DEBUG.");
     }
 }

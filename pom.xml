@@ -498,11 +498,11 @@
 
     <!-- Build Profiles -->
     <profiles>
-        <!-- Production Profile -->
+        <!-- Development Profile -->
         <profile>
-            <id>prod</id>
+            <id>dev</id>
             <properties>
-                <quarkus.profile>prod</quarkus.profile>
+                <quarkus.profile>dev</quarkus.profile>
             </properties>
         </profile>
         <!-- Native Compilation Profile -->

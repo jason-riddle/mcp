@@ -29,7 +29,7 @@ make build
 # Run in development mode (with live reload and dev UI)
 make dev
 
-# Or run in production mode
+# Or run in development mode
 make run
 ```
 
