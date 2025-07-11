@@ -163,7 +163,7 @@ test-mutation: clean ## Run PITest mutation testing on memory package
 	@$(MVN) clean test-compile org.pitest:pitest-maven:mutationCoverage -Pmemory-mutation-tests -q --no-transfer-progress $(MAVEN_PROFILE)
 	@echo "✓ Mutation testing complete. Reports available in target/pit-reports/"
 
-test-mutation-incremental: ## Run incremental PITest mutation testing
+test-mutation-incremental: clean ## Run incremental PITest mutation testing
 	@echo "Running incremental PITest mutation testing..."
 	@$(MVN) org.pitest:pitest-maven:mutationCoverage -DwithHistory -Pmemory-mutation-tests -q --no-transfer-progress
 	@echo "✓ Incremental mutation testing complete"
