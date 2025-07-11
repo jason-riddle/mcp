@@ -32,13 +32,6 @@ public final class TimeService {
     }
 
     /**
-     * Create a new TimeService using the system default clock.
-     */
-    public TimeService() {
-        this(Clock.systemDefaultZone());
-    }
-
-    /**
      * Get current time in specified timezone.
      *
      * @param timezoneName IANA timezone name (e.g., "America/New_York", "Europe/London").

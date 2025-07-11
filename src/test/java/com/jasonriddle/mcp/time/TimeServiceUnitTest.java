@@ -9,8 +9,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import io.quarkus.test.junit.QuarkusTest;
 import java.time.Clock;
 import java.time.Instant;
-import java.time.ZoneId;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,10 +26,7 @@ class TimeServiceUnitTest {
 
     @BeforeEach
     void setUp() {
-        fixedClock =
-                Clock.fixed(
-                        Instant.parse("2024-01-01T12:00:00Z"),
-                        ZoneId.of("UTC"));
+        fixedClock = Clock.fixed(Instant.parse("2024-01-01T12:00:00Z"), ZoneId.of("UTC"));
         timeService = new TimeService(fixedClock);
     }
 
@@ -267,8 +264,7 @@ class TimeServiceUnitTest {
 
     @Test
     void testConvertTimeAcrossDateBoundary() {
-        final Clock eveningClock =
-                Clock.fixed(Instant.parse("2024-01-01T23:30:00Z"), ZoneId.of("UTC"));
+        final Clock eveningClock = Clock.fixed(Instant.parse("2024-01-01T23:30:00Z"), ZoneId.of("UTC"));
         final TimeService eveningService = new TimeService(eveningClock);
 
         final TimeConversionResult result = eveningService.convertTime("UTC", "23:30", "Asia/Tokyo");
