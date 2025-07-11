@@ -320,27 +320,12 @@ final class ConfigurationValidationUnitTest {
         }
 
         @Test
-        @DisplayName("Should validate REST client configuration for weather service")
-        void shouldValidateRestClientConfiguration() {
-            // Weather client configuration removed - using @RegisterRestClient(baseUri =
-            // "https://api.openweathermap.org")
-            // Test that the WeatherClient interface is properly configured with hardcoded base URI
-            // This test is maintained for documentation purposes but no longer validates configuration properties
-            assertTrue(true, "WeatherClient uses @RegisterRestClient annotation with hardcoded baseUri");
-        }
-
-        @Test
         @DisplayName("Should validate weather configuration consistency")
         void shouldValidateWeatherConfigurationConsistency() {
-            // Weather client configuration removed - using @RegisterRestClient(baseUri =
-            // "https://api.openweathermap.org")
             // Verify that weather API key configuration is present (can be empty for tests)
             String weatherApiKey =
                     config.getOptionalValue("weather.api.key", String.class).orElse("");
             assertNotNull(weatherApiKey, "Weather API key configuration must be present (can be empty for tests).");
-
-            // The base URI is now hardcoded in @RegisterRestClient annotation as "https://api.openweathermap.org"
-            assertTrue(true, "WeatherClient uses HTTPS and OpenWeatherMap service via @RegisterRestClient annotation");
         }
     }
 
