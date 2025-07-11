@@ -1,11 +1,21 @@
 { pkgs, ... }:
 {
+  # ============================================================================
+  # ENVIRONMENT CONFIGURATION
+  # ============================================================================
+
   # https://devenv.sh/integrations/dotenv/
-  dotenv.enable = true;
-  dotenv.filename = [
-    ".env"
-    ".env.local"
-  ];
+  dotenv = {
+    enable = true;
+    filename = [
+      ".env"
+      ".env.local"
+    ];
+  };
+
+  # ============================================================================
+  # LANGUAGE & RUNTIME CONFIGURATION
+  # ============================================================================
 
   # https://devenv.sh/languages/
   languages.java = {
@@ -17,62 +27,94 @@
     };
   };
 
+  # ============================================================================
+  # PACKAGES & TOOLS
+  # ============================================================================
+
   # https://devenv.sh/packages/
   packages = with pkgs; [
     flyctl
   ];
 
+  # ============================================================================
+  # GIT HOOKS CONFIGURATION
+  # ============================================================================
   # https://devenv.sh/git-hooks/
-  # Organized by speed: fast checks first, slower ones last
+  # Organized by execution speed: fast checks first, slower ones last
+
   git-hooks.hooks = {
-    # ========== FAST CHECKS (< 1s) ==========
 
-    # Branch protection
-    # no-commit-to-branch = {
-    #   enable = true;
-    #   args = [ "--branch" "main" "--branch" "master" ];
-    # };
+    # ==========================================================================
+    # FAST CHECKS (< 1s)
+    # ==========================================================================
 
-    # File format validation (fast)
+    # --------------------------------------------------------------------------
+    # File Format Validation
+    # --------------------------------------------------------------------------
     check-xml.enable = true;
     check-yaml.enable = true;
     check-json.enable = true;
 
-    # File integrity checks (fast)
+    # --------------------------------------------------------------------------
+    # File Integrity Checks
+    # --------------------------------------------------------------------------
     check-merge-conflicts.enable = true;
     check-case-conflicts.enable = true;
     check-executables-have-shebangs.enable = true;
     check-shebang-scripts-are-executable.enable = true;
+
     check-added-large-files = {
       enable = true;
       args = [ "--maxkb=1024" ]; # 1MB limit for API projects
     };
 
-    # File formatting (fast)
+    # --------------------------------------------------------------------------
+    # File Formatting
+    # --------------------------------------------------------------------------
     end-of-file-fixer.enable = true;
     fix-byte-order-marker.enable = true;
     mixed-line-endings.enable = true;
+
     trim-trailing-whitespace = {
       enable = true;
       # args = [ "--markdown-linebreak-ext=md" ];
     };
 
-    # ========== MEDIUM SPEED CHECKS (1-5s) ==========
+    # --------------------------------------------------------------------------
+    # Branch Protection (commented out for flexibility)
+    # --------------------------------------------------------------------------
+    # no-commit-to-branch = {
+    #   enable = true;
+    #   args = [ "--branch" "main" "--branch" "master" ];
+    # };
 
-    # Nix formatting
+    # ==========================================================================
+    # MEDIUM SPEED CHECKS (1-5s)
+    # ==========================================================================
+
+    # --------------------------------------------------------------------------
+    # Code Formatting
+    # --------------------------------------------------------------------------
     nixfmt-rfc-style.enable = true;
 
-    # YAML linting with configuration
+    # --------------------------------------------------------------------------
+    # Configuration Linting
+    # --------------------------------------------------------------------------
     yamllint = {
       enable = true;
     };
 
-    # ========== SECURITY VALIDATION ==========
+    # ==========================================================================
+    # SECURITY VALIDATION
+    # ==========================================================================
 
-    # General secrets detection
+    # --------------------------------------------------------------------------
+    # Secrets Detection (Multiple Layers)
+    # --------------------------------------------------------------------------
+
+    # Fast regex-based secret detection
     ripsecrets = {
       enable = true;
-      # Fast regex-based secret detection
     };
 
     # SOPS encryption enforcement
@@ -82,7 +124,7 @@
       # It automatically works with your .sops.yaml configuration
     };
 
-    # TruffleHog comprehensive secrets scanner
+    # Comprehensive secrets scanner (slower but thorough)
     trufflehog = {
       enable = true;
       # Scan entire repository including git history for secrets
@@ -94,6 +136,10 @@
         "manual"
       ];
     };
+
+    # --------------------------------------------------------------------------
+    # Credential Detection
+    # --------------------------------------------------------------------------
 
     # AWS credentials detection
     detect-aws-credentials = {
@@ -108,15 +154,25 @@
       # Critical for MCP servers that may handle authentication
     };
 
+    # --------------------------------------------------------------------------
+    # Documentation Security
+    # --------------------------------------------------------------------------
+
     # VCS permalink validation
     check-vcs-permalinks = {
       enable = true;
       # Ensure documentation links are permanent (not subject to branch changes)
     };
 
-    # ========== SLOWER CHECKS (5-30s) ==========
+    # ==========================================================================
+    # SLOWER CHECKS (5-30s)
+    # ==========================================================================
 
-    # Java code quality
+    # --------------------------------------------------------------------------
+    # Java Code Quality
+    # --------------------------------------------------------------------------
+
+    # Code formatting validation
     spotless-check = {
       enable = true;
       name = "spotless-check";
@@ -126,7 +182,7 @@
       pass_filenames = false;
     };
 
-    # Maven checkstyle validation
+    # Style guide validation
     maven-checkstyle = {
       enable = true;
       name = "maven-checkstyle";
@@ -136,7 +192,7 @@
       pass_filenames = false;
     };
 
-    # PMD cognitive complexity validation
+    # Cognitive complexity validation
     pmd-cognitive-complexity = {
       enable = true;
       name = "pmd-cognitive-complexity";
@@ -146,7 +202,7 @@
       pass_filenames = false;
     };
 
-    # Javadoc validation
+    # Documentation validation
     javadoc-check = {
       enable = true;
       name = "javadoc-check";
@@ -155,6 +211,10 @@
       files = "\\.java$";
       pass_filenames = false;
     };
+
+    # --------------------------------------------------------------------------
+    # Testing
+    # --------------------------------------------------------------------------
 
     # Unit tests
     maven-test = {
@@ -166,7 +226,11 @@
       pass_filenames = false;
     };
 
-    # SSE Integration tests
+    # --------------------------------------------------------------------------
+    # Optional/Disabled Checks
+    # --------------------------------------------------------------------------
+
+    # SSE Integration tests (disabled for performance)
     # maven-sse-integration-test = {
     #   enable = true;
     #   name = "maven-sse-integration-test";
@@ -176,7 +240,7 @@
     #   pass_filenames = false;
     # };
 
-    # STDIO Integration tests
+    # STDIO Integration tests (disabled for performance)
     # maven-stdio-integration-test = {
     #   enable = true;
     #   name = "maven-stdio-integration-test";
@@ -186,7 +250,7 @@
     #   pass_filenames = false;
     # };
 
-    # Maven package
+    # Maven package (disabled for performance)
     # maven-package = {
     #   enable = true;
     #   name = "maven-package";
@@ -196,7 +260,7 @@
     #   pass_filenames = false;
     # };
 
-    # Dependency security check (only on pom.xml changes)
+    # Dependency security check (disabled - only on pom.xml changes)
     # dependency-check = {
     #   enable = true;
     #   name = "dependency-check";
@@ -215,25 +279,37 @@
     # };
   };
 
-  # Environment variables for development
+  # ============================================================================
+  # ENVIRONMENT VARIABLES
+  # ============================================================================
+
   env = {
-    # Maven optimization
+    # Maven optimization for development
     MAVEN_OPTS = "-Xmx2g -XX:+UseG1GC";
 
-    # Java development settings
+    # Java development settings (commented out to avoid conflicts)
     # JAVA_TOOL_OPTIONS = "-Dfile.encoding=UTF-8";
   };
 
-  # Development shell setup
+  # ============================================================================
+  # DEVELOPMENT SHELL SETUP
+  # ============================================================================
+
   enterShell = ''
-    echo "🚀 Java Development Environment"
-    echo "📦 Java: $(java -version 2>&1 | tail -n1)"
-    echo "📦 Maven: $(mvn -version | head -n1)"
-    echo "📍 Java path: $(which java)"
-    echo "📍 Maven path: $(which mvn)"
+    echo "🚀 Java MCP Server Development Environment"
     echo ""
-    echo "💡 Tips:"
-    echo "    - Use 'git commit --no-verify' to skip git hooks in emergencies"
+    echo "📦 Runtime Information:"
+    echo "   Java: $(java -version 2>&1 | tail -n1)"
+    echo "   Maven: $(mvn -version | head -n1)"
+    echo ""
+    echo "📍 Tool Locations:"
+    echo "   Java: $(which java)"
+    echo "   Maven: $(which mvn)"
+    echo ""
+    echo "💡 Development Tips:"
+    echo "   - Use 'git commit --no-verify' to skip git hooks in emergencies"
+    echo "   - Use 'make env-encrypt' to encrypt environment files"
+    echo "   - Use 'make env-decrypt' to decrypt environment files"
     echo ""
   '';
 }
