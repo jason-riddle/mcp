@@ -74,7 +74,7 @@ final class McpServerStdioIntegrationTest extends McpIntegrationTestBase {
                 .build();
 
         Thread.sleep(3000);
-        // waitForClientReady();
+        waitForClientReady();
     }
 
     @Test
@@ -299,20 +299,36 @@ final class McpServerStdioIntegrationTest extends McpIntegrationTestBase {
         final int maxRetries = 5;
         final long retryDelayMs = 2000;
 
+        System.out.println("DEBUG: Starting waitForClientReady() - attempting to connect to MCP client...");
+
         for (int attempt = 1; attempt <= maxRetries; attempt++) {
+            System.out.println(
+                    "DEBUG: Attempt " + attempt + "/" + maxRetries + " - trying to execute memory.read_graph tool");
             try {
                 String result = mcpClient.executeTool(ToolExecutionRequest.builder()
                         .name("memory.read_graph")
                         .arguments("{}")
                         .build());
 
+                String resultStatus;
+                if (result != null) {
+                    resultStatus = "SUCCESS (length=" + result.length() + ")";
+                } else {
+                    resultStatus = "NULL";
+                }
+                System.out.println("DEBUG: Tool execution result: " + resultStatus);
                 if (result != null && result.length() > 0) {
+                    System.out.println("DEBUG: MCP client is ready!");
                     return;
                 }
             } catch (Exception e) {
+                System.out.println("DEBUG: Attempt " + attempt + " failed with exception: "
+                        + e.getClass().getSimpleName() + ": " + e.getMessage());
                 if (attempt == maxRetries) {
+                    System.out.println("DEBUG: All attempts failed. Throwing RuntimeException.");
                     throw new RuntimeException("MCP client failed to initialize after " + maxRetries + " attempts", e);
                 }
+                System.out.println("DEBUG: Waiting " + retryDelayMs + "ms before retry...");
                 Thread.sleep(retryDelayMs);
             }
         }

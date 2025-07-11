@@ -102,11 +102,11 @@
             <artifactId>quarkus-mcp-server-sse</artifactId>
             <version>${mcp.version}</version>
         </dependency>
-        <!-- OIDC Security -->
-        <dependency>
+        <!-- OIDC Security (disabled for now) -->
+        <!-- <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-oidc</artifactId>
-        </dependency>
+        </dependency> -->
 
         <!-- REST Client for Weather API -->
         <dependency>
@@ -127,12 +127,12 @@
             <version>1.1.0-beta7</version>
             <scope>test</scope>
         </dependency>
-        <!-- OIDC Test Client -->
-        <dependency>
+        <!-- OIDC Test Client (disabled for now) -->
+        <!-- <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-test-oidc-server</artifactId>
             <scope>test</scope>
-        </dependency>
+        </dependency> -->
         <!-- jqwik for property-based testing with permutations -->
         <dependency>
             <groupId>net.jqwik</groupId>
@@ -425,6 +425,7 @@
                 <version>${surefire-plugin.version}</version>
                 <configuration>
                     <aggregate>true</aggregate>
+                    <linkXRef>false</linkXRef>
                 </configuration>
                 <executions>
                     <execution>
