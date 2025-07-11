@@ -7,6 +7,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.quarkus.test.junit.QuarkusTest;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,10 +22,15 @@ import org.junit.jupiter.api.Test;
 class TimeServiceUnitTest {
 
     private TimeService timeService;
+    private Clock fixedClock;
 
     @BeforeEach
     void setUp() {
-        timeService = new TimeService();
+        fixedClock =
+                Clock.fixed(
+                        Instant.parse("2024-01-01T12:00:00Z"),
+                        ZoneId.of("UTC"));
+        timeService = new TimeService(fixedClock);
     }
 
     @Test
@@ -42,14 +51,9 @@ class TimeServiceUnitTest {
         assertEquals("Asia/Tokyo", tokyoTime.getZone().getId());
         assertEquals("Europe/London", londonTime.getZone().getId());
 
-        // All should be approximately the same instant
-        final long utcSeconds = utcTime.toEpochSecond();
-        final long tokyoSeconds = tokyoTime.toEpochSecond();
-        final long londonSeconds = londonTime.toEpochSecond();
-
-        // Should be within 1 second of each other (accounting for test execution time)
-        assertTrue(Math.abs(utcSeconds - tokyoSeconds) <= 1);
-        assertTrue(Math.abs(utcSeconds - londonSeconds) <= 1);
+        // All should represent the same instant
+        assertEquals(utcTime.toInstant(), tokyoTime.toInstant());
+        assertEquals(utcTime.toInstant(), londonTime.toInstant());
     }
 
     @Test
@@ -250,5 +254,40 @@ class TimeServiceUnitTest {
         // Both should be valid boolean values (not null)
         assertNotNull(currentDst);
         assertNotNull(conversionDst);
+    }
+
+    @Test
+    void testGetCurrentTimeFixedClock() {
+        final ZonedDateTime nyTime = timeService.getCurrentTime("America/New_York");
+
+        assertEquals(7, nyTime.getHour());
+        assertEquals(0, nyTime.getMinute());
+        assertEquals("America/New_York", nyTime.getZone().getId());
+    }
+
+    @Test
+    void testConvertTimeAcrossDateBoundary() {
+        final Clock eveningClock =
+                Clock.fixed(Instant.parse("2024-01-01T23:30:00Z"), ZoneId.of("UTC"));
+        final TimeService eveningService = new TimeService(eveningClock);
+
+        final TimeConversionResult result = eveningService.convertTime("UTC", "23:30", "Asia/Tokyo");
+
+        assertEquals(23, result.sourceTime().getHour());
+        assertEquals(30, result.sourceTime().getMinute());
+        assertEquals(8, result.targetTime().getHour());
+        assertEquals(30, result.targetTime().getMinute());
+        assertEquals(2, result.targetTime().getDayOfMonth());
+    }
+
+    @Test
+    void testIsDaylightSavingTimeSpecificDates() {
+        final ZonedDateTime summer =
+                ZonedDateTime.of(LocalDateTime.of(2024, 7, 1, 12, 0), ZoneId.of("America/New_York"));
+        final ZonedDateTime winter =
+                ZonedDateTime.of(LocalDateTime.of(2024, 1, 1, 12, 0), ZoneId.of("America/New_York"));
+
+        assertTrue(timeService.isDaylightSavingTime(summer));
+        assertFalse(timeService.isDaylightSavingTime(winter));
     }
 }
