@@ -67,9 +67,51 @@
       enable = true;
     };
 
-    # Security validation
+    # ========== SECURITY VALIDATION ==========
+
+    # General secrets detection
     ripsecrets = {
       enable = true;
+      # Fast regex-based secret detection
+    };
+
+    # SOPS encryption enforcement
+    pre-commit-hook-ensure-sops = {
+      enable = true;
+      # This hook checks that specified files are encrypted with SOPS
+      # It automatically works with your .sops.yaml configuration
+    };
+
+    # TruffleHog comprehensive secrets scanner
+    trufflehog = {
+      enable = true;
+      # Scan entire repository including git history for secrets
+      # More thorough than ripsecrets but slower
+      pass_filenames = false;
+      # Only run on manual invocation or when files change
+      stages = [
+        "pre-commit"
+        "manual"
+      ];
+    };
+
+    # AWS credentials detection
+    detect-aws-credentials = {
+      enable = true;
+      # Allow missing credentials for local dev environments
+      args = [ "--allow-missing-credentials" ];
+    };
+
+    # Private key detection
+    detect-private-keys = {
+      enable = true;
+      # Critical for MCP servers that may handle authentication
+    };
+
+    # VCS permalink validation
+    check-vcs-permalinks = {
+      enable = true;
+      # Ensure documentation links are permanent (not subject to branch changes)
     };
 
     # ========== SLOWER CHECKS (5-30s) ==========
