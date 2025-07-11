@@ -28,8 +28,8 @@ import org.junit.jupiter.api.Test;
  * to remote production service.
  */
 @QuarkusTest
-@TestProfile(McpServerEndToEndTest.RemoteTestProfile.class)
-final class McpServerEndToEndTest extends McpIntegrationTestBase {
+@TestProfile(McpServerHerokuEndToEndTest.RemoteTestProfile.class)
+final class McpServerHerokuEndToEndTest extends McpIntegrationTestBase {
 
     private static final String REMOTE_SSE_URL = "https://us.inference.heroku.com/mcp/sse";
     private static final Duration REMOTE_TIMEOUT = Duration.ofSeconds(30);
@@ -49,7 +49,7 @@ final class McpServerEndToEndTest extends McpIntegrationTestBase {
 
         @Override
         public String getConfigProfile() {
-            return "end-to-end-test";
+            return "heroku-end-to-end-test";
         }
     }
 
