@@ -6,6 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.jasonriddle.mcp.time.TimeService;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
@@ -22,7 +25,8 @@ final class McpTimeToolsUnitTest {
 
     @BeforeEach
     void setUp() {
-        timeService = new TimeService();
+        final Clock fixedClock = Clock.fixed(Instant.parse("2006-01-02T15:04:05Z"), ZoneId.of("-07:00"));
+        timeService = new TimeService(fixedClock);
         mcpTimeTools = new McpTimeTools();
         mcpTimeTools.timeService = timeService;
     }

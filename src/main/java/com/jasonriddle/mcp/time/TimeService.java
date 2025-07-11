@@ -1,6 +1,8 @@
 package com.jasonriddle.mcp.time;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -17,6 +19,18 @@ public final class TimeService {
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
     private static final long SECONDS_PER_HOUR = 3600L;
 
+    private final Clock clock;
+
+    /**
+     * Create a new TimeService using the provided clock.
+     *
+     * @param clock clock instance used for time calculations.
+     */
+    @Inject
+    public TimeService(final Clock clock) {
+        this.clock = clock;
+    }
+
     /**
      * Get current time in specified timezone.
      *
@@ -27,7 +41,7 @@ public final class TimeService {
     public ZonedDateTime getCurrentTime(final String timezoneName) {
         try {
             final ZoneId timezone = ZoneId.of(timezoneName);
-            return ZonedDateTime.now(timezone);
+            return ZonedDateTime.now(clock.withZone(timezone));
         } catch (Exception e) {
             throw new IllegalArgumentException("Invalid timezone: " + timezoneName, e);
         }
@@ -49,7 +63,7 @@ public final class TimeService {
         final ZoneId targetZone = parseTimezone(targetTimezone);
         final LocalTime parsedTime = parseTimeString(timeString);
 
-        final LocalDate currentDate = LocalDate.now();
+        final LocalDate currentDate = LocalDate.now(clock);
         final ZonedDateTime sourceTime = ZonedDateTime.of(currentDate, parsedTime, sourceZone);
         final ZonedDateTime targetTime = sourceTime.withZoneSameInstant(targetZone);
 

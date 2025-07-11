@@ -2,6 +2,7 @@ package com.jasonriddle.mcp.time;
 
 import com.code_intelligence.jazzer.api.FuzzedDataProvider;
 import com.code_intelligence.jazzer.junit.FuzzTest;
+import java.time.Clock;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
@@ -10,7 +11,7 @@ import java.time.ZonedDateTime;
  */
 final class TimeServiceFuzzTest {
 
-    private final TimeService timeService = new TimeService();
+    private final TimeService timeService = new TimeService(Clock.systemDefaultZone());
 
     /**
      * Fuzz the {@link TimeService#getCurrentTime(String)} method.
