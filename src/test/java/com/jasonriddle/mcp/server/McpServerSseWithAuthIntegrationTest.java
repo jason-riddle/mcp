@@ -15,9 +15,9 @@ import jakarta.ws.rs.client.ClientRequestFilter;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.sse.SseEventSource;
 import java.net.URI;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.Map;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,25 +28,30 @@ import org.junit.jupiter.api.Test;
 @TestProfile(McpServerSseWithAuthIntegrationTest.AuthProfile.class)
 public class McpServerSseWithAuthIntegrationTest {
 
-    @TestHTTPResource("/v1/memory/mcp/sse")
+    @TestHTTPResource("/v1/mcp/sse")
     URI sseEndpoint;
 
-    private static final OidcTestClient oidcTestClient = new OidcTestClient();
+    private static final OidcTestClient OIDC_TEST_CLIENT = new OidcTestClient();
     private Client client;
 
     private static class BearerAuthFilter implements ClientRequestFilter {
         private final String token;
-        BearerAuthFilter(String token) { this.token = token; }
+
+        BearerAuthFilter(final String token) {
+            this.token = token;
+        }
+
         @Override
-        public void filter(ClientRequestContext requestContext) {
+        public void filter(final ClientRequestContext requestContext) {
             if (token != null) {
                 requestContext.getHeaders().add("Authorization", "Bearer " + token);
             }
         }
     }
 
-    private Client createAuthenticatedClient(String token) {
-        return ClientBuilder.newBuilder().register(new BearerAuthFilter(token)).build();
+    private Client createAuthenticatedClient(final String token) {
+        BearerAuthFilter authFilter = new BearerAuthFilter(token);
+        return ClientBuilder.newBuilder().register(authFilter).build();
     }
 
     /** Test profile with SSE and OIDC enabled. */
@@ -57,7 +62,7 @@ public class McpServerSseWithAuthIntegrationTest {
                     "memory.file.path", "memory-sse-auth-test.jsonl",
                     "weather.api.key", "test-api-key",
                     "quarkus.mcp.server.sse.root-path", "/v1/memory/mcp",
-                    "quarkus.http.auth.permission.authenticated.paths", "/v1/memory/mcp/sse",
+                    "quarkus.http.auth.permission.authenticated.paths", "/v1/mcp/sse",
                     "quarkus.http.auth.permission.authenticated.policy", "authenticated",
                     "quarkus.mcp.server.stdio.enabled", "false",
                     "quarkus.mcp.server.stdio.initialization-enabled", "false",
@@ -84,7 +89,7 @@ public class McpServerSseWithAuthIntegrationTest {
 
     @AfterAll
     static void closeClient() {
-        oidcTestClient.close();
+        OIDC_TEST_CLIENT.close();
     }
 
     @Test
@@ -101,7 +106,7 @@ public class McpServerSseWithAuthIntegrationTest {
 
     @Test
     void shouldConnectWithToken() throws InterruptedException {
-        String token = oidcTestClient.getAccessToken("alice", "alice");
+        String token = OIDC_TEST_CLIENT.getAccessToken("alice", "alice");
         Client authClient = createAuthenticatedClient(token);
         try {
             WebTarget target = authClient.target(sseEndpoint);

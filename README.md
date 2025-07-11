@@ -65,11 +65,6 @@ memory.file.path=memory.jsonl
 
 # STDIO transport is enabled for MCP communication
 quarkus.mcp.server.stdio.enabled=true
-
-# Optional HTTP/SSE transport
-quarkus.mcp.server.sse.root-path=/v1/memory/mcp
-quarkus.http.auth.permission.authenticated.paths=/v1/memory/mcp/sse
-quarkus.http.auth.permission.authenticated.policy=authenticated
 ```
 
 ## Usage
