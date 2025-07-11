@@ -44,16 +44,12 @@ final class McpServerEndToEndTest extends McpIntegrationTestBase {
     public static final class RemoteTestProfile implements QuarkusTestProfile {
         @Override
         public Map<String, String> getConfigOverrides() {
-            return Map.of(
-                    "memory.file.path", E2E_TEST_MEMORY_FILE,
-                    "weather.api.key", "test-api-key",
-                    "quarkus.mcp.server.stdio.enabled", "false",
-                    "quarkus.mcp.server.stdio.initialization-enabled", "false");
+            return Map.of("memory.file.path", E2E_TEST_MEMORY_FILE);
         }
 
         @Override
         public String getConfigProfile() {
-            return "e2e-test";
+            return "end-to-end-test";
         }
     }
 

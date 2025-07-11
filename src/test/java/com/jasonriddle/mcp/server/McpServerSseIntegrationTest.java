@@ -46,18 +46,12 @@ final class McpServerSseIntegrationTest extends McpIntegrationTestBase {
     public static final class TestProfile implements QuarkusTestProfile {
         @Override
         public Map<String, String> getConfigOverrides() {
-            return Map.of(
-                    "memory.file.path", SSE_TEST_MEMORY_FILE,
-                    "weather.api.key", "test-api-key",
-                    "quarkus.mcp.server.sse.root-path", "/mcp",
-                    "quarkus.mcp.server.traffic-logging.enabled", "true",
-                    "quarkus.mcp.server.stdio.enabled", "false",
-                    "quarkus.mcp.server.stdio.initialization-enabled", "false");
+            return Map.of("memory.file.path", SSE_TEST_MEMORY_FILE);
         }
 
         @Override
         public String getConfigProfile() {
-            return "sse-test";
+            return "sse-integration-test";
         }
     }
 

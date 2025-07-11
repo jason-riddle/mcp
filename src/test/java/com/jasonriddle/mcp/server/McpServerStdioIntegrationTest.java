@@ -40,17 +40,12 @@ final class McpServerStdioIntegrationTest extends McpIntegrationTestBase {
     public static final class TestProfile implements QuarkusTestProfile {
         @Override
         public Map<String, String> getConfigOverrides() {
-            return Map.of(
-                    "memory.file.path", STDIO_TEST_MEMORY_FILE,
-                    "weather.api.key", "test-api-key",
-                    "quarkus.mcp.server.stdio.enabled", "true",
-                    "quarkus.mcp.server.stdio.initialization-enabled", "true",
-                    "quarkus.mcp.server.stdio.null-system-out", "true");
+            return Map.of("memory.file.path", STDIO_TEST_MEMORY_FILE);
         }
 
         @Override
         public String getConfigProfile() {
-            return "stdio-test";
+            return "stdio-integration-test";
         }
     }
 

@@ -59,19 +59,12 @@ public class McpServerSseWithAuthIntegrationTest {
         @Override
         public Map<String, String> getConfigOverrides() {
             return Map.of(
-                    "memory.file.path", "memory-sse-auth-test.jsonl",
-                    "weather.api.key", "test-api-key",
-                    "quarkus.mcp.server.sse.root-path", "/v1/memory/mcp",
-                    "quarkus.http.auth.permission.authenticated.paths", "/v1/mcp/sse",
-                    "quarkus.http.auth.permission.authenticated.policy", "authenticated",
-                    "quarkus.mcp.server.stdio.enabled", "false",
-                    "quarkus.mcp.server.stdio.initialization-enabled", "false",
-                    "quarkus.mcp.server.traffic-logging.enabled", "true");
+                    "memory.file.path", "memory-sse-auth-test.jsonl");
         }
 
         @Override
         public String getConfigProfile() {
-            return "sse-auth-test";
+            return "sse-with-auth-integration-test";
         }
     }
 
