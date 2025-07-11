@@ -102,6 +102,11 @@
             <artifactId>quarkus-mcp-server-sse</artifactId>
             <version>${mcp.version}</version>
         </dependency>
+        <!-- OIDC Security -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-oidc</artifactId>
+        </dependency>
 
         <!-- REST Client for Weather API -->
         <dependency>
@@ -120,6 +125,12 @@
             <groupId>dev.langchain4j</groupId>
             <artifactId>langchain4j-mcp</artifactId>
             <version>1.1.0-beta7</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- OIDC Test Client -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-test-oidc-server</artifactId>
             <scope>test</scope>
         </dependency>
         <!-- jqwik for property-based testing with permutations -->
