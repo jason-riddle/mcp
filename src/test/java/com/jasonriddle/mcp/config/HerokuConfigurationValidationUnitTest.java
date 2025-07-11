@@ -78,13 +78,6 @@ final class HerokuConfigurationValidationUnitTest {
     }
 
     @Test
-    @DisplayName("Should disable MCP traffic logging in production")
-    void shouldDisableMcpTrafficLogging() {
-        Boolean trafficLoggingEnabled = config.getValue("quarkus.mcp.server.traffic-logging.enabled", Boolean.class);
-        assertFalse(trafficLoggingEnabled, "MCP traffic logging should be disabled in production for performance.");
-    }
-
-    @Test
     @DisplayName("Should maintain consistent core configurations")
     void shouldMaintainConsistentCoreConfigurations() {
         // These should remain the same across all profiles

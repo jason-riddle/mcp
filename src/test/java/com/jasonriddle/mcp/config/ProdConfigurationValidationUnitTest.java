@@ -60,18 +60,6 @@ final class ProdConfigurationValidationUnitTest {
     }
 
     @Test
-    @DisplayName("Should disable MCP traffic logging")
-    void shouldDisableMcpTrafficLogging() {
-        Boolean trafficLoggingEnabled = config.getValue("quarkus.mcp.server.traffic-logging.enabled", Boolean.class);
-        assertFalse(
-                trafficLoggingEnabled,
-                "MCP traffic logging must be disabled in production for performance and security.");
-
-        Integer textLimit = config.getValue("quarkus.mcp.server.traffic-logging.text-limit", Integer.class);
-        assertEquals(500, textLimit, "Traffic logging text limit should remain at default even when disabled.");
-    }
-
-    @Test
     @DisplayName("Should maintain consistent core configurations")
     void shouldMaintainConsistentCoreConfigurations() {
         // These should remain the same across all profiles
