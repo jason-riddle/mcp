@@ -3,4 +3,6 @@
 .devenv.flake.nix
 .env
 .env.local
+.idea
 .pre-commit-config.yaml
+target
