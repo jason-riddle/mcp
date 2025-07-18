@@ -1,4 +1,6 @@
 .claude
 .devenv
 .devenv.flake.nix
+.env
+.env.local
 .pre-commit-config.yaml
