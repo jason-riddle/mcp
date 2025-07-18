@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<!DOCTYPE suppressions PUBLIC
+        "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+        "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+
+<suppressions>
+    <!-- Suppress certain checks for test files (following Palantir patterns) -->
+    <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="AvoidStaticImport"/>
+    <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="JavadocMethod"/>
+    <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="JavadocType"/>
+    <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="MagicNumber"/>
+    <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="MissingJavadocMethod"/>
+    <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="MissingJavadocType"/>
+    <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="MultipleStringLiterals"/>
+    <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="VisibilityModifier"/>
+    <!-- Suppress only specific regex checks for tests that would interfere with testing -->
+    <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="RegexpSinglelineJava" message="console output"/>
+    <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="RegexpSinglelineJava" message="printStackTrace"/>
+    <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="RegexpSinglelineJava" message="Avoid var with complex right-hand side.*"/>
+    <suppress files="[/\\]src[/\\].*[Tt]est[/\\]java[/\\]" checks="RegexpSinglelineJava" message="Avoid var with diamond operator.*"/>
+    <!-- Keep important style rules even in tests -->
+    <!-- ModifierOrder, NeedBraces, LeftCurly, RightCurly still apply to tests -->
+
+    <!-- Integration test naming patterns -->
+    <suppress files=".*IT\.java" checks="AbbreviationAsWordInName"/>
+    <suppress files=".*IntegrationTest\.java" checks="AbbreviationAsWordInName"/>
+
+    <!-- Allow longer lines for method chaining in resource/prompt classes -->
+    <suppress files=".*McpMemoryResources\.java" checks="LineLength"/>
+    <suppress files=".*McpMemoryPrompts\.java" checks="LineLength"/>
+
+    <!-- Allow string literals in template-heavy classes -->
+    <suppress files=".*McpMemoryResources\.java" checks="MultipleStringLiterals"/>
+    <suppress files=".*McpMemoryTools\.java" checks="MultipleStringLiterals"/>
+
+    <!-- Allow higher complexity in resource generation classes -->
+    <suppress files=".*McpMemoryResources\.java" checks="NPathComplexity"/>
+    <suppress files=".*McpMemoryResources\.java" checks="CyclomaticComplexity"/>
+
+    <!-- Generated code suppressions -->
+    <suppress files=".*[/\\]generated[/\\].*\.java" checks=".*"/>
+    <suppress files=".*[/\\]target[/\\]generated-sources[/\\].*\.java" checks=".*"/>
+
+    <!-- Configuration classes that may need public fields -->
+    <suppress files=".*Config\.java" checks="VisibilityModifier"/>
+    <suppress files=".*Configuration\.java" checks="VisibilityModifier"/>
+    <suppress files=".*Properties\.java" checks="VisibilityModifier"/>
+
+    <!-- Record classes have different javadoc requirements -->
+    <suppress files=".*Record\.java" checks="JavadocMethod"/>
+    <suppress files=".*\.java" checks="JavadocMethod" message=".*record component.*"/>
+</suppressions>

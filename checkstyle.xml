@@ -1,0 +1,444 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC
+        "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+        "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<!--
+    Palantir-inspired Checkstyle configuration for mcp-jasonriddle-com
+    Based on Palantir Baseline Checkstyle configuration
+    Authors: Based on work by Robert Fink, Brian Worth, Merrick Zoubeiri, and contributors
+    Reference: https://github.com/palantir/gradle-baseline
+-->
+
+<module name="Checker">
+    <property name="charset" value="UTF-8"/>
+    <property name="severity" value="error"/>
+    <property name="fileExtensions" value="java, properties, xml"/>
+
+    <!-- Suppression Configuration -->
+    <module name="SuppressionFilter">
+        <property name="file" value="checkstyle-suppressions.xml"/>
+        <property name="optional" value="false"/>
+    </module>
+    <module name="SuppressWarningsFilter"/>
+
+    <!-- File-Level Formatting -->
+    <module name="FileTabCharacter"/>
+    <module name="NewlineAtEndOfFile">
+        <property name="lineSeparator" value="lf"/>
+    </module>
+
+    <!-- File-Level Pattern Enforcement -->
+    <module name="RegexpSingleline">
+        <property name="format" value="&lt;&lt;&lt;&lt;&lt;&lt;&lt;"/>
+        <property name="message" value="Found (&lt;&lt;&lt;&lt;&lt;&lt;&lt;), so it looks like you had a merge conflict that compiles. Please fix it."/>
+    </module>
+    <module name="RegexpSingleline">
+        <property name="format" value="\s+$"/>
+        <property name="message" value="Whitespace at end-of-line"/>
+    </module>
+    <module name="RegexpMultiline">
+        <property name="fileExtensions" value="java"/>
+        <property name="format" value="^\n\n$"/>
+        <property name="message" value="Two consecutive blank lines are not permitted."/>
+    </module>
+    <module name="RegexpMultiline">
+        <property name="fileExtensions" value="java"/>
+        <property name="format" value="if\s*\([^{]*&amp;&amp;[^{]*&amp;&amp;[^{]*\)\s*\{"/>
+        <property name="message" value="Complex if statements with multiple &amp;&amp; operators are banned - extract conditions to separate boolean variables for better readability"/>
+    </module>
+    <module name="RegexpSingleline">
+        <property name="format" value="\uFEFF"/>
+        <property name="message" value="UTF-8 BOM detected - files should not contain Byte Order Mark"/>
+    </module>
+
+    <!-- Line Length Constraints -->
+    <module name="LineLength">
+        <property name="max" value="120"/>
+        <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
+        <property name="fileExtensions" value="java"/>
+    </module>
+
+    <!-- TreeWalker for Java source files -->
+    <module name="TreeWalker">
+        <property name="tabWidth" value="4"/>
+        <module name="SuppressWarningsHolder"/>
+
+        <!-- 1. Core Language Structure -->
+
+        <!-- Naming Conventions -->
+        <module name="AbbreviationAsWordInName">
+            <property name="ignoreFinal" value="false"/>
+            <property name="allowedAbbreviationLength" value="1"/>
+            <property name="allowedAbbreviations" value="XML,HTTP,JSON,API,URL,URI,UUID,DTO,MCP,SSE,VCR,JUnit,PIT"/>
+        </module>
+        <module name="ClassTypeParameterName"/>
+        <module name="ConstantName"/>
+        <module name="InterfaceTypeParameterName"/>
+        <module name="LocalFinalVariableName"/>
+        <module name="LocalVariableName"/>
+        <module name="MemberName"/>
+        <module name="MethodName"/>
+        <module name="MethodTypeParameterName"/>
+        <module name="PackageName">
+            <property name="format" value="^[a-z]+(\.[a-z][a-z0-9]*)*$"/>
+        </module>
+        <module name="ParameterName"/>
+        <module name="StaticVariableName"/>
+        <module name="TypeName"/>
+
+        <!-- Import Management -->
+        <module name="AvoidStarImport"/>
+        <module name="AvoidStaticImport">
+            <property name="excludes" value="com.google.common.base.Preconditions.*, java.util.Collections.*, org.assertj.core.api.Assertions.*, org.mockito.Mockito.*"/>
+        </module>
+        <module name="IllegalImport">
+            <property name="illegalPkgs" value="junit.framework, sun"/>
+            <property name="illegalClasses" value="com.google.common.base.Optional, com.google.common.base.Supplier, java.util.stream.Collectors, java.util.logging.Logger"/>
+            <message key="import.illegal" value="Forbidden imports: JUnit 3 (use org.junit.*), Oracle internals (sun.*), legacy Guava (use Java 8 equivalents), Collectors (use simple loops instead), JUL Logger (use org.slf4j.Logger instead)"/>
+        </module>
+        <module name="RedundantImport"/>
+        <module name="UnusedImports">
+            <property name="processJavadoc" value="true"/>
+        </module>
+
+        <!-- 2. Code Architecture -->
+
+        <!-- Size Constraints -->
+        <module name="MethodLength">
+            <property name="max" value="150"/>
+        </module>
+        <module name="ParameterNumber">
+            <property name="max" value="8"/>
+        </module>
+
+        <!-- Class Design -->
+        <module name="FinalClass"/>
+        <module name="HideUtilityClassConstructor"/>
+        <module name="InterfaceIsType"/>
+        <module name="VisibilityModifier">
+            <property name="packageAllowed" value="true"/>
+            <property name="protectedAllowed" value="true"/>
+        </module>
+
+        <!-- Method Design -->
+        <module name="FinalParameters">
+            <property name="tokens" value="METHOD_DEF,CTOR_DEF"/>
+        </module>
+
+        <!-- 3. Code Quality & Safety -->
+
+        <!-- Type Safety -->
+        <module name="IllegalType">
+            <property name="illegalClassNames" value="java.util.ArrayList, java.util.HashSet, java.util.HashMap, java.util.LinkedList, java.util.LinkedHashMap, java.util.LinkedHashSet, java.util.TreeSet, java.util.TreeMap"/>
+            <message key="illegal.type" value="Use interface types (List, Set, Map) instead of concrete implementations in APIs"/>
+        </module>
+        <module name="IllegalInstantiation">
+            <property name="classes" value="java.lang.Boolean, java.lang.Byte, java.lang.Character, java.lang.Double, java.lang.Float, java.lang.Integer, java.lang.Long"/>
+        </module>
+
+        <!-- Coding Problems -->
+        <module name="EmptyStatement"/>
+        <module name="EqualsHashCode"/>
+        <module name="HiddenField">
+            <property name="ignoreConstructorParameter" value="true"/>
+            <property name="ignoreSetter" value="true"/>
+        </module>
+        <module name="InnerAssignment"/>
+        <module name="MagicNumber">
+            <property name="ignoreNumbers" value="-1, 0, 1, 2, 8, 10, 16, 100, 1000"/>
+            <property name="ignoreHashCodeMethod" value="true"/>
+            <property name="ignoreAnnotation" value="true"/>
+        </module>
+        <module name="MissingSwitchDefault"/>
+        <module name="MultipleStringLiterals">
+            <property name="allowedDuplicates" value="2"/>
+        </module>
+        <module name="MultipleVariableDeclarations"/>
+        <module name="SimplifyBooleanExpression"/>
+        <module name="SimplifyBooleanReturn"/>
+
+        <!-- Pattern Enforcement -->
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="System\.(out|err)\.|\.printStackTrace\(\)"/>
+            <property name="message" value="Use proper logging instead of console output or printStackTrace"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\.\w+\s*\(\s*new\s+\w+\s*\("/>
+            <property name="message" value="Extract object instantiation to separate variable before method call for better debugging"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="Map\.of\s*\([^)]*Map\.of\s*\("/>
+            <property name="message" value="Avoid nested Map.of calls - extract inner maps to separate variables for better readability"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\w+\(\)\..*\(\)\..*\(\)\..*\(\)"/>
+            <property name="message" value="Avoid excessive method chaining (4+ chained calls) - extract intermediate variables for better readability"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\w+\([^)]*\|\|[^)]*\)"/>
+            <property name="message" value="Avoid logical OR (||) inside method calls - extract to boolean variables for better readability"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\.stream\(\)"/>
+            <property name="message" value="stream() is banned - use simple loops instead for better readability and maintainability"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\.map\("/>
+            <property name="message" value="map() is banned - use simple loops instead for better readability"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\.collect\("/>
+            <property name="message" value="collect() is banned - use simple loops instead for better readability"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="Collectors\."/>
+            <property name="message" value="Collectors usage is banned - use simple loops instead for better readability and performance"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\.filter\("/>
+            <property name="message" value="filter() is banned - use simple if statements in loops for better readability"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\.removeIf\("/>
+            <property name="message" value="removeIf() is banned - use simple loops with explicit removal logic for better readability"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\.forEach\("/>
+            <property name="message" value="forEach() is banned - use simple for-each loops for better readability"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="->\s*!"/>
+            <property name="message" value="Avoid negation at the start of lambda expressions - extract to a named boolean variable for clarity"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="if\s*\([^)]*&amp;&amp;[^)]*&amp;&amp;"/>
+            <property name="message" value="Complex if statements with multiple &amp;&amp; operators are banned - extract conditions to separate boolean variables for better readability"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="(\w+)\s*\|\|\s*!\s*\1\s*[;\)]"/>
+            <property name="message" value="Tautological expressions (x || !x) are always true and should be removed"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="(\w+)\s*&amp;&amp;\s*!\s*\1\s*[;\)]"/>
+            <property name="message" value="Contradictory expressions (x &amp;&amp; !x) are always false and should be removed"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\w+\s*\?\s*[^:]+\s*:\s*[^;]+"/>
+            <property name="message" value="Ternary operators are banned - use if-else statements for better readability"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+
+        <!-- Ban Optional chaining -->
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\.map\(.*\.filter\(|\.filter\(.*\.map\("/>
+            <property name="message" value="Optional chaining is banned - use simple if statements instead"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\.flatMap\("/>
+            <property name="message" value="Optional.flatMap() is banned - use simple if statements instead"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\.orElseGet\(.*\.orElse\(|\.orElse\(.*\.orElseGet\("/>
+            <property name="message" value="Optional chaining with multiple fallbacks is banned - use simple if-else logic"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+
+        <!-- Ban CompletableFuture chaining -->
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\.thenApply\("/>
+            <property name="message" value="CompletableFuture.thenApply() chaining is banned - use simple async patterns"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\.thenCompose\("/>
+            <property name="message" value="CompletableFuture.thenCompose() chaining is banned - use simple async patterns"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\.thenCombine\("/>
+            <property name="message" value="CompletableFuture.thenCombine() chaining is banned - use simple async patterns"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\.whenComplete\("/>
+            <property name="message" value="CompletableFuture.whenComplete() chaining is banned - use simple async patterns"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+
+        <!-- Ban Module System complexity -->
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="module\s+\w+\s*\{"/>
+            <property name="message" value="Module system is banned - use simple classpath-based projects"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+
+        <!-- Ban Pattern Matching complexity -->
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="switch\s*\([^)]*\)\s*\{[^}]*case.*\s+when\s+"/>
+            <property name="message" value="Pattern matching with guards is banned - use simple switch or if-else"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="case.*\(.*\)\s*when\s+"/>
+            <property name="message" value="Pattern matching with when guards is banned - use simple switch or if-else"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+
+        <!-- Ban Sealed Classes -->
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="sealed\s+(class|interface)"/>
+            <property name="message" value="Sealed classes/interfaces are banned - use regular inheritance"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="permits\s+\w+"/>
+            <property name="message" value="Sealed class permits clause is banned - use regular inheritance"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+
+        <!-- Enforce VCR abbreviation capitalization -->
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="(?&lt;![a-z])Vcr(?![a-z])"/>
+            <property name="message" value="Use 'VCR' instead of 'Vcr' - VCR must be fully capitalized as it's an abbreviation for Video Cassette Recorder"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+
+        <!-- Ban meaningless test assertions -->
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="assertTrue\s*\(\s*true\s*\)"/>
+            <property name="message" value="assertTrue(true) is meaningless - write a meaningful assertion instead"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="assertFalse\s*\(\s*false\s*\)"/>
+            <property name="message" value="assertFalse(false) is meaningless - write a meaningful assertion instead"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+
+        <!-- Modern Java Features Guidelines -->
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="var\s+\w+\s*=\s*new\s+\w+&lt;&gt;\(\)"/>
+            <property name="message" value="Avoid var with diamond operator - either use explicit type or var with clear initialization"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="var\s+\w+\s*=\s*[^;]{50,}"/>
+            <property name="message" value="Avoid var with complex right-hand side - extract to intermediate variable for clarity"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+
+        <!-- 4. Code Style -->
+
+        <!-- Whitespace -->
+        <module name="EmptyForIteratorPad"/>
+        <module name="GenericWhitespace"/>
+        <module name="MethodParamPad"/>
+        <module name="NoWhitespaceAfter"/>
+        <module name="NoWhitespaceBefore"/>
+        <module name="OperatorWrap"/>
+        <module name="ParenPad"/>
+        <module name="TypecastParenPad"/>
+        <module name="WhitespaceAfter"/>
+        <module name="WhitespaceAround">
+            <property name="allowEmptyConstructors" value="true"/>
+            <property name="allowEmptyMethods" value="true"/>
+            <property name="allowEmptyTypes" value="true"/>
+            <property name="allowEmptyLoops" value="true"/>
+            <property name="allowEmptyLambdas" value="true"/>
+        </module>
+
+        <!-- Blocks & Braces -->
+        <module name="AvoidNestedBlocks"/>
+        <module name="EmptyBlock"/>
+        <module name="LeftCurly"/>
+        <module name="NeedBraces"/>
+        <module name="RightCurly"/>
+
+        <!-- Modifiers -->
+        <module name="ModifierOrder"/>
+        <module name="RedundantModifier"/>
+
+        <!-- Miscellaneous Style -->
+        <module name="ArrayTypeStyle"/>
+        <module name="UpperEll"/>
+
+        <!-- Code Complexity Metrics -->
+        <module name="CyclomaticComplexity">
+            <property name="max" value="8"/>
+            <property name="switchBlockAsSingleDecisionPoint" value="true"/>
+            <message key="cyclomaticComplexity" value="Method complexity is {0,number,integer} (max allowed is {1,number,integer}). Consider breaking down this method."/>
+        </module>
+
+        <module name="NPathComplexity">
+            <property name="max" value="100"/>
+            <message key="npathComplexity" value="Method NPATH complexity is {0,number,integer} (max allowed is {1,number,integer}). Consider simplifying this method."/>
+        </module>
+
+        <!-- 5. Documentation -->
+
+        <!-- Javadoc Requirements -->
+        <module name="JavadocMethod">
+            <property name="tokens" value="METHOD_DEF"/>
+            <property name="allowMissingParamTags" value="false"/>
+            <property name="allowMissingReturnTag" value="false"/>
+        </module>
+        <module name="JavadocType">
+            <property name="tokens" value="CLASS_DEF, INTERFACE_DEF, ENUM_DEF"/>
+        </module>
+        <module name="JavadocStyle">
+            <property name="checkFirstSentence" value="true"/>
+            <property name="endOfSentenceFormat" value="([.?!][ \t\n\r\f&lt;])|([.?!]$)"/>
+            <property name="checkEmptyJavadoc" value="false"/>
+            <property name="checkHtml" value="false"/>
+        </module>
+        <module name="MissingJavadocMethod">
+            <property name="tokens" value="METHOD_DEF"/>
+            <property name="allowMissingPropertyJavadoc" value="true"/>
+            <property name="scope" value="public"/>
+        </module>
+        <module name="MissingJavadocType">
+            <property name="tokens" value="CLASS_DEF, INTERFACE_DEF, ENUM_DEF"/>
+        </module>
+        <module name="SummaryJavadoc">
+            <property name="forbiddenSummaryFragments" value="^@return the *|^This method returns |^A [{]@code [a-zA-Z0-9]+[}]( is a )"/>
+            <property name="period" value="."/>
+        </module>
+
+        <!-- Comment Standards -->
+        <module name="TodoComment">
+            <property name="severity" value="info"/>
+        </module>
+
+        <!-- 6. Annotations -->
+
+        <!-- Annotation Placement -->
+        <module name="AnnotationLocation">
+            <property name="id" value="AnnotationLocationMostCases"/>
+            <property name="tokens" value="CLASS_DEF, INTERFACE_DEF, ENUM_DEF, METHOD_DEF, CTOR_DEF"/>
+        </module>
+        <module name="AnnotationLocation">
+            <property name="id" value="AnnotationLocationVariables"/>
+            <property name="tokens" value="VARIABLE_DEF"/>
+            <property name="allowSamelineMultipleAnnotations" value="true"/>
+        </module>
+    </module>
+</module>
