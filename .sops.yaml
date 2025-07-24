@@ -1,0 +1,16 @@
+creation_rules:
+  # Default rule for YAML and JSON files
+  - path_regex: \.((ya?ml)|(json))$
+    encrypted_regex: '^(data|stringData|password|secret|key|token|cert|ca|crt|private.*|.*_key|.*_secret|.*_password|.*_token)$'
+    
+  # Rule for environment files
+  - path_regex: \.env.*
+    encrypted_regex: '^.*(password|secret|key|token|cert|ca|private).*$'
+    
+  # Rule for properties files
+  - path_regex: \.properties$
+    encrypted_regex: '^.*(password|secret|key|token|cert|ca|private).*$'
+    
+  # Rule for specific secret files
+  - path_regex: secrets/.*\.(ya?ml|json|env)$
+    encrypted_regex: '^.*$'
